@@ -1,11 +1,9 @@
-from flask import Flask
-
-app = Flask(__name__)
-
+from flask import render_template
+from flask_init import app
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return render_template("index.html")
 
 
 # # Press the green button in the gutter to run the script.

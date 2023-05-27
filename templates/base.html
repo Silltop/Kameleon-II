@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Kameleon - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/halfmoon.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/halfmoon-variables.css') }}">
+    <script src="{{ url_for('static', filename='js/halfmoon.js') }}"></script>
+<!--    <script src="{{ url_for('static', filename='js/halfmoon-module.js') }}"></script>-->
+    <script type="text/javascript">
+      // Dark mode toggle demo
+      function toggleDemo() {
+        halfmoon.toggleDarkMode();
+      }
+    </script>
 </head>
 <body>
+{% block content %}
 
+{% endblock %}
 </body>
 </html>
