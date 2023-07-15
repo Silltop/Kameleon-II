@@ -1,6 +1,6 @@
 from flask import render_template
 
-from ansible_wrapper import check_service_status
+# from ansible_wrapper import check_service_status
 from flask_init import app
 import logging_setup
 import flask_routes

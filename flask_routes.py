@@ -1,6 +1,6 @@
 from flask import render_template
 
-from ansible_wrapper import check_service_status
+# from ansible_wrapper import check_service_status
 from flask_init import app
 from utils import get_managed_hosts
 

@@ -14,6 +14,8 @@ def get_managed_hosts():
             user = line[1].replace("ansible_user=", '')
             to_return.append((host, user))
         return to_return
+
+
 def dns_resolve_ip(domain: str):
     resolver = dns.resolver.Resolver()
     resolver.nameservers = [config.dns_ip]
@@ -24,4 +26,3 @@ def dns_resolve_ns(domain: str):
     resolver = dns.resolver.Resolver()
     resolver.nameservers = [config.dns_ip]
     return resolver.resolve(domain, 'NS')[0]
-
