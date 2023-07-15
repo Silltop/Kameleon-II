@@ -1,16 +1,11 @@
 from flask import render_template
+
+from ansible_wrapper import check_service_status
 from flask_init import app
 import logging_setup
-
-
-@app.route("/")
-def hello_world():
-    app.logger.info('hello there')
-    variable = "HELLO THERE"
-    return render_template("index.html", ala=variable)
-
+import flask_routes
 
 # # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    app.run()
+    app.run(debug=True, use_reloader=True)

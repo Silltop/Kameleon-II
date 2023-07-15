@@ -1,5 +1,8 @@
 flask>=2.3.2
 requests
 paramiko
-ansible>=7.6.0
+ansible
 distro>=1.8.0
+ansible-runner
+Flask-SQLAlchemy
+dnspython

@@ -1,0 +1,12 @@
+<div class="container-fluid">
+ <h4>Disk usage:</h4>
+{% for element in meter %}
+
+<div class="row h-25"><div class="col-sm-1">{{element.name}}</div>
+ <div class="col-auto">
+   <meter min="0" max="100" low="60" high="80" value="{{element.value}}" data-toggle="tooltip" data-title="{{element.value}} %"></meter>
+ </div>
+</div>
+
+{% endfor %}
+</div>

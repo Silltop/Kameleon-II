@@ -1,0 +1,86 @@
+  .mask_container {
+    background: linear-gradient(115deg, #eeeeef, #ebebeb, #f5f5f5, #576363, #25282c, #191c20, #111417);
+    background-size: 300% 300%;
+    -webkit-animation: Animation 6s ease infinite;
+    -moz-animation: Animation 6s ease infinite;
+    animation: Animation 6s ease infinite;
+  }
+
+  .mask_container {
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-type: alpha;
+    mask-size: contain;
+    mask-type: alpha;
+    mask-mode: alpha;
+    width: 5rem;
+    height: 5rem;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: #576363;
+    overflow: visible;
+  }
+
+  @media (max-width: 979px) {
+    .mask_container {
+      width: 2em;
+      height: 2em;
+    }
+  }
+
+  @-webkit-keyframes Animation {
+    0% {
+      background-position: 10% 0
+    }
+
+    50% {
+      background-position: 91% 100%
+    }
+
+    100% {
+      background-position: 10% 0
+    }
+  }
+
+  @-moz-keyframes Animation {
+    0% {
+      background-position: 10% 0
+    }
+
+    50% {
+      background-position: 91% 100%
+    }
+
+    100% {
+      background-position: 10% 0
+    }
+  }
+
+  @keyframes Animation {
+    0% {
+      background-position: 10% 0
+    }
+
+    50% {
+      background-position: 91% 100%
+    }
+
+    100% {
+      background-position: 10% 0
+    }
+  }
+
+  @media screen and (max-width: 769px) {
+    .nav-link {
+      width: 100%;
+    }
+
+    .mask_holder {
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .mask_container {
+      margin-right: 10px;
+    }
+  }
