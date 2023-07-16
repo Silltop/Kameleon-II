@@ -1,0 +1,13 @@
+<div class="container-fluid">
+ <h4>Disk usage:</h4>
+{% for host, values_list in disk_data.items() %}
+    {{ host }}
+{% for entry in values_list %}
+    <div class="row h-25"><div class="col-sm-1">{{entry.device}}</div>
+     <div class="col-auto">
+       <meter min="0" max="100" low="60" high="80" value="{{entry.used}}" data-toggle="tooltip" data-title="{{entry.used}} of {{entry.size}}"></meter>
+     </div>
+    </div>
+{% endfor %}
+{% endfor %}
+</div>

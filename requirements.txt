@@ -1,4 +1,5 @@
 flask>=2.3.2
+pint
 requests
 paramiko
 ansible
@@ -6,3 +7,5 @@ distro>=1.8.0
 ansible-runner
 Flask-SQLAlchemy
 dnspython
+flask-CKEditor
+parallel-ssh

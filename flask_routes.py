@@ -2,6 +2,7 @@ from flask import render_template
 
 # from ansible_wrapper import check_service_status
 from flask_init import app
+from ssh_connection_functions_core import get_disk_devices_status
 from utils import get_managed_hosts
 
 
@@ -17,7 +18,8 @@ def configuration_page():
 
 
 @app.route("/")
-def hello_world():
-    app.logger.info('hello there')
-    check_service_status('ssh')
-    return render_template("index.html")
+def index():
+    # app.logger.info('hello there')
+    disk_status = get_disk_devices_status()
+    print(type(disk_status))
+    return render_template("index.html", disk_data=disk_status)
