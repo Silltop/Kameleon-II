@@ -17,9 +17,14 @@ def configuration_page():
     return render_template("config.html", managed_hosts=mh)
 
 
+@app.route("/disks")
+def disk_status():
+    return render_template("disks-status.html", disk_data=get_disk_devices_status())
+
+
 @app.route("/")
 def index():
     # app.logger.info('hello there')
-    disk_status = get_disk_devices_status()
+
     print(type(disk_status))
-    return render_template("index.html", disk_data=disk_status)
+    return render_template("index.html")

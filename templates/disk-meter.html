@@ -1,13 +1,31 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+<script src="{{ url_for('static', filename='js/bucket-fill.js') }}"></script>
+
 <div class="container-fluid">
- <h4>Disk usage:</h4>
+
 {% for host, values_list in disk_data.items() %}
     {{ host }}
+    <div class="row row-box">
+
 {% for entry in values_list %}
-    <div class="row h-25"><div class="col-sm-1">{{entry.device}}</div>
-     <div class="col-auto">
-       <meter min="0" max="100" low="60" high="80" value="{{entry.used}}" data-toggle="tooltip" data-title="{{entry.used}} of {{entry.size}}"></meter>
-     </div>
+<div class="bucket bg-light-lm bg-dark-dm">
+  <div class="vertical-meter" id="{{host.replace('.','')}}{{entry.device.replace('//', '')}}">
+   </div>
+    <div class="bucket-content">
+        <div class="text-break bucket-top">{{entry.device}}</div>
+        <div class="font-size-12 bucket-bottom">{{entry.used}}/{{entry.size}}</div>
+
     </div>
+
+</div>
+<script>
+    fillContainerById({{entry.percentage}}, '{{host.replace('.','')}}{{entry.device.replace('//', '')}}'); // Fill the container to 80%
+</script>
+
+
 {% endfor %}
+  </div>
 {% endfor %}
+
+
 </div>

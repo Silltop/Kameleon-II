@@ -34,13 +34,13 @@ def get_linux_distro():
 
 
 def get_disk_devices_status():
-    results = execute_command("df -h | awk 'NR>1 {print $1, $2, $3}'")
+    results = execute_command("df -h | awk 'NR>1 {print $1, $2, $3, $5}'")
     results_to_return = {}
     for host, values in results.items():
         new_list = []
         for list_entry in values:
-            device, size, used = list_entry.split(" ")
-            new_list.append({'device': device, 'size': size, 'used': used.strip("\n")})
+            device, size, used, percentage = list_entry.split(" ")
+            new_list.append({'device': device, 'size': size, 'used': used, 'percentage': percentage.strip("%\n")})
         results_to_return[host] = new_list
     return results_to_return
 

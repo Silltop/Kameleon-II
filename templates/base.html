@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <title>Kameleon - {% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/halfmoon.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome-all.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/halfmoon-variables.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/anim.css') }}">
     <script src="{{ url_for('static', filename='js/halfmoon.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/font-awesome-all.js') }}"></script>
 <!--    <script src="{{ url_for('static', filename='js/halfmoon-module.js') }}"></script>-->
-    <script type="text/javascript">
+    <script>
       // Dark mode toggle demo
       function toggleDemo() {
         halfmoon.toggleDarkMode();
@@ -18,14 +20,16 @@
 <body>
 <div class="page-wrapper with-navbar">
 
-{% include 'login-modal.html' %}
-{% include 'navbar.html' %}
 
+{% include 'navbar.html' %}
+{% include 'login-modal.html' %}
+
+<div class="content-wrapper">
 {% block content %}
 
 {% endblock %}
-
-<script type="text/javascript">
+</div>
+<script>
  // Make sure that the cookie exists
  if (halfmoon.readCookie("halfmoon_preferredMode")) {
    if (halfmoon.readCookie("halfmoon_preferredMode") == "light-mode") {

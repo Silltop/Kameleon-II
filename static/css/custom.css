@@ -1,0 +1,59 @@
+.bucket {
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
+    box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
+    border: 1px solid #000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .vertical-meter {
+    width: inherit;
+    position: absolute;
+    animation: gradient 5s ease infinite;
+    background-size: 100% 200%;
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-origin: content-box;
+    box-sizing: border-box;
+  }
+
+  .bucket-content{
+    padding: 2px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+    width: inherit;
+  }
+  .bucket-top{
+    display: flex;
+    height: 50%;
+    font-size: 1.1rem;
+  }
+  .bucket-bottom{
+    display: flex;
+    height: 50%;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+  }
+
+  @keyframes bucket-gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+  .row-box{
+    padding: 1%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
