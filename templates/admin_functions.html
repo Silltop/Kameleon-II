@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Admin Functions{% endblock %}
+{% block content %}
+
+{% include 'result-modal.html' %}
+
+<div class="container-fluid">
+    <div class="card w-400 mw-full">
+      <h2 class="card-title">
+        Check Mailing Services
+      </h2>
+      <p border-bottom>
+        This functionality will run Service check on desired host and return result.
+          Checked Services: Exim, Dovecot, Spamassasin
+      </p>
+      <div class="text-right"> <!-- text-right = text-align: right -->
+
+        <!-- Third row -->
+        <div class="form-row row-eq-spacing-md d-flex justify-content-end align-items-center">
+          <label for="state" class="required">Hosts</label>
+          <div class="col-md-4">
+            <select class="form-control" id="state" required="required">
+              <option value="all" selected="selected" >All</option>
+              {% for host in host_list %}
+              <option value="{{host}}">{{host}}</option>
+              {% endfor %}
+            </select>
+
+          </div>
+        <a href="#" class="btn">Run</a>
+      </div>
+    </div>
+</div>
+{% endblock %}

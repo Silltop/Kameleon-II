@@ -3,5 +3,37 @@
 {% block content %}
 
 <div class="container-fluid">
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Host</th>
+      <th>Distribution</th>
+      <th>Kernel Version</th>
+      <th>IP's</th>
+      <th>Users</th>
+      <th>Disk devices</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ip, host_details in host_details_list.items() %}
+    <tr>
+      <th>{{host_details.hostname}}</th>
+      <th>{{host_details.distro}}</th>
+      <th>{{host_details.kernel}}</th>
+      <td>{{host_details.ips}}</td>
+      <td>{{host_details.users}}</td>
+      <td>
+        <div style="overflow-y: auto; height: 5em;">
+        {% for device in host_details.devices %}
+        {{device}} <br>
+        {% endfor %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 </div>
 {% endblock %}

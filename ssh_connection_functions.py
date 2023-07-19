@@ -5,12 +5,9 @@ from utils import get_managed_hosts
 from ssh_connection_functions_core import *
 
 
-def read_file(rfile):
-    for line in rfile:
-        pass
-        # print(line)
-    return "hello there"
+def check_mailing_services():
+    dovecot = get_service_status('dovecot')
+    exim = get_service_status('exim')
+    spamassasin = get_service_status('spamassasin')
 
-
-get_linux_distro()
-print(execute_function_on_remote_file('/etc/passwd', read_file))
+print(check_mailing_services())
