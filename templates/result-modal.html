@@ -1,20 +1,22 @@
-<div class="modal" id="modal-1" tabindex="-1" role="dialog">
+<div class="modal" id="result-modal" tabindex="-1" role="dialog" data-overlay-dismissal-disabled="true" data-esc-dismissal-disabled="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <a href="#" class="close" role="button" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </a>
       <h5 class="modal-title">Execution Status</h5>
       <p>
-        This is the modal content. Almost any type of content can be presented to the user here.
+        {% for host, status, status_details in results %}
+         <div>{{host}} status:
+          {% if status.lower() == 'ok' %}
+          <span class="text-success">{{status}}</span>
+          {% else %}
+          <span class="text-danger">{{status}}</span>
+          {% endif %}
+      <br><p class="text-muted font-size-12">{{status_details}}</p></div>
+        <hr>
+        {% endfor %}
       </p>
       <div class="text-right mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
-        <a href="#" class="btn mr-5" role="button">Close</a>
-        <a href="#" class="btn btn-primary" role="button">I understand</a>
+        <a href="#" class="btn mr-5" onclick="halfmoon.toggleModal('result-modal')" role="button">Close</a>
       </div>
     </div>
   </div>
 </div>
-<script>
-  halfmoon.toggleModal('modal-1');
-</script>

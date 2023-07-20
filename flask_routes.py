@@ -1,20 +1,28 @@
-from flask import render_template
+from flask import render_template, url_for, redirect, session
 
 # from ansible_wrapper import check_service_status
 from flask_init import app
 from ssh_connection_functions_core import get_disk_devices_status, gather_facts
 from utils import get_managed_hosts, get_hosts_only
+import admin_functions
 
+@app.route("/admin-functions")
+def admin_functions_render():
+    results = session.pop('results', [])
+    return render_template("admin_functions.html", host_list=get_hosts_only(), results=results)
+@app.route("/run-function/<functionname>")
+def run_admin_function(functionname):
+    print(functionname)
+    adm_function = getattr(admin_functions, functionname)
+    session['results'] = adm_function()
+    return redirect(url_for('admin_functions_render'))
 
 @app.route("/login")
 def login():
     return render_template("login.html")
 
 
-@app.route("/admin-functions")
-def admin_functions():
 
-    return render_template("admin_functions.html", host_list=get_hosts_only())
 
 
 @app.route("/config")

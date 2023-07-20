@@ -6,11 +6,6 @@ Notes:
     3. Of course, I tested, locally keys using ssh -i command.
 """
 import ipaddress
-
-import paramiko
-from pint import UnitRegistry
-
-import config
 from utils import get_managed_hosts, get_hosts_only
 from pssh.clients import ParallelSSHClient
 
@@ -18,12 +13,18 @@ from pssh.clients import ParallelSSHClient
 def execute_command(command):
     # hosts, users = get_managed_hosts()
     hosts = get_hosts_only()
+
     client = ParallelSSHClient(hosts, user='root', pkey='/home/patryk/PycharmProjects/Kameleon-II/env/id_ed')
-    output = client.run_command(command)
+    output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
         new_output = []
+        if host_out.exception is not None:
+            response_dict[host_out.host] = [host_out.exception]
+            continue
         for line in host_out.stdout:
+            new_output.append(line.strip("\n"))
+        for line in host_out.stderr:
             new_output.append(line.strip("\n"))
         response_dict[host_out.host] = new_output
     # print(response_dict)
@@ -70,7 +71,9 @@ def get_hostnames():
 
 def get_service_status(service_name):
     result = execute_command(f"service {service_name} status")
+    result = {host: {service_name: res[0].strip("\n")} for host, res in result.items()}
     return result
+
 
 
 def restart_service(service_name):

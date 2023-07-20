@@ -4,12 +4,18 @@
 
 {% include 'result-modal.html' %}
 
+{% if results|length >= 1 %}
+<script>
+  halfmoon.toggleModal('result-modal');
+</script>
+{% endif %}
+
 <div class="container-fluid">
     <div class="card w-400 mw-full">
       <h2 class="card-title">
         Check Mailing Services
       </h2>
-      <p border-bottom>
+      <p class="border-bottom">
         This functionality will run Service check on desired host and return result.
           Checked Services: Exim, Dovecot, Spamassasin
       </p>
@@ -27,7 +33,7 @@
             </select>
 
           </div>
-        <a href="#" class="btn">Run</a>
+        <a href="/run-function/check_mailing_services" class="btn">Run</a>
       </div>
     </div>
 </div>
