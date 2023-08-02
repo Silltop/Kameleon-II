@@ -14,14 +14,14 @@ def execute_command(command):
     # hosts, users = get_managed_hosts()
     hosts = get_hosts_only()
 
-    client = ParallelSSHClient(hosts, user='root', pkey='/home/patryk/PycharmProjects/Kameleon-II/env/id_ed', timeout=2, retry_delay=1, num_retries=3)
+    client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=2, retry_delay=1, num_retries=3)
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
-        print(host_out)
+        #print(host_out)
         new_output = []
         if host_out.exception is not None:
-            print(host_out.exception)
+            #print(host_out.exception)
             response_dict[host_out.host] = [str(host_out.exception)]
             continue
         for line in host_out.stdout:
@@ -34,7 +34,7 @@ def execute_command(command):
 
 
 def get_linux_distro():
-    results = execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}'")
+    results = execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"' ")
     distro = {host: {'distro': res[0].strip("\n")} for host, res in results.items()}
     return distro
 

@@ -1,5 +1,6 @@
 from flask import render_template
 
+import db_models
 # from ansible_wrapper import check_service_status
 from flask_init import app
 import logging_setup
@@ -11,7 +12,8 @@ if __name__ == '__main__':
 
     pssh_logger = logging.getLogger("pssh")
     pssh_logger.setLevel(logging.CRITICAL)
-
+    with app.app_context():
+        db_models.init_db_tables_with_data()
     #loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
     #print(loggers)
 
