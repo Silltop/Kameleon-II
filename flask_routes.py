@@ -6,6 +6,7 @@ from ssh_connection_functions_core import get_disk_devices_status, gather_facts
 from utils import get_managed_hosts, get_hosts_only
 import admin_functions
 
+
 @app.route("/admin-functions")
 def admin_functions_render():
     results = session.pop('results', [])

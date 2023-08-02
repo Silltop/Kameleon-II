@@ -14,13 +14,15 @@ def execute_command(command):
     # hosts, users = get_managed_hosts()
     hosts = get_hosts_only()
 
-    client = ParallelSSHClient(hosts, user='root', pkey='/home/patryk/PycharmProjects/Kameleon-II/env/id_ed')
+    client = ParallelSSHClient(hosts, user='root', pkey='/home/patryk/PycharmProjects/Kameleon-II/env/id_ed', timeout=2, retry_delay=1, num_retries=3)
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
+        print(host_out)
         new_output = []
         if host_out.exception is not None:
-            response_dict[host_out.host] = [host_out.exception]
+            print(host_out.exception)
+            response_dict[host_out.host] = [str(host_out.exception)]
             continue
         for line in host_out.stdout:
             new_output.append(line.strip("\n"))
