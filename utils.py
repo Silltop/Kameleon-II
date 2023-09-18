@@ -35,3 +35,11 @@ def dns_resolve_ns(domain: str):
     resolver = dns.resolver.Resolver()
     resolver.nameservers = [config.dns_ip]
     return resolver.resolve(domain, 'NS')[0]
+
+def convert_to_gb(quota):
+    try:
+        quota_int = int(quota)
+        quota_gb = quota_int / 1000
+        return f"{quota_gb}GB"
+    except ValueError:
+        return "Unknown"

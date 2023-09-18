@@ -1,10 +1,11 @@
 from ssh_connection_functions_core import get_service_status
 
 
-def check_mailing_services():
-    dovecot = get_service_status('dovecot')
-    exim = get_service_status('exim')
-    spamassasin = get_service_status('spamassasin')
+def check_mailing_services(hosts: tuple = None):
+    print(hosts)
+    dovecot = get_service_status('dovecot', hosts)
+    exim = get_service_status('exim4', hosts)
+    spamassasin = get_service_status('spamassasin', hosts)
     dicts=[dovecot,exim,spamassasin]
     combined_dict = {}
     for d in dicts:

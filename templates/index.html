@@ -13,12 +13,13 @@
       <th>IP's</th>
       <th>Users</th>
       <th>Disk devices</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody>
-    {% for ip, host_details in host_details_list.items() %}
+    {% for host, host_details in host_details_list %}
     <tr>
-      <th>{{host_details.hostname}}</th>
+      <th>{{host_details.hostname}} ({{host.host_ip}})</th>
       <th>{{host_details.distro}}</th>
       <th>{{host_details.kernel}}</th>
       <td>{{host_details.ips}}</td>
@@ -29,6 +30,9 @@
         {{device}} <br>
         {% endfor %}
         </div>
+      </td>
+      <td>
+        {{host_details.sync_timestamp}}
       </td>
     </tr>
     {% endfor %}

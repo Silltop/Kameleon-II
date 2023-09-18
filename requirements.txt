@@ -9,3 +9,4 @@ Flask-SQLAlchemy
 dnspython
 flask-CKEditor
 parallel-ssh
+schedule

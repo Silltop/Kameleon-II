@@ -22,10 +22,10 @@
       <div class="text-right"> <!-- text-right = text-align: right -->
 
         <!-- Third row -->
-        <div class="form-row row-eq-spacing-md d-flex justify-content-end align-items-center">
-          <label for="state" class="required">Hosts</label>
+        <form action="/run-function/check_mailing_services" method="POST" class="form-row row-eq-spacing-md d-flex justify-content-end align-items-center">
+          <label for="host" class="required">Hosts</label>
           <div class="col-md-4">
-            <select class="form-control" id="state" required="required">
+            <select class="form-control" name="host" id="host" required="required">
               <option value="all" selected="selected" >All</option>
               {% for host in host_list %}
               <option value="{{host}}">{{host}}</option>
@@ -33,8 +33,8 @@
             </select>
 
           </div>
-        <a href="/run-function/check_mailing_services" class="btn">Run</a>
-      </div>
+        <button class="btn">Run</button>
+      </form>
     </div>
 </div>
 {% endblock %}

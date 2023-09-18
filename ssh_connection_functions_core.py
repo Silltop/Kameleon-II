@@ -6,22 +6,28 @@ Notes:
     3. Of course, I tested, locally keys using ssh -i command.
 """
 import ipaddress
+
+from db_models import Host
 from utils import get_managed_hosts, get_hosts_only
 from pssh.clients import ParallelSSHClient
+from pssh.exceptions import ConnectionErrorException
 
-
-def execute_command(command):
+def execute_command(command, hosts: tuple = None):
     # hosts, users = get_managed_hosts()
-    hosts = get_hosts_only()
-
-    client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=2, retry_delay=1, num_retries=3)
+    if hosts is None:
+        hosts = get_hosts_only()
+    client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=1, retry_delay=1, num_retries=1)
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
-        #print(host_out)
+        # print(host_out)
         new_output = []
+        if isinstance(host_out.exception, ConnectionErrorException):
+            response_dict[host_out.host] = ["Connection Error"]
+            continue
         if host_out.exception is not None:
-            #print(host_out.exception)
+            # print(host_out.exception)
+            print(host_out.exception)
             response_dict[host_out.host] = [str(host_out.exception)]
             continue
         for line in host_out.stdout:
@@ -33,19 +39,19 @@ def execute_command(command):
     return response_dict
 
 
-def get_linux_distro():
+def get_linux_distro(hosts: tuple = None):
     results = execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"' ")
     distro = {host: {'distro': res[0].strip("\n")} for host, res in results.items()}
     return distro
 
 
-def get_linux_kernel_version():
+def get_linux_kernel_version(hosts: tuple = None):
     results = execute_command("uname -r")
     versions = {host: {'kernel': res[0].strip("\n")} for host, res in results.items()}
     return versions
 
 
-def get_disk_devices_status():
+def get_disk_devices_status(hosts: tuple = None):
     results = execute_command("df -h | awk 'NR>1 {print $1, $2, $3, $5}'")
     results_to_return = {}
     for host, values in results.items():
@@ -55,36 +61,35 @@ def get_disk_devices_status():
     return results_to_return
 
 
-def get_disk_devices_names():
+def get_disk_devices_names(hosts: tuple = None):
     results = execute_command("df -h | awk 'NR>1 {print $1, $6}'")
     return {host: {'devices': values} for host, values in results.items()}
 
 
-def get_disk_usage_per_user():
-    results = execute_command("du -sh /home/* | sort -hr | awk '{print $2, $1}'")
+def get_disk_usage_per_user(hosts: tuple = None):
+    results = execute_command("du -sh /home/* | sort -hr | awk '{print $2, $1}'", hosts)
     return results
 
 
-def get_hostnames():
-    results = execute_command("hostname")
+def get_hostnames(hosts: tuple = None):
+    results = execute_command("hostname", hosts)
     hostnames = {host: {'hostname': res[0].strip("\n")} for host, res in results.items()}
     return hostnames
 
 
-def get_service_status(service_name):
-    result = execute_command(f"service {service_name} status")
+def get_service_status(service_name, hosts: tuple = None):
+    result = execute_command(f"service {service_name} status", hosts)
     result = {host: {service_name: res[0].strip("\n")} for host, res in result.items()}
     return result
 
 
-
-def restart_service(service_name):
-    result = execute_command(f"service {service_name} status")
+def restart_service(service_name, hosts: tuple = None):
+    result = execute_command(f"service {service_name} status", hosts)
     return result
 
 
-def get_user_count():
-    results = execute_command("grep -c bash /etc/passwd")
+def get_user_count(hosts=None):
+    results = execute_command("grep -c bash /etc/passwd", hosts)
     hostnames = {host: {'users': res[0].strip("\n")} for host, res in results.items()}
     return hostnames
 
@@ -97,30 +102,12 @@ def is_private_ip(ip):
         return False
 
 
-def get_all_ips_on_host():
-    result = execute_command("ip -br addr | awk '{print $3}' | cut -d'/' -f1")
+def get_all_ips_on_host(hosts: tuple = None):
+    result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1", hosts)
     return {host: {'ips': values} for host, values in result.items()}
 
 
 def read_remote_file(remote_file_path):
     pass
 
-
-def gather_facts():
-    hostnames = get_hostnames()
-    kernels = get_linux_kernel_version()
-    devices = get_disk_devices_names()
-    distro = get_linux_distro()
-    users = get_user_count()
-    dicts = [hostnames, kernels, devices, distro, users]
-    combined_dict = {}
-    for d in dicts:
-        for key, value in d.items():
-            if key in combined_dict:
-                # If the key already exists in the combined dictionary, merge the nested dictionaries
-                combined_dict[key].update(value)
-            else:
-                # If the key does not exist, add it to the combined dictionary
-                combined_dict[key] = value
-    return combined_dict
 

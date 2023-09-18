@@ -24,11 +24,25 @@ class HostUsers(db.Model):
     user = db.Column(db.String)
 
 
+class HostIps(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    ip = db.Column(db.String, nullable=False, unique=True)
+    is_listed = db.Column(db.String, nullable=False, default=False)
+    listed_on = db.Column(db.String, nullable=False, default="")
+
+
 class HostDevices(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'))
     name = db.Column(db.String, nullable=False, default="Unknown")
     mountpoint = db.Column(db.String, nullable=False, default="Unknown")
+
+
+class ExtensionRoutes(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, nullable=False, default="Unknown")
+    route = db.Column(db.String, nullable=False, default="Unknown")
 
 
 def init_db_tables_with_data():
