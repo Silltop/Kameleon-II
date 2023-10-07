@@ -25,7 +25,6 @@ template_dir = "./templates"
 static_dir = "./static"
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = generate_random_secret_key(32)
-print(find_extensions_templates())
 for directory in find_extensions_templates():
     app.jinja_loader.searchpath.append(directory)
 

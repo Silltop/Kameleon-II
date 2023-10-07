@@ -12,6 +12,7 @@ import sync_functions
 # # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     import logging
+    logging.info("Kameleon starting up...")
     pssh_logger = logging.getLogger("pssh")
     pssh_logger.setLevel(logging.CRITICAL)
     with app.app_context():
@@ -20,4 +21,4 @@ if __name__ == '__main__':
     #loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
     #print(loggers)
     schedule.every(5).minutes.do(sync_functions.sync_all)
-    app.run(debug=True, use_reloader=True)
+    app.run(debug=True, use_reloader=False)

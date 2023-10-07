@@ -4,6 +4,17 @@
 
 <div class="container-fluid">
 
+  <div class="dashboard-content">
+      <h2 class="content-title">
+        Overall status
+      </h2>
+  {% include 'chart.html' %}
+  </div>
+  <div class="dashboard-content">
+      <h2 class="content-title">
+        Host Summary
+      </h2>
+
 <table class="table table-hover">
   <thead>
     <tr>
@@ -22,7 +33,9 @@
       <th>{{host_details.hostname}} ({{host.host_ip}})</th>
       <th>{{host_details.distro}}</th>
       <th>{{host_details.kernel}}</th>
-      <td>{{host_details.ips}}</td>
+      {% for ip in host.host_ips %}
+        <td>{{ip.ip}}</td>
+      {% endfor %}
       <td>{{host_details.users}}</td>
       <td>
         <div style="overflow-y: auto; height: 5em;">
@@ -38,6 +51,7 @@
     {% endfor %}
   </tbody>
 </table>
-
+<div>
 </div>
+
 {% endblock %}

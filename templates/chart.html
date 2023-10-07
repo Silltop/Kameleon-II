@@ -1,0 +1,49 @@
+<div class="row">
+{% for chart in charts %}
+<canvas id="{{chart.name}}" width="{{chart.w}}" height="{{chart.h}}"></canvas>
+<script>
+
+    var data = [
+      {% for element in chart.data %}
+      { label: '{{element.label}}', value: '{{element.value}}', color: '{{element.color}}' },
+      {% endfor %}
+    ];
+
+    new Chart(
+      document.getElementById('{{chart.name}}'),
+      {
+        type: '{{chart.type}}',
+        data: {
+          labels: data.map(item => item.label),
+          datasets: [{
+            data: data.map(item => item.value),
+            backgroundColor: data.map(item => item.color),
+          }],
+        },
+        options: {
+          animation: false,
+          responsive: false,
+          scale: {
+            ticks: {
+              precision: {{chart.precision}}
+            }
+          },
+          plugins: {
+            legend: {
+              display: false,
+              position: 'bottom',
+            },
+            tooltip: {
+              enabled: true,
+            },
+            title: {
+            display: true,
+            text: '{{chart.title}}'
+            },
+          },
+        },
+      }
+    );
+</script>
+{% endfor %}
+</div>

@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from flask_init import db
 from utils import get_hosts_only
@@ -7,6 +8,7 @@ from utils import get_hosts_only
 class Host(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_ip = db.Column(db.String, unique=True, nullable=False)
+    host_ips = db.relationship('HostIps', backref='host', lazy='selectin')
 
 
 class HostFacts(db.Model):
@@ -25,9 +27,8 @@ class HostUsers(db.Model):
 
 
 class HostIps(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ip = db.Column(db.String, nullable=False, unique=True, primary_key=True)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
-    ip = db.Column(db.String, nullable=False, unique=True)
     is_listed = db.Column(db.String, nullable=False, default=False)
     listed_on = db.Column(db.String, nullable=False, default="")
 
@@ -46,6 +47,7 @@ class ExtensionRoutes(db.Model):
 
 
 def init_db_tables_with_data():
+    logging.info("Initializing DB entries from source file")
     db.create_all()
     hosts = get_hosts_only()
     for ip in hosts:
@@ -58,3 +60,4 @@ def init_db_tables_with_data():
             host_facts = HostFacts(host_id=hst.id)
             db.session.add(host_facts)
     db.session.commit()
+    logging.info("DB import done...")

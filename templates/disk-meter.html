@@ -1,31 +1,24 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-<script src="{{ url_for('static', filename='js/bucket-fill.js') }}"></script>
-
 <div class="container-fluid">
+<script src="{{ url_for('static', filename='js/disk-chart.js') }}"></script>
 
 {% for host, values_list in disk_data.items() %}
-    {{ host }}
-    <div class="row row-box">
+      <div class="dashboard-content">
+      <h2 class="content-title">
+        {{ host }}
+      </h2>
 
-{% for entry in values_list %}
-<div class="bucket bg-light-lm bg-dark-dm">
-  <div class="vertical-meter" id="{{host.replace('.','')}}{{entry.device.replace('//', '')}}">
-   </div>
-    <div class="bucket-content">
-        <div class="text-break bucket-top">{{entry.device}}</div>
-        <div class="font-size-12 bucket-bottom">{{entry.used}}/{{entry.size}}</div>
+            <div class="disk-chart">
 
-    </div>
-
-</div>
-<script>
-    fillContainerById({{entry.percentage}}, '{{host.replace('.','')}}{{entry.device.replace('//', '')}}'); // Fill the container to 80%
-</script>
-
-
+            {% for entry in values_list %}
+            <div class="card">
+            <h5 class="card-title">{{entry.device}}</h5>
+            <canvas id="{{entry.randomid}}" width="200em" height="200em"></canvas>
+            </div>
+            <script>
+            createDiskSpaceChart({{entry.used}}, {{entry.size}}, '{{entry.randomid}}');
+            </script>
+        {% endfor %}
+      </div></div>
 {% endfor %}
-  </div>
-{% endfor %}
-
-
 </div>

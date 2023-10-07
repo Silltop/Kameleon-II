@@ -1,59 +1,27 @@
-.bucket {
-    margin: 10px;
-    width: 100px;
-    height: 100px;
-    border-radius: 5px;
-    -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
-    box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
-    border: 1px solid #000;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .vertical-meter {
-    width: inherit;
-    position: absolute;
-    animation: gradient 5s ease infinite;
-    background-size: 100% 200%;
-    background-repeat: no-repeat;
-    background-position: bottom;
-    background-origin: content-box;
-    box-sizing: border-box;
-  }
-
-  .bucket-content{
-    padding: 2px;
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    height: inherit;
-    width: inherit;
-  }
-  .bucket-top{
-    display: flex;
-    height: 50%;
-    font-size: 1.1rem;
-  }
-  .bucket-bottom{
-    display: flex;
-    height: 50%;
-    flex-direction: row-reverse;
-    align-items: flex-end;
-  }
-
-  @keyframes bucket-gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+.dashboard-content {
+    color: black;
+    background-color: #f8f8f8;
+    border: 1px solid rgba(205,205,205,.2);
+    border-radius: 0.4rem;
+    margin: 2rem;
+    padding: 2rem;
 }
-  .row-box{
-    padding: 1%;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  }
+
+.dark-mode .dashboard-content {
+    color: rgba(255,255,255,.8);
+    background-color: #191c20;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 0.4rem;
+    margin: 2rem;
+    padding: 2rem;
+}
+
+.disk-chart{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.disk-chart .card{
+    padding: 0.3em;
+    margin: 0.3em;
+}

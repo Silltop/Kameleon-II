@@ -6,6 +6,7 @@ Notes:
     3. Of course, I tested, locally keys using ssh -i command.
 """
 import ipaddress
+from secrets import token_hex
 
 from db_models import Host
 from utils import get_managed_hosts, get_hosts_only
@@ -50,14 +51,29 @@ def get_linux_kernel_version(hosts: tuple = None):
     versions = {host: {'kernel': res[0].strip("\n")} for host, res in results.items()}
     return versions
 
+def parse_results(values):
+    parsed_results = []
+    for list_entry in values:
+        if len(list_entry.split(" ")) != 4:
+            parsed_results.append({'device': 'unknown','size': 0,'used': 0,'percentage': 0, 'randomid': token_hex(10)})
+            break
+        device, size, used, percentage = list_entry.split(" ")
+        parsed_result = {
+            'device': device,
+            'size': size,
+            'used': used,
+            'percentage': percentage.strip("%\n"),
+            'randomid': token_hex(10)
+        }
+        parsed_results.append(parsed_result)
+    return parsed_results
 
 def get_disk_devices_status(hosts: tuple = None):
-    results = execute_command("df -h | awk 'NR>1 {print $1, $2, $3, $5}'")
+    results = execute_command("df | awk 'NR>1 {print $1, $2, $3, $5}'")
     results_to_return = {}
+    print(results)
     for host, values in results.items():
-        results_to_return[host] = [{'device': device, 'size': size, 'used': used, 'percentage': percentage.strip("%\n")}
-                                   for list_entry in values
-                                   for device, size, used, percentage in [list_entry.split(" ")]]
+        results_to_return[host] = parse_results(values)
     return results_to_return
 
 
@@ -110,4 +126,6 @@ def get_all_ips_on_host(hosts: tuple = None):
 def read_remote_file(remote_file_path):
     pass
 
+def new_function(lala):
+    print("Im super lololo")
 

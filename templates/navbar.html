@@ -1,18 +1,10 @@
 <nav class="navbar">
-    <!-- Navbar content (with toggle sidebar button) -->
-    <!--      <div class="navbar-content">-->
-    <!--        <button class="btn btn-action" type="button">-->
-    <!--          <i class="fa fa-bars" aria-hidden="true"></i>-->
-    <!--          <span class="sr-only">Toggle sidebar</span> &lt;!&ndash; sr-only = show only on screen readers &ndash;&gt;-->
-    <!--        </button>-->
-    <!--      </div>-->
-    <!-- Navbar brand -->
     <a href="{{url_for('index')}}" class="navbar-brand">
         <div class="mask_container" id="logo" style="mask-image: url({{ url_for('static', filename='img/logo.svg') }}); -webkit-mask-image: url({{ url_for('static', filename='img/logo.svg') }})"></div>
-    </a>
+
 
     <!-- Navbar text -->
-    <span class="navbar-text text-monospace">Kameleon v.2</span>
+    <div class="navbar-text text-monospace" style="font-size: 75%">Kameleon v.2</div></a>
     <!-- text-monospace = font-family shifted to monospace -->
     <!-- Navbar nav -->
     <ul class="navbar-nav d-none d-md-flex">
@@ -27,7 +19,7 @@
         <a href="/admin-functions" class="dropdown-item">Admin Functions</a>
         </div></li>
         <li class="nav-item">
-            <a href="#" class="nav-link">Options</a>
+            <a href="{{url_for('configuration_page')}}" class="nav-link">Options</a>
         </li>
         <li class="nav-item dropdown with-arrow toggle-on-hover">
           <a class="nav-link" data-toggle="dropdown" id="extension-dropdown-toggle">
