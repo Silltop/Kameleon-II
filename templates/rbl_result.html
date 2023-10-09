@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}RBL status for {{ip}}{% endblock %}
+{% block content %}
+<div class="dashboard-content">
+{% if success %}
+<h2>RBL result for {{ ip }}</h2>
+<table class="table table-hover" >
+  <thead>
+    <tr>
+      <th>Organization</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for entry in result %}
+
+  {% for k, v in entry.items() %}
+    <tr><td>{{ k }}</td><td>{% if v==0 %} <span style="color:green">Not Listed</span> {% else %} <span style="color:red">Listed</span> {% endif %}</td></tr>
+  {% endfor %}
+  {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+<h2>Provided IP '{{ ip }}' is <span style="color: red">INVALID</span></h2>
+{% endif %}
+
+</div>
+{% endblock %}

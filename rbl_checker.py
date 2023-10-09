@@ -71,18 +71,15 @@ rblDict = {'spam.spamrats.com': 'http://www.spamrats.com',
 
 
 def check_rbl(ip):
-    orgs_where_listed = []
+    result = []
     for rblOrg in rblDict:
-        print('{:14}{:35}'.format(' [ Checking ]', rblOrg), end='')
+        # print('{:14}{:35}'.format(' [ Checking ]', rblOrg), end='')
         ipRev = '.'.join(ip.split('.')[::-1])
         searchQuery = ipRev + '.' + rblOrg
         try:
             resolver.resolve(searchQuery, 'A')
-            print('Listed')
-            orgs_where_listed.append(rblOrg)
+            # print('Listed')
+            result.append({rblOrg: 1})
         except:
-            print('Not Listed')
-    return orgs_where_listed
-
-# Debug ip
-#print(check_rbl('45.14.114.208'))
+            result.append({rblOrg: 0})
+    return result

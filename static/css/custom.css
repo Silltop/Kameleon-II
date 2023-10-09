@@ -25,3 +25,27 @@
     padding: 0.3em;
     margin: 0.3em;
 }
+
+.item-scroll{
+    display: flex;
+    align-items: center;
+    overflow-y: auto;
+    height: 5em;
+}
+
+.grey-string{
+    color: gray;
+}
+
+.dashboard-content .card{
+    padding: 1%;
+    margin: 1%
+}
+
+.dark-mode .dashboard-content .card{
+    background-color: #17191c;
+}
+
+.dashboard-content .card-title{
+    border-bottom: solid;
+}

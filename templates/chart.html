@@ -1,49 +1,91 @@
 <div class="row">
+<script src="{{ url_for('static', filename='js/main-chart.js') }}"></script>
 {% for chart in charts %}
 <canvas id="{{chart.name}}" width="{{chart.w}}" height="{{chart.h}}"></canvas>
 <script>
-
     var data = [
       {% for element in chart.data %}
       { label: '{{element.label}}', value: '{{element.value}}', color: '{{element.color}}' },
       {% endfor %}
     ];
+    createChart('{{chart.name}}', '{{chart.type}}', data, {{chart.precision}}, '{{chart.title}}');
+</script>
+{% endfor %}
+<canvas id="load-avg" width="250em" height="150em"></canvas>
+<script>
+function updateChart() {
+  // Get the canvas element
+  const ctx = document.getElementById('load-avg').getContext('2d');
 
-    new Chart(
-      document.getElementById('{{chart.name}}'),
-      {
-        type: '{{chart.type}}',
+  // Destroy the existing chart instance if it exists
+  if (window.loadAvgChart) {
+    window.loadAvgChart.destroy();
+  }
+
+  // Make an AJAX request to fetch data from the endpoint
+  fetch('/load-avg')
+    .then(response => response.json())
+    .then(data => {
+      // Extract the IPs and load averages from the data
+      const ips = Object.keys(data);
+      const loadAvgs = ips.map(ip => {
+        const loadAvgData = data[ip][0].split(' '); // Split the load avg string into an array
+        return parseFloat(loadAvgData[2]); // Get the 5-minute load average as a float
+      });
+
+      // Create a new pie chart
+      window.loadAvgChart = new Chart(ctx, {
+        type: 'pie', // Use a pie chart
         data: {
-          labels: data.map(item => item.label),
+          labels: ips,
           datasets: [{
-            data: data.map(item => item.value),
-            backgroundColor: data.map(item => item.color),
+            data: loadAvgs,
+            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 205, 86, 1)', 'rgba(54, 162, 235, 1)'],
+            borderWidth: 1,
           }],
         },
         options: {
-          animation: false,
           responsive: false,
-          scale: {
-            ticks: {
-              precision: {{chart.precision}}
-            }
-          },
           plugins: {
+            title: {
+              display: true,
+              text: 'Load Avg 5',
+              position: 'top',
+            },
             legend: {
               display: false,
-              position: 'bottom',
             },
             tooltip: {
-              enabled: true,
-            },
-            title: {
-            display: true,
-            text: '{{chart.title}}'
+              callbacks: {
+                label: (context) => {
+                  // Get the current dataset index
+                  const datasetIndex = context.dataIndex;
+
+                  // Get the host IP for the current dataset
+                  const hostIp = ips[datasetIndex];
+
+                  // Get the load average value
+                  const loadAvg = loadAvgs[datasetIndex];
+
+                  // Return the tooltip label with host IP and load average
+                  return `IP: ${hostIp}, Load Avg: ${loadAvg}`;
+                },
+              },
             },
           },
         },
-      }
-    );
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+}
+    // Set the interval for updating the chart (e.g., every 5 seconds)
+    const updateInterval = 60000; // 60000 milliseconds (1min)
+    // Initial call to updateChart to fetch and display data
+    updateChart();
+    // Set up the interval to periodically update the chart
+    const intervalId = setInterval(updateChart, updateInterval);
 </script>
-{% endfor %}
 </div>

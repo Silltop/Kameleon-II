@@ -10,3 +10,4 @@ dnspython
 flask-CKEditor
 parallel-ssh
 schedule
+flask-caching

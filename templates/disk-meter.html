@@ -13,7 +13,7 @@
             {% for entry in values_list %}
             <div class="card">
             <h5 class="card-title">{{entry.device}}</h5>
-            <canvas id="{{entry.randomid}}" width="200em" height="200em"></canvas>
+            <canvas id="{{entry.randomid}}" width="150em" height="150em"></canvas>
             </div>
             <script>
             createDiskSpaceChart({{entry.used}}, {{entry.size}}, '{{entry.randomid}}');

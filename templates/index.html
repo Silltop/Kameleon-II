@@ -14,7 +14,8 @@
       <h2 class="content-title">
         Host Summary
       </h2>
-
+<p> <i class="fa fa-asterisk" aria-hidden="true"></i> Host private IP address are <span style="color: grey">grey</span>.</p>
+<p> <i class="fa fa-asterisk" aria-hidden="true"></i> IP addresses that are listed in RBL DB are marked in <span style="color: red">red</span>.</p>
 <table class="table table-hover">
   <thead>
     <tr>
@@ -24,7 +25,7 @@
       <th>IP's</th>
       <th>Users</th>
       <th>Disk devices</th>
-      <th>Status</th>
+      <th>Sync Time</th>
     </tr>
   </thead>
   <tbody>
@@ -33,14 +34,18 @@
       <th>{{host_details.hostname}} ({{host.host_ip}})</th>
       <th>{{host_details.distro}}</th>
       <th>{{host_details.kernel}}</th>
-      {% for ip in host.host_ips %}
-        <td>{{ip.ip}}</td>
-      {% endfor %}
-      <td>{{host_details.users}}</td>
       <td>
-        <div style="overflow-y: auto; height: 5em;">
-        {% for device in host_details.devices %}
-        {{device}} <br>
+        {% for ip in host.host_ips %}
+        <div class="item-scroll {% if ip.is_private %}grey-string{% endif %}">
+          {{ip.ip}}<br>
+        </div>
+        {% endfor %}
+      </td>
+      <td>{{host_details.user_count}}</td>
+      <td>
+        <div class="item-scroll">
+        {% for device in host.host_devices %}
+        {{device.name}} <br>
         {% endfor %}
         </div>
       </td>

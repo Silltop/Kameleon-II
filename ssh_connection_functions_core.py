@@ -7,11 +7,11 @@ Notes:
 """
 import ipaddress
 from secrets import token_hex
-
 from db_models import Host
 from utils import get_managed_hosts, get_hosts_only
 from pssh.clients import ParallelSSHClient
 from pssh.exceptions import ConnectionErrorException
+
 
 def execute_command(command, hosts: tuple = None):
     # hosts, users = get_managed_hosts()
@@ -21,13 +21,11 @@ def execute_command(command, hosts: tuple = None):
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
-        # print(host_out)
         new_output = []
         if isinstance(host_out.exception, ConnectionErrorException):
             response_dict[host_out.host] = ["Connection Error"]
             continue
         if host_out.exception is not None:
-            # print(host_out.exception)
             print(host_out.exception)
             response_dict[host_out.host] = [str(host_out.exception)]
             continue
@@ -40,40 +38,36 @@ def execute_command(command, hosts: tuple = None):
     return response_dict
 
 
-def get_linux_distro(hosts: tuple = None):
-    results = execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"' ")
-    distro = {host: {'distro': res[0].strip("\n")} for host, res in results.items()}
-    return distro
+def parse_output_to_dict(result_to_parse, assignment_key):
+    parsed_output = {host: {assignment_key: res[0].strip("\n")} for host, res in result_to_parse.items()}
+    return parsed_output
 
 
-def get_linux_kernel_version(hosts: tuple = None):
-    results = execute_command("uname -r")
-    versions = {host: {'kernel': res[0].strip("\n")} for host, res in results.items()}
-    return versions
-
-def parse_results(values):
+def parse_device_results(values):
     parsed_results = []
     for list_entry in values:
-        if len(list_entry.split(" ")) != 4:
-            parsed_results.append({'device': 'unknown','size': 0,'used': 0,'percentage': 0, 'randomid': token_hex(10)})
+        if len(list_entry.split(" ")) != 5:
+            parsed_results.append(
+                {'device': 'unknown', 'size': 0, 'used': 0, 'percentage': 0, 'mountpoint':'unknown', 'randomid': token_hex(10)})
             break
-        device, size, used, percentage = list_entry.split(" ")
+        device, size, used, percentage, mountpoint = list_entry.split(" ")
         parsed_result = {
             'device': device,
             'size': size,
             'used': used,
-            'percentage': percentage.strip("%\n"),
+            'percentage': percentage,
+            'mountpoint': mountpoint.strip("%\n"),
             'randomid': token_hex(10)
         }
         parsed_results.append(parsed_result)
     return parsed_results
 
+
 def get_disk_devices_status(hosts: tuple = None):
-    results = execute_command("df | awk 'NR>1 {print $1, $2, $3, $5}'")
+    results = execute_command("df | awk 'NR>1 {print $1, $2, $3, $5, $6}'")
     results_to_return = {}
-    print(results)
     for host, values in results.items():
-        results_to_return[host] = parse_results(values)
+        results_to_return[host] = parse_device_results(values)
     return results_to_return
 
 
@@ -87,27 +81,14 @@ def get_disk_usage_per_user(hosts: tuple = None):
     return results
 
 
-def get_hostnames(hosts: tuple = None):
-    results = execute_command("hostname", hosts)
-    hostnames = {host: {'hostname': res[0].strip("\n")} for host, res in results.items()}
-    return hostnames
-
-
 def get_service_status(service_name, hosts: tuple = None):
     result = execute_command(f"service {service_name} status", hosts)
-    result = {host: {service_name: res[0].strip("\n")} for host, res in result.items()}
+    result = parse_output_to_dict(result, service_name)
     return result
 
 
 def restart_service(service_name, hosts: tuple = None):
-    result = execute_command(f"service {service_name} status", hosts)
-    return result
-
-
-def get_user_count(hosts=None):
-    results = execute_command("grep -c bash /etc/passwd", hosts)
-    hostnames = {host: {'users': res[0].strip("\n")} for host, res in results.items()}
-    return hostnames
+    return execute_command(f"service {service_name} status", hosts)
 
 
 def is_private_ip(ip):
@@ -123,9 +104,6 @@ def get_all_ips_on_host(hosts: tuple = None):
     return {host: {'ips': values} for host, values in result.items()}
 
 
+
 def read_remote_file(remote_file_path):
     pass
-
-def new_function(lala):
-    print("Im super lololo")
-

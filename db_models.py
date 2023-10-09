@@ -9,6 +9,7 @@ class Host(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_ip = db.Column(db.String, unique=True, nullable=False)
     host_ips = db.relationship('HostIps', backref='host', lazy='selectin')
+    host_devices = db.relationship('HostDevices', backref='host', lazy='selectin')
 
 
 class HostFacts(db.Model):
@@ -18,6 +19,7 @@ class HostFacts(db.Model):
     sync_timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     kernel = db.Column(db.String, nullable=False, default="Unknown")
     distro = db.Column(db.String, nullable=False, default="Unknown")
+    user_count = db.Column(db.Integer, nullable=False, default=0)
 
 
 class HostUsers(db.Model):
@@ -29,6 +31,7 @@ class HostUsers(db.Model):
 class HostIps(db.Model):
     ip = db.Column(db.String, nullable=False, unique=True, primary_key=True)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    is_private = db.Column(db.Boolean, default=False)
     is_listed = db.Column(db.String, nullable=False, default=False)
     listed_on = db.Column(db.String, nullable=False, default="")
 
@@ -38,6 +41,7 @@ class HostDevices(db.Model):
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'))
     name = db.Column(db.String, nullable=False, default="Unknown")
     mountpoint = db.Column(db.String, nullable=False, default="Unknown")
+    size = db.Column(db.String, nullable=False, default="Unknown")
 
 
 class ExtensionRoutes(db.Model):
@@ -56,7 +60,6 @@ def init_db_tables_with_data():
             hst = Host(host_ip=ip)
             db.session.add(hst)
             db.session.commit()
-            print(hst.id)
             host_facts = HostFacts(host_id=hst.id)
             db.session.add(host_facts)
     db.session.commit()

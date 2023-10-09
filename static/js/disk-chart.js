@@ -30,8 +30,8 @@ function createDiskSpaceChart(usedSpaceBytes, totalSpaceBytes, chartId) {
         datasets: [{
           data: [usedSpacePercentage, freeSpacePercentage],
           backgroundColor: [
-            'rgba(255, 99, 132, 0.7)', // Red for Used Space
-            'rgba(0, 255, 0, 0.7)',     // Green for Free Space
+            'rgba(204, 0, 0, 0.7)', // Red for Used Space
+            'rgba(0, 153, 0, 0.7)',     // Green for Free Space
           ],
         }],
       },

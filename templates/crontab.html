@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}All host crontab{% endblock %}
+{% block content %}
+
+<div class="dashboard-content d-flex">
+{% for host, result in result.items() %}
+
+<div class="card w-300">
+  <h3 class="card-title">
+    {{host}}
+  </h3>
+  {% for e in result %}
+  {{ e }} <br>
+  <hr>
+  {% endfor %}
+</div>
+
+
+{% endfor %}
+</div>
+
+{% endblock %}

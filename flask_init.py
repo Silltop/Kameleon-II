@@ -1,5 +1,7 @@
 import os
 import secrets
+
+from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import glob
@@ -20,6 +22,11 @@ def find_extensions_templates():
     # Now, the template_dirs variable will contain a list of full paths to the template directories
     return template_dirs
 
+config = {
+    "DEBUG": True,          # some Flask specific configs
+    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300
+}
 
 template_dir = "./templates"
 static_dir = "./static"
@@ -31,3 +38,5 @@ for directory in find_extensions_templates():
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{app.root_path}/db/kameleon.db"
 db = SQLAlchemy()
 db.init_app(app)
+app.config.from_mapping(config)
+cache = Cache(app)
