@@ -3,7 +3,7 @@ from datetime import datetime
 import schedule
 from db_models import HostFacts, HostIps, HostDevices
 from flask_init import db, app
-from ssh_connection_functions_core import *
+from remote_data_processor import *
 
 
 def gather_facts():

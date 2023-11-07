@@ -30,8 +30,8 @@
   </thead>
   <tbody>
     {% for host, host_details in host_details_list %}
-    <tr>
-      <th>{{host_details.hostname}} ({{host.host_ip}})</th>
+    <tr class="t-row">
+      <th class="first-cell"><i class="fa fa-power-off status-dot"></i> {{host_details.hostname}} ({{host.host_ip}})</th>
       <th>{{host_details.distro}}</th>
       <th>{{host_details.kernel}}</th>
       <td>
@@ -58,5 +58,5 @@
 </table>
 <div>
 </div>
-
+<script src="{{ url_for('static', filename='js/status.js') }}"></script>
 {% endblock %}

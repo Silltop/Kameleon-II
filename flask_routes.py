@@ -6,13 +6,13 @@ from flask import render_template as base_render_template
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
-import ssh_connection_functions_core
+import remote_data_processor
 from charts import Chart, ChartDataElement, chart_from_column_elements
 from db_models import HostFacts, Host, ExtensionRoutes, HostIps, HostDevices
 # from ansible_wrapper import check_service_status
 from flask_init import app, db, cache
 from rbl_checker import check_rbl
-from ssh_connection_functions_core import get_disk_devices_status, get_all_ips_on_host
+from remote_data_processor import get_disk_devices_status, get_all_ips_on_host
 from sync_functions import sync_all
 from utils import get_managed_hosts, get_hosts_only, ip_address_is_valid
 import admin_functions
@@ -48,7 +48,7 @@ def render_template(*args, **kwargs):
 
 @app.route("/active-crontabs", methods=['GET'])
 def get_crontabs():
-    res = ssh_connection_functions_core.execute_command("crontab -l")
+    res = remote_data_processor.execute_command("crontab -l")
     return render_template('crontab.html', result=res)
 
 @app.route("/query-rbl/<ip>", methods=['GET'])
@@ -61,8 +61,12 @@ def query_rbl_db(ip):
 @app.route('/load-avg', methods=['GET'])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def get_load_avg():
-    return ssh_connection_functions_core.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
+    return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
 
+@app.route('/uptime', methods=['GET'])
+@cached_endpoint(timeout=60)  # Cache for 60 seconds
+def uptime():
+    return remote_data_processor.execute_command("uptime")
 
 @app.route("/admin-functions")
 def admin_functions_render():
