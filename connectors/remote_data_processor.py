@@ -7,8 +7,7 @@ Notes:
 """
 import ipaddress
 from secrets import token_hex
-from db_models import Host
-from utils import get_managed_hosts, get_hosts_only
+from host_management.utils import get_hosts_only
 from pssh.clients import ParallelSSHClient
 from pssh.exceptions import ConnectionErrorException
 

@@ -1,4 +1,4 @@
-from remote_data_processor import get_service_status
+from connectors.remote_data_processor import get_service_status
 
 
 def check_mailing_services(hosts: tuple = None):

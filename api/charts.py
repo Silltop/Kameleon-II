@@ -3,8 +3,7 @@ from secrets import token_hex
 
 from sqlalchemy import func
 
-from flask_init import app, db
-from db_models import *
+from data_management.db_models import *
 
 
 def chart_from_column_elements(column, title='', type="bar"):

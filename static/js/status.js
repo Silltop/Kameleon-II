@@ -7,12 +7,13 @@
         .then((rdata) => {
           for (const ip in rdata) {
             const status = rdata[ip][0];
+            console.log(rdata[ip])
             const rows = document.querySelectorAll(".t-row");
             rows.forEach((row) => {
               const nameCell = row.firstElementChild;
               const iconElement = nameCell.firstElementChild;
               if (nameCell.textContent.includes(ip)) {
-
+                console.log(status)
                 if (status === 'Connection Error') {
                     iconElement.style.backgroundColor = 'red';
                     iconElement.style.boxShadow = '0 0 0 3px rgba(255, 51, 51, 0.8)';

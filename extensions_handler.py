@@ -3,8 +3,9 @@ import logging
 import os
 import importlib
 
-from db_models import ExtensionRoutes
-from flask_init import db
+from data_management.db_models import ExtensionRoutes
+from api.app import db
+
 
 def init_extensions():
     # Define the path to the extensions directory
@@ -20,7 +21,7 @@ def init_extensions():
         if os.path.isfile(json_file):
             with open(json_file, 'r') as f:
                 json_data = json.loads(f.read())
-                name=json_data['name']
+                name = json_data['name']
                 exists = ExtensionRoutes.query.filter_by(name=name).first()
                 if not exists:
                     er = ExtensionRoutes(name=json_data['name'], route=json_data['route'])
@@ -28,4 +29,27 @@ def init_extensions():
                     db.session.add(er)
             db.session.commit()
             extension_module = importlib.import_module(f"{extensions_dir}.{extension}")
+            db.create_all()
     logging.info("Extensions lookup done")
+
+
+# def create_prefixed_table(model_class, prefix='extension_'):
+#     table_name = prefix + model_class.__name__.lower()
+#
+#     # Create the table
+#     columns = []
+#     for column in model_class.__table__.columns:
+#         columns.append(column.copy())
+#
+#     table = type(table_name, (db.Model,), {
+#         '__tablename__': table_name,
+#         '__module__': model_class.__module__,
+#         'id': db.Column(db.Integer, primary_key=True),
+#         **{column.name: column for column in columns}
+#     })
+#
+#     # Add the table to the metadata
+#     db.metadata.create_all(db.engine, tables=[table.__table__])
+#
+# def create_table(model_class):
+#     create_prefixed_table(model_class)

@@ -1,0 +1,28 @@
+<div id="sidenav" class="sidenav">
+<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        self.file.write(dom)
+        for item in item_list:
+            dom='<a class="ehs" id="e'+ item +'" href="#' + item + '">' + item +'</a>'
+            self.file.write(dom)
+
+ </div>
+        self.file.write(dom)
+
+        dom = '\n<script>\n'
+        dom += 'let list_elements = [];\n'
+        self.file.write(dom)
+        x = 0
+        dom = ""
+        try:
+            for item in item_list:
+                dom = 'list_elements['+str(x)+']="' + item + '";\n'
+                self.file.write(dom)
+                x += 1
+        except Exception as e:
+            print(e)
+        
+        dom = '</script>\n'
+        self.file.write(dom)
+
+        dom = '<script src="/js/sidebar.js"></script>'
+        self.file.write(dom)

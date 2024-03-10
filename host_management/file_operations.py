@@ -1,7 +1,7 @@
 import hashlib
 import os
 
-import remote_data_processor
+from connectors import remote_data_processor
 
 
 def file_checksum(filename, hash_func=hashlib.sha256, block_size=65536):

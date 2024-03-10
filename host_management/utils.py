@@ -1,10 +1,12 @@
+import os
+
 import dns.resolver
 import ipaddress
-import config
+from configuration import config
 
 
 def get_managed_hosts():
-    with open('./inventory/hosts', 'r') as f:
+    with open(f'{os.getcwd()}/inventory/hosts', 'r') as f:
         file_data = f.readlines()
         to_return = []
         for line in file_data:
@@ -16,7 +18,8 @@ def get_managed_hosts():
 
 
 def get_hosts_only():
-    with open('./inventory/hosts', 'r') as f:
+    # todo remove hosts from db when not in file
+    with open(f'{os.getcwd()}/inventory/hosts', 'r') as f:
         file_data = f.readlines()
         to_return = []
         for line in file_data:
@@ -38,11 +41,12 @@ def dns_resolve_ns(domain: str):
 
 
 def ip_address_is_valid(ip_string):
-   try:
-       ipaddress.ip_address(ip_string)
-       return True
-   except ValueError:
-       return False
+    try:
+        ipaddress.ip_address(ip_string)
+        return True
+    except ValueError:
+        return False
+
 
 def convert_to_gb(quota):
     try:

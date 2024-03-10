@@ -1,37 +1,32 @@
-from datetime import datetime
 from functools import wraps
 
-from flask import url_for, redirect, session, request, jsonify, flash
+from flask import url_for, redirect, session, request, jsonify
 from flask import render_template as base_render_template
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
-import remote_data_processor
-from charts import Chart, ChartDataElement, chart_from_column_elements
-from db_models import HostFacts, Host, ExtensionRoutes, HostIps, HostDevices
+from connectors import remote_data_processor
+from .charts import Chart, ChartDataElement, chart_from_column_elements
+from data_management.db_models import HostFacts, Host, ExtensionRoutes
 # from ansible_wrapper import check_service_status
-from flask_init import app, db, cache
-from rbl_checker import check_rbl
-from remote_data_processor import get_disk_devices_status, get_all_ips_on_host
-from sync_functions import sync_all
-from utils import get_managed_hosts, get_hosts_only, ip_address_is_valid
-import admin_functions
+from api.app import app, db, cache
+from host_management.rbl_checker import check_rbl
+from connectors.remote_data_processor import get_disk_devices_status
+from data_management.sync_functions import sync_all
+from host_management.utils import get_managed_hosts, get_hosts_only, ip_address_is_valid
+from host_management import admin_functions
 
 
 def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 minutes)
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            # Generate a cache key based on the request path and query parameters
             cache_key = request.full_path
-            # Try to fetch data from cache
             cached_data = cache.get(cache_key)
             if cached_data is None:
-                # If data is not in cache, fetch it and cache it
                 data = f(*args, **kwargs)
                 cache.set(cache_key, data, timeout=timeout)
             else:
-                # If data is in cache, return it
                 data = cached_data
             return jsonify(data)
 
@@ -51,6 +46,7 @@ def get_crontabs():
     res = remote_data_processor.execute_command("crontab -l")
     return render_template('crontab.html', result=res)
 
+
 @app.route("/query-rbl/<ip>", methods=['GET'])
 def query_rbl_db(ip):
     if ip_address_is_valid(ip):
@@ -58,15 +54,18 @@ def query_rbl_db(ip):
         return render_template("rbl_result.html", ip=ip, result=result, success=True)
     return render_template("rbl_result.html", ip=ip, success=False)
 
+
 @app.route('/load-avg', methods=['GET'])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def get_load_avg():
     return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
 
+
 @app.route('/uptime', methods=['GET'])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def uptime():
     return remote_data_processor.execute_command("uptime")
+
 
 @app.route("/admin-functions")
 def admin_functions_render():

@@ -1,24 +1,42 @@
-import schedule
-from flask import render_template
+import time
+from threading import Thread
 
-import db_models
+import schedule
+from data_management import db_models, sync_functions
 import extensions_handler
 # from ansible_wrapper import check_service_status
-from flask_init import app
-import logging_setup
-import flask_routes
-import sync_functions
+from api import app
+from configuration import setup_logging, logger
+from threading import Event
+import atexit
 
-# # Press the green button in the gutter to run the script.
+
+def run_scheduled_jobs(event):
+    while not event.is_set():
+        schedule.run_pending()
+        time.sleep(1)
+
+
+# stop the background task gracefully before exit
+def stop_background_threads(stop_event, threads: list):
+    logger.info('At exit stopping background threads...')
+    # request the background thread stop
+    stop_event.set()
+    # wait for the background thread to stop
+    for thread in threads:
+        thread.join()
+    logger.info('At exit threads shutdown complete.')
+
+
 if __name__ == '__main__':
-    import logging
-    logging.info("Kameleon starting up...")
-    pssh_logger = logging.getLogger("pssh")
-    pssh_logger.setLevel(logging.CRITICAL)
+    setup_logging()
+    stop_event = Event()
+    logger.info("Kameleon starting up...")
     with app.app_context():
         db_models.init_db_tables_with_data()
         extensions_handler.init_extensions()
-    #loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
-    #print(loggers)
-    schedule.every(5).minutes.do(sync_functions.sync_all)
+    schedule.every(1).minutes.do(sync_functions.sync_all)
+    scheduler_thread = Thread(target=run_scheduled_jobs, args=(stop_event,), daemon=True, name="TaskExecutor")
+    scheduler_thread.start()
+    atexit.register(stop_background_threads, stop_event, [scheduler_thread])
     app.run(debug=True, use_reloader=False)

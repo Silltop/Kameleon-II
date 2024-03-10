@@ -1,15 +1,22 @@
 import datetime
 import logging
 
-from flask_init import db
-from utils import get_hosts_only
+from api.app import db
+from host_management.utils import get_hosts_only
 
 
 class Host(db.Model):
+    # change id to IP?
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_ip = db.Column(db.String, unique=True, nullable=False)
     host_ips = db.relationship('HostIps', backref='host', lazy='selectin')
     host_devices = db.relationship('HostDevices', backref='host', lazy='selectin')
+
+
+class HostStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    state = db.Column(db.Boolean, default=False)
 
 
 class HostFacts(db.Model):

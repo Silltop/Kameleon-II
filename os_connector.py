@@ -1,9 +1,0 @@
-"""
-1. OS CONNECTION VARIETY (BASE SSH - PARAMIKO)
-2. OS DISCOVERY INCLUDING PACKAGE MANAGER 0 os_functionalities
-3. command execution?
-
-
-
-
-"""
