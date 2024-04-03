@@ -8,11 +8,20 @@
     <!-- text-monospace = font-family shifted to monospace -->
     <!-- Navbar nav -->
     <ul class="navbar-nav d-none d-md-flex">
-        <!-- d-none = display: none, d-md-flex = display: flex on medium screens and up (width > 768px) -->
+        <li class="nav-item dropdown with-arrow toggle-on-hover">
+          <a class="nav-link" data-toggle="dropdown" id="nav-link-dropdown-toggle-ansible">
+            Ansible
+            <i class="fa fa-angle-down ml-5" aria-hidden="true"></i>
+          </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-link-dropdown-toggle-ansible">
+        <a href="/ansible-dashboard" class="dropdown-item">Dashboard</a>
+        <a href="/ansible-wrapper-configuration" class="dropdown-item">Configuration</a>
+
+        </div></li>
         <li class="nav-item dropdown with-arrow toggle-on-hover">
           <a class="nav-link" data-toggle="dropdown" id="nav-link-dropdown-toggle">
             Reports
-            <i class="fa fa-angle-down ml-5" aria-hidden="true"></i> <!-- ml-5= margin-left: 0.5rem (5px) -->
+            <i class="fa fa-angle-down ml-5" aria-hidden="true"></i>
           </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-link-dropdown-toggle">
         <a href="/disks" class="dropdown-item">Disks</a>

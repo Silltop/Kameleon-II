@@ -4,7 +4,7 @@ from threading import Thread
 import schedule
 from data_management import db_models, sync_functions
 import extensions_handler
-# from ansible_wrapper import check_service_status
+from ansible_wrapper import ansible_routes, ansible_init
 from api import app
 from configuration import setup_logging, logger
 from threading import Event
