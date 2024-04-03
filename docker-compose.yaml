@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  main_machine:
+    build:
+      context: docker/
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 3
+    networks:
+      machine-net:
+
+networks:
+  machine-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.55.0/24"
