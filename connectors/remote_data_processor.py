@@ -47,7 +47,7 @@ def parse_device_results(values):
     for list_entry in values:
         if len(list_entry.split(" ")) != 5:
             parsed_results.append(
-                {'device': 'unknown', 'size': 0, 'used': 0, 'percentage': 0, 'mountpoint':'unknown', 'randomid': token_hex(10)})
+                {'device': 'unknown', 'size': 0, 'used': 0, 'percentage': 0, 'mountpoint': 'unknown'})
             break
         device, size, used, percentage, mountpoint = list_entry.split(" ")
         parsed_result = {
@@ -56,7 +56,6 @@ def parse_device_results(values):
             'used': used,
             'percentage': percentage,
             'mountpoint': mountpoint.strip("%\n"),
-            'randomid': token_hex(10)
         }
         parsed_results.append(parsed_result)
     return parsed_results

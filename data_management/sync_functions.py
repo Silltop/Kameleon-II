@@ -4,30 +4,33 @@ from datetime import datetime
 
 from configuration import config
 from connectors import remote_data_processor
+from connectors.api_connector import call_endpoints
 from data_management.db_models import HostFacts, HostIps, HostDevices, HostStatus, Host
 from api.app import db, app
 from connectors.remote_data_processor import *
 from configuration import logger
 
-def merge_list_of_dicts(dict_list: list):
-    combined_dict = {}
-    for d in dict_list:
-        for key, value in d.items():
-            combined_dict[key] = combined_dict.get(key, {})
-            combined_dict[key].update(value)
-    return combined_dict
 
-
-def gather_facts():
-    hostnames = parse_output_to_dict(execute_command('hostname'), 'hostname')
-    kernels = parse_output_to_dict(execute_command('uname -r'), 'kernel')
-    distro = parse_output_to_dict(
-        execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"' "), 'distro')
-    users = parse_output_to_dict(execute_command(
-        "awk -F: '$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print \"0\" }' /etc/passwd"),
-        'users')
-    dicts = [hostnames, kernels, distro, users]
-    return merge_list_of_dicts(dicts)
+# def merge_list_of_dicts(dict_list: list):
+#     combined_dict = {}
+#     for d in dict_list:
+#         for key, value in d.items():
+#             combined_dict[key] = combined_dict.get(key, {})
+#             combined_dict[key].update(value)
+#     return combined_dict
+#
+#
+# def gather_facts():
+#     print(call_endpoints("/host-facts", method='GET'))
+#     hostnames = parse_output_to_dict(execute_command('hostname'), 'hostname')
+#     kernels = parse_output_to_dict(execute_command('uname -r'), 'kernel')
+#     distro = parse_output_to_dict(
+#         execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"' "), 'distro')
+#     users = parse_output_to_dict(execute_command(
+#         "awk -F: '$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print \"0\" }' /etc/passwd"),
+#         'users')
+#     dicts = [hostnames, kernels, distro, users]
+#     return merge_list_of_dicts(dicts)
 
 
 def save_device_data():
@@ -82,7 +85,7 @@ def save_facts(facts):
 
 def sync_all():
     logger.info("Executing sync up with hosts...")
-    facts = gather_facts()
+    facts = call_endpoints("/host-facts", method='GET')  # gather_facts()
     save_facts(facts)
     save_ips_data()
     save_device_data()
@@ -97,13 +100,13 @@ def healthcheck_service():
         print(ip)
     host_status = HostStatus.query.filter_by(host_id=host_id_to_update).first()
 
-    #if host_status:
-        # Update the state in the HostStatus model
+    # if host_status:
+    # Update the state in the HostStatus model
     #    host_status.state = new_state
     #    db.session.commit()
-    #else:
-        # Handle the case where the HostStatus record does not exist for the specified host_id
+    # else:
+    # Handle the case where the HostStatus record does not exist for the specified host_id
     #    pass
     time.sleep(config.check_interval)
 
-#healthcheck_service()
+# healthcheck_service()

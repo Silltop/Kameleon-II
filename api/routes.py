@@ -6,6 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
 from connectors import remote_data_processor
+from connectors.api_connector import call_endpoints
 from .charts import Chart, ChartDataElement, chart_from_column_elements
 from data_management.db_models import HostFacts, Host, ExtensionRoutes
 # from ansible_wrapper import check_service_status
@@ -36,7 +37,7 @@ def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 min
 
 
 def render_template(*args, **kwargs):
-    # automatic add of navbar items as override to base flask function
+    """Dynamic list of navbar items as override to base flask function"""
     extension_routes = db.session.query(ExtensionRoutes).all()
     return base_render_template(*args, **kwargs, extension_routes=extension_routes)
 
@@ -58,13 +59,16 @@ def query_rbl_db(ip):
 @app.route('/load-avg', methods=['GET'])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def get_load_avg():
-    return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
+    #  raise NotImplementedError
+    return call_endpoints("/load-avg", method='GET')
+    #  return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
 
 
 @app.route('/uptime', methods=['GET'])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def uptime():
-    return remote_data_processor.execute_command("uptime")
+    return call_endpoints("/uptime", method='GET')
+    #  return remote_data_processor.execute_command("uptime")
 
 
 @app.route("/admin-functions")

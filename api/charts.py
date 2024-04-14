@@ -1,8 +1,6 @@
 from random import randint
 from secrets import token_hex
-
 from sqlalchemy import func
-
 from data_management.db_models import *
 
 

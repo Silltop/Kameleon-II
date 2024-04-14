@@ -2,7 +2,6 @@
 1. OS CONNECTION VARIETY (BASE SSH - PARAMIKO)
 2. OS DISCOVERY INCLUDING PACKAGE MANAGER 0 os_functionalities
 3. command execution?
-
 """
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Dict

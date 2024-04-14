@@ -39,4 +39,4 @@ if __name__ == '__main__':
     scheduler_thread = Thread(target=run_scheduled_jobs, args=(stop_event,), daemon=True, name="TaskExecutor")
     scheduler_thread.start()
     atexit.register(stop_background_threads, stop_event, [scheduler_thread])
-    app.run(debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", debug=True, use_reloader=True)
