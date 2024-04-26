@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional, List, Tuple, Dict
 from pssh.clients import ParallelSSHClient
 from pssh.exceptions import ConnectionError
-from host_management.utils import get_hosts_only
+from configuration import config
 
 
 @dataclass
@@ -60,7 +60,7 @@ class HostOutputManager:
 def execute_command_v2(command, hosts: tuple = None, default_on_error=None) -> HostOutputManager:
     # hosts, users = get_managed_hosts()
     if hosts is None:
-        hosts = get_hosts_only()
+        hosts = config.ConfigManager().ip_list
     client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=1, retry_delay=1, num_retries=1)
     command_output = client.run_command(command, stop_on_errors=False)
     hom = HostOutputManager()

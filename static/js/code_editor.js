@@ -1,8 +1,9 @@
 
 
 const editor = document.getElementById("editor");
+let code_data = document.getElementById("editor-content");
 const code = CodeMirror(editor, {
-  value: "hello\n",
+  value: code_data.innerHTML,
   mode: "yaml",
   lineNumbers: true,
   gutters: ["CodeMirror-lint-markers"],

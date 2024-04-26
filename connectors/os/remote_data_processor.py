@@ -7,15 +7,17 @@ Notes:
 """
 import ipaddress
 from secrets import token_hex
-from host_management.utils import get_hosts_only
+# from host_management.utils import get_hosts_only
 from pssh.clients import ParallelSSHClient
 from pssh.exceptions import ConnectionErrorException
+
+from configuration import config
 
 
 def execute_command(command, hosts: tuple = None):
     # hosts, users = get_managed_hosts()
     if hosts is None:
-        hosts = get_hosts_only()
+        hosts = config.ConfigManager().ip_list
     client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=1, retry_delay=1, num_retries=1)
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}

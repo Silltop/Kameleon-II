@@ -1,43 +1,18 @@
 import logging
 import time
 from datetime import datetime
-
-from configuration import config
-from connectors import remote_data_processor
-from connectors.api_connector import call_endpoints
+from connectors.connector import Connection
 from data_management.db_models import HostFacts, HostIps, HostDevices, HostStatus, Host
 from api.app import db, app
-from connectors.remote_data_processor import *
+from connectors.os.remote_data_processor import *
 from configuration import logger
-
-
-# def merge_list_of_dicts(dict_list: list):
-#     combined_dict = {}
-#     for d in dict_list:
-#         for key, value in d.items():
-#             combined_dict[key] = combined_dict.get(key, {})
-#             combined_dict[key].update(value)
-#     return combined_dict
-#
-#
-# def gather_facts():
-#     print(call_endpoints("/host-facts", method='GET'))
-#     hostnames = parse_output_to_dict(execute_command('hostname'), 'hostname')
-#     kernels = parse_output_to_dict(execute_command('uname -r'), 'kernel')
-#     distro = parse_output_to_dict(
-#         execute_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"' "), 'distro')
-#     users = parse_output_to_dict(execute_command(
-#         "awk -F: '$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print \"0\" }' /etc/passwd"),
-#         'users')
-#     dicts = [hostnames, kernels, distro, users]
-#     return merge_list_of_dicts(dicts)
 
 
 def save_device_data():
     with app.app_context():
-        devices = get_disk_devices_status()
+        devices = Connection().get_disk_devices()  # get_disk_devices_status()
         for host, device_list in devices.items():
-            for device_details in device_list:
+            for device_details in device_list.get("disk_devices"):
                 logging.debug(f"SYNC | Device of {host} found: {device_details.get('device')}")
                 host_id = Host.query.filter_by(host_ip=host).first()
                 device_entry = HostDevices.query.filter_by(name=device_details.get('device')).filter_by(
@@ -85,7 +60,7 @@ def save_facts(facts):
 
 def sync_all():
     logger.info("Executing sync up with hosts...")
-    facts = call_endpoints("/host-facts", method='GET')  # gather_facts()
+    facts = Connection().host_facts()
     save_facts(facts)
     save_ips_data()
     save_device_data()
@@ -95,7 +70,7 @@ def sync_all():
 
 def healthcheck_service():
     # make it a thread
-    data = remote_data_processor.execute_command("uptime")
+    data = Connection.get_uptime()
     for ip, output in data.items():
         print(ip)
     host_status = HostStatus.query.filter_by(host_id=host_id_to_update).first()

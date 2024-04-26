@@ -39,7 +39,7 @@ logging_config = {
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',
             'formatter': 'default',
-            'level': 'DEBUG'
+            'level': 'WARNING'
         },
         'stderr': {
             'class': 'logging.StreamHandler',
@@ -58,7 +58,7 @@ logging_config = {
     },
     "loggers": {
         'root': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'handlers': ['stdout', 'stderr', 'file']
         }
     }
@@ -88,6 +88,7 @@ def _handle_flask_exception(exception_object):
     response.content_type = "application/json"  # Set content type
     logging.error(f"API returned error: {http_error_code}, with description: {exception_object.description}")
     return response
+
 
 def setup_logging():
     dictConfig(config=logging_config)

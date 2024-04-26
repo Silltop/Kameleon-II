@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Inventory List{% endblock %}
+{% block content %}
+
+{% for group_name, values in inventory.items() %}
+<div class="card w-300">
+  <h3 class="card-title">
+    {{group_name}}
+  </h3>
+    <div class="card-body">
+    {% for hostname, host_values in values.get("hosts", {}).items() %}
+    <div>
+        {{hostname}}:
+        {% for key, var in host_values.items() %}<dd>
+        <li>{{key}}: {{var}}</li>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% include 'editor_body.html' %}
+{% endblock %}

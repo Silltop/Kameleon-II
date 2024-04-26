@@ -2,7 +2,7 @@ import datetime
 import logging
 
 from api.app import db
-from host_management.utils import get_hosts_only
+from configuration import config
 
 
 class Host(db.Model):
@@ -60,7 +60,7 @@ class ExtensionRoutes(db.Model):
 def init_db_tables_with_data():
     logging.info("Initializing DB entries from source file")
     db.create_all()
-    hosts = get_hosts_only()
+    hosts = config.ConfigManager().ip_list
     for ip in hosts:
         exists = Host.query.filter_by(host_ip=ip).first()
         if not exists:

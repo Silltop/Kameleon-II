@@ -1,20 +1,21 @@
 from functools import wraps
 
+import yaml
 from flask import url_for, redirect, session, request, jsonify
 from flask import render_template as base_render_template
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
-from connectors import remote_data_processor
-from connectors.api_connector import call_endpoints
+from configuration import config
+from configuration.config import ConfigManager
+from connectors.connector import Connection
 from .charts import Chart, ChartDataElement, chart_from_column_elements
 from data_management.db_models import HostFacts, Host, ExtensionRoutes
 # from ansible_wrapper import check_service_status
 from api.app import app, db, cache
 from host_management.rbl_checker import check_rbl
-from connectors.remote_data_processor import get_disk_devices_status
 from data_management.sync_functions import sync_all
-from host_management.utils import get_managed_hosts, get_hosts_only, ip_address_is_valid
+from host_management.utils import ip_address_is_valid
 from host_management import admin_functions
 
 
@@ -44,7 +45,8 @@ def render_template(*args, **kwargs):
 
 @app.route("/active-crontabs", methods=['GET'])
 def get_crontabs():
-    res = remote_data_processor.execute_command("crontab -l")
+    #  res = remote_data_processor.execute_command("crontab -l")
+    res = Connection().load_avg()
     return render_template('crontab.html', result=res)
 
 
@@ -60,21 +62,22 @@ def query_rbl_db(ip):
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def get_load_avg():
     #  raise NotImplementedError
-    return call_endpoints("/load-avg", method='GET')
+    return Connection().load_avg()
     #  return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
 
 
 @app.route('/uptime', methods=['GET'])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def uptime():
-    return call_endpoints("/uptime", method='GET')
+    return Connection().get_uptime()
     #  return remote_data_processor.execute_command("uptime")
 
 
 @app.route("/admin-functions")
 def admin_functions_render():
     results = session.pop('results', [])
-    return render_template("admin_functions.html", host_list=get_hosts_only(), results=results)
+    host_list = config.ConfigManager().ip_list
+    return render_template("admin_functions.html", host_list=host_list, results=results)
 
 
 @app.route("/run-function/<functionname>", methods=['POST'])
@@ -94,8 +97,8 @@ def login():
 
 @app.route("/config")
 def configuration_page():
-    mh = get_managed_hosts()
-    return render_template("config.html", managed_hosts=mh)
+    file = ConfigManager().file_content
+    return render_template("config.html", file_content=yaml.dump(file))
 
 
 @app.route("/disks")

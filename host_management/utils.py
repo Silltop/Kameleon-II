@@ -1,31 +1,7 @@
 import os
-
 import dns.resolver
 import ipaddress
 from configuration import config
-
-
-def get_managed_hosts():
-    with open(f'{os.getcwd()}/inventory/hosts', 'r') as f:
-        file_data = f.readlines()
-        to_return = []
-        for line in file_data:
-            line = line.split(' ')
-            host = line[0]
-            user = line[1].replace("ansible_user=", '')
-            to_return.append((host, user))
-        return to_return
-
-
-def get_hosts_only():
-    # todo remove hosts from db when not in file
-    with open(f'{os.getcwd()}/inventory/hosts', 'r') as f:
-        file_data = f.readlines()
-        to_return = []
-        for line in file_data:
-            line = line.split(' ')
-            to_return.append(line[0])
-        return to_return
 
 
 def dns_resolve_ip(domain: str):

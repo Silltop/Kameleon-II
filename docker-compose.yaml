@@ -22,19 +22,44 @@ services:
       - ./host_management:/kameleon/host_management
       - ./templates:/kameleon/templates
       - ./static:/kameleon/static
-      - ./inventory:/kameleon/inventory
+      - ./configuration.yaml:/kameleon/configuration.yaml
       - ./env:/kameleon/env
     ports:
       - "127.0.0.1:5000:5000"
 
-  agent_machine:
+  agent_machine_1:
     build:
       context: .
       dockerfile: docker/target_host.Dockerfile
     deploy:
-      replicas: 3
+      replicas: 1
     networks:
       machine-net:
+        ipv4_address: 192.168.55.3
+    volumes:
+      - ./agent:/kameleon-agent/
+
+  agent_machine_2:
+    build:
+      context: .
+      dockerfile: docker/target_host.Dockerfile
+    deploy:
+      replicas: 1
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.4
+    volumes:
+      - ./agent:/kameleon-agent/
+
+  agent_machine_3:
+    build:
+      context: .
+      dockerfile: docker/target_host.Dockerfile
+    deploy:
+      replicas: 1
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.5
     volumes:
       - ./agent:/kameleon-agent/
 

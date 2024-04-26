@@ -7,9 +7,8 @@
     Managed hosts
   </summary>
   <div class="collapse-content">
-    {% for host, user in managed_hosts %}
-    <p> Host: {{host}} User:{{user}}</p>
-    {% endfor %}
+    <div style="display: none" id="editor-content">{{file_content}}</div>
+    {% include 'editor_body.html' %}
   </div>
 </details>
 
