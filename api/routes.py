@@ -103,7 +103,7 @@ def configuration_page():
 
 @app.route("/disks")
 def disk_status():
-    disk_data = get_disk_devices_status()
+    disk_data = Connection().get_disk_devices()
     print(disk_data)
     return render_template("disks-status.html", disk_data=disk_data)
 

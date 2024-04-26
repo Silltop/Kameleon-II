@@ -10,6 +10,15 @@ const code = CodeMirror(editor, {
   lint: true
 });
 
+if (halfmoon.readCookie("halfmoon_preferredMode")) {
+    if (halfmoon.readCookie("halfmoon_preferredMode") == "light-mode") {
+        code.setOption("theme", "3024-day");
+    }
+    else if (halfmoon.readCookie("halfmoon_preferredMode") == "dark-mode") {
+        code.setOption("theme", "blackboard");
+    }
+}
+
 code.on("change", function () {
   const content = code.getValue();
   try {

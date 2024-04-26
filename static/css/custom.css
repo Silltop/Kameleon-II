@@ -5,6 +5,7 @@
     border-radius: 0.4rem;
     margin: 2rem;
     padding: 2rem;
+    width: 30vw;
 }
 
 .dark-mode .dashboard-content {
@@ -16,14 +17,9 @@
     padding: 2rem;
 }
 
-.disk-chart{
-    display:flex;
-    flex-direction: row;
+.container-fluid{
+    display: flex;
     flex-wrap: wrap;
-}
-.disk-chart .card{
-    padding: 0.3em;
-    margin: 0.3em;
 }
 
 .item-scroll{

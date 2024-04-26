@@ -7,7 +7,7 @@
         .then((rdata) => {
           for (const ip in rdata) {
             const status = rdata[ip][0];
-            console.log(rdata[ip])
+//            console.log(rdata[ip])
             const rows = document.querySelectorAll(".t-row");
             rows.forEach((row) => {
               const nameCell = row.firstElementChild;
