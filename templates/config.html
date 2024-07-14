@@ -2,14 +2,36 @@
 {% block title %}Tool configuration{% endblock %}
 {% block content %}
 
+
+<div class="">
 <details class="collapse-panel w-400 mw-full"> <!-- w-400 = width: 40rem (400px), mw-full = max-width: 100% -->
   <summary class="collapse-header">
-    Managed hosts
+    Managed hosts file <i class="fas fa-edit"></i>
   </summary>
   <div class="collapse-content">
     <div style="display: none" id="editor-content">{{file_content}}</div>
     {% include 'editor_body.html' %}
+    <button class="btn" onclick="saveConfig()"><i class="fa-solid fa-floppy-disk"></i></button>
   </div>
 </details>
 
+<script>
+function saveConfig() {
+  var configContent = document.getElementById("editor-content").value;
+
+  saveContent(configContent, "/saveContent", function(err, response) {
+      if (err) {
+          notifyStatus("error");
+          console.error(err);
+      } else {
+          notifyStatus("success");
+          console.log("Server response:", response);
+      }
+  });
+
+
+  toggleEditForm();
+}
+</script>
+</div>
 {% endblock %}

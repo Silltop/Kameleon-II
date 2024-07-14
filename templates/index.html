@@ -2,15 +2,22 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
+
+<div class="row font-size-12" style="font-size: ">
+  <div class="" style="margin-left: auto;"> Refresh data
+  <button class="btn" onclick="callAndNotify('/sync-all')"><i class="fa-solid fa-arrows-rotate"></i></button></div>
+</div>
+
 <div class="container-fluid">
 
-  <div class="dashboard-content">
+<div class="dashboard-content"></div>
+  <div class="dashboard-widget">
       <h2 class="content-title">
-        Overall status
+        Pinned statuses
       </h2>
   {% include 'chart.html' %}
   </div>
-  <div class="dashboard-content">
+  <div class="dashboard-widget">
       <h2 class="content-title">
         Host Summary
       </h2>
@@ -19,11 +26,11 @@
 <table class="table table-hover">
   <thead>
     <tr>
-      <th>Host</th>
+      <th>Hostname</th>
       <th>Distribution</th>
       <th>Kernel Version</th>
-      <th>IP's</th>
-      <th>Users</th>
+      <th>IP list</th>
+      <th>User Count</th>
       <th>Disk devices</th>
       <th>Sync Time</th>
     </tr>
@@ -31,7 +38,7 @@
   <tbody>
     {% for host, host_details in host_details_list %}
     <tr class="t-row">
-      <th class="first-cell"><i class="fa fa-power-off status-dot"></i> {{host_details.hostname}} ({{host.host_ip}})</th>
+      <th class="first-cell"><i class="fa fa-power-off status-dot"></i> {{host_details.hostname}}</th>
       <th>{{host_details.distro}}</th>
       <th>{{host_details.kernel}}</th>
       <td>
@@ -57,6 +64,6 @@
   </tbody>
 </table>
 <div>
-</div>
+</div></div>
 <script src="{{ url_for('static', filename='js/status.js') }}"></script>
 {% endblock %}

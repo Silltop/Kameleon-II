@@ -111,7 +111,7 @@ def disk_status():
 @app.route("/sync-all")
 def synchronize_data():
     sync_all()
-    return redirect(url_for('index'))
+    return jsonify("Data will be synchronized shortly")
 
 
 @app.route("/")

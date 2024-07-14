@@ -1,14 +1,18 @@
-.dashboard-content {
+.dashboard-content{
+    width: 100%;
+}
+
+.dashboard-widget {
     color: black;
     background-color: #f8f8f8;
     border: 1px solid rgba(205,205,205,.2);
     border-radius: 0.4rem;
     margin: 2rem;
     padding: 2rem;
-    width: 30vw;
+    width: 100%;
 }
 
-.dark-mode .dashboard-content {
+.dark-mode .dashboard-widget {
     color: rgba(255,255,255,.8);
     background-color: #191c20;
     border: 1px solid rgba(0,0,0,.2);
