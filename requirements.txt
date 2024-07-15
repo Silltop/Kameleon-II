@@ -3,7 +3,7 @@ pint==0.23
 requests
 ansible
 distro==1.9.0
-ansible-runner==2.3.6
+ansible-runner==2.4.0
 Flask-SQLAlchemy==3.1.1
 dnspython==2.6.1
 flask-CKEditor==0.5.1

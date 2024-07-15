@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Ansible Dashboard{% endblock %}
+{% block content %}
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Playbook Name</th>
+      <th>Status</th>
+      <th>Started by</th>
+      <th>Start</th>
+      <th>Duration</th>
+      <th>Options</th>
+    </tr>
+  </thead>
+  <tbody>
+            {% for row in table_data %}
+            <tr>
+                <td>{{ row.playbook_name }}</td>
+                <td>
+                {% if row.status == "success" %}
+                    <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Success </span>
+                {% elif row.status == "unknown" %}
+                    <span class="badge badge-pill"><i class="fa-solid fa-circle-question"></i> Unknown </span>
+                {% elif row.status == "failed" %}
+                    <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Failure </span>
+                {% elif row.status == "running" %}
+                    <span class="badge badge-primary"><i class="fa-solid fa-forward"></i> Running </span>
+                {% endif %}
+                </td>
+                <td>{{ row.started_by }}</td>
+                <td>{{ row.start }}</td>
+                <td>{{ row.duration }}</td>
+                <td><a href="/run_playbook/{{ row.id }}"><button class="btn btn-success">Run now</button> </a></td>
+            </tr>
+            {% endfor %}
+<!--<tr><td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Success </span></td><td></td><td></td></tr>-->
+<!--<tr><td><span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Failure </span></td><td></td><td></td></tr>-->
+<!--<tr><td><span class="badge badge-primary"><i class="fa-solid fa-forward"></i> Running </span></td><td></td><td></td></tr>-->
+<!--<tr><td><span class="badge badge-pill"><i class="fa-solid fa-circle-question"></i> Unknown </span></td><td></td><td></td></tr>-->
+
+
+  </tbody>
+</table>
+
+
+{% endblock %}

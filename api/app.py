@@ -33,6 +33,7 @@ app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = generate_random_secret_key(32)
 for directory in find_extensions_templates():
     app.jinja_loader.searchpath.append(directory)
+app.jinja_loader.searchpath.append(os.path.join(os.getcwd(), 'ansible_wrapper/templates'))
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.getcwd()}/db/kameleon.db"
 db = SQLAlchemy()

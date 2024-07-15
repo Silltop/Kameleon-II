@@ -24,6 +24,7 @@ services:
       - ./static:/kameleon/static
       - ./configuration.yaml:/kameleon/configuration.yaml
       - ./env:/kameleon/env
+      - ./ansible_wrapper/playbooks:/kameleon/ansible_wrapper/playbooks
     ports:
       - "127.0.0.1:5000:5000"
 

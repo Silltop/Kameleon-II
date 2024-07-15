@@ -24,3 +24,4 @@ class Domains(db.Model):
     dns_a = db.Column(db.String, nullable=False, default="Unknown")
     dns_mx = db.Column(db.String, nullable=False, default="Unknown")
     dns_ns = db.Column(db.String, nullable=False, default="Unknown")
+
