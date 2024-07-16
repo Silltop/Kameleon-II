@@ -25,7 +25,7 @@ logging_config = {
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': '[%(asctime)s | %(levelname)s] module:%(module)s: %(message)s ',
+            'format': '[%(asctime)s | %(levelname)s] module:%(module)s: %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         'detailed': {
@@ -69,4 +69,6 @@ def setup_logging():
     pssh_logger.setLevel(logging.CRITICAL)
     schedule_logger = logging.getLogger('schedule')
     schedule_logger.setLevel(level=logging.DEBUG)
+    werkzeug_logger = logging.getLogger('werkzeug')
+    werkzeug_logger.setLevel(logging.WARNING)
     dictConfig(config=logging_config)

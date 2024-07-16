@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Playbook log{% endblock %}
+{% block content %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Include CodeMirror styles and script -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
+    <!-- Include the theme selector stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/material.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <!-- Include the mode for displaying logs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/javascript/javascript.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/darcula.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/blackboard.css">
+</head>
+<body>
+    <h5>Logs will update every 5 seconds</h5>
+    <label for="theme-select">Select Theme:</label>
+    <select class="form-control" id="theme-select" >
+        <option value="default">Default</option>
+        <option value="material">Material</option>
+        <option value="blackboard">Blackboard</option>
+        <option value="darcula">Darcula</option>
+        <!-- Add more options as desired -->
+    </select>
+
+    <!-- CodeMirror editor -->
+    <textarea id="log-container" class="codemirror"></textarea>
+
+    <script>
+        var editor; // Declare editor variable globally
+
+        function initCodeMirror(theme) {
+            // Initialize CodeMirror with the selected theme
+            editor = CodeMirror.fromTextArea(document.getElementById('log-container'), {
+                lineNumbers: true,
+                readOnly: true,
+                mode: 'javascript',
+                theme: theme // Set initial theme
+            });
+        }
+
+        function fetchLogs(playbookId) {
+            $.ajax({
+                url: `/logs/${playbookId}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(logs) {
+                    displayLogs(logs);
+                },
+                error: function(error) {
+                    console.error('Error fetching logs:', error);
+                }
+            });
+        }
+
+        function displayLogs(logs) {
+            editor.setValue(''); // Clear existing content
+            logs.forEach(log => {
+                editor.replaceRange(log + '\n', CodeMirror.Pos(editor.lastLine()));
+            });
+        }
+
+        // Function to fetch logs for the latest playbook run and display them
+        function fetchAndDisplayLatestLogs(playbookId) {
+            fetchLogs(playbookId);
+        }
+
+        // Refresh logs every 5 seconds (adjust as needed)
+        setInterval(function() {
+            const playbookId = {{playbook_id}};
+            fetchAndDisplayLatestLogs(playbookId);
+        }, 5000); // 5000 milliseconds = 5 seconds
+
+        // Initial fetch on page load
+        $(document).ready(function() {
+            const playbookId = {{playbook_id}};
+            fetchAndDisplayLatestLogs(playbookId);
+
+            // Initialize CodeMirror with default theme
+            initCodeMirror('default');
+
+            // Theme selector change event
+            $('#theme-select').on('change', function() {
+                var selectedTheme = $(this).val();
+                editor.setOption('theme', selectedTheme); // Change editor theme dynamically
+            });
+        });
+    </script>
+{% endblock %}

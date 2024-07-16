@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Ansible Dashboard{% endblock %}
 {% block content %}
+<script language="javascript">
+setTimeout(function(){
+   window.location.reload(1);
+}, 5000);
+</script>
 
 <table class="table table-hover">
   <thead>
@@ -31,7 +36,10 @@
                 <td>{{ row.started_by }}</td>
                 <td>{{ row.start }}</td>
                 <td>{{ row.duration }}</td>
-                <td><a href="/run_playbook/{{ row.id }}"><button class="btn btn-success">Run now</button> </a></td>
+                <td>
+                    <button onclick="callAndNotify('/run_playbook/{{ row.id }}')" class="btn btn-primary"> Run now </button>
+                    <a href="/display_logs/{{ row.id }}"><button class="btn btn-primary"> Show recent logs </button></a>
+                </td>
             </tr>
             {% endfor %}
 <!--<tr><td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Success </span></td><td></td><td></td></tr>-->

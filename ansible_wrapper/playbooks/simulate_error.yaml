@@ -1,0 +1,5 @@
+- name: Demonstrate intentional error
+  hosts: localhost
+  tasks:
+    - name: Attempting to access a non-existent file
+      command: cat /path/to/nonexistent/file

@@ -1,7 +1,16 @@
 ---
 
 - name: Sleep for 2 minutes
-  hosts: all
+  hosts: all, 127.0.0.1
   tasks:
-    - name: Sleep for 2 minutes
-      command: sleep 120
+    - name: Sleep for 10 sec
+      command: sleep 10
+
+    - name: Sleep for 10 sec 2
+      command: sleep 10
+
+    - name: Sleep for 20 sec
+      command: sleep 20
+
+    - name: Sleep for 30 sec
+      command: sleep 30
