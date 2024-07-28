@@ -1,3 +1,4 @@
+import json
 import os
 
 import dns.resolver
@@ -27,6 +28,10 @@ def get_hosts_only():
             to_return.append(line[0])
         return to_return
 
+def get_rbls_from_json():
+    with open(f'{os.getcwd()}/inventory/rbl.json', 'r') as f:
+        file_data = json.load(f)
+        return file_data
 
 def dns_resolve_ip(domain: str):
     resolver = dns.resolver.Resolver()

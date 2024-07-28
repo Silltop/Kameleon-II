@@ -32,9 +32,22 @@ services:
       context: .
       dockerfile: docker/target_host.Dockerfile
     deploy:
-      replicas: 3
+      replicas: 1
     networks:
       machine-net:
+        ipv4_address: 192.168.55.3
+    volumes:
+      - ./agent:/kameleon-agent/
+
+  agent_machine1:
+    build:
+      context: .
+      dockerfile: docker/target_host.Dockerfile
+    deploy:
+      replicas: 1
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.4
     volumes:
       - ./agent:/kameleon-agent/
 

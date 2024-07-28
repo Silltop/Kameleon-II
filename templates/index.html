@@ -36,7 +36,7 @@
       <th>{{host_details.kernel}}</th>
       <td>
         {% for ip in host.host_ips %}
-        <div class="item-scroll {% if ip.is_private %}grey-string{% endif %}">
+        <div class="item-scroll {% if ip.is_listed %} red-string {% elif ip.is_private %} grey-string {% endif %}">
           {{ip.ip}}<br>
         </div>
         {% endfor %}
