@@ -37,6 +37,10 @@
     color: gray;
 }
 
+.red-string{
+    color: red;
+}
+
 .dashboard-content .card{
     padding: 1%;
     margin: 1%

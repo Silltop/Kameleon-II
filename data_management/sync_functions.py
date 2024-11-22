@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import time
 from datetime import datetime
@@ -6,6 +7,7 @@ from data_management.db_models import HostFacts, HostIps, HostDevices, HostStatu
 from api.app import db, app
 from connectors.os.remote_data_processor import *
 from configuration import logger
+from host_management.rbl_checker import check_rbl
 
 
 def save_device_data():
@@ -60,12 +62,38 @@ def save_facts(facts):
 
 def sync_all():
     logger.info("Executing sync up with hosts...")
-    facts = Connection().host_facts()
+    facts = call_endpoints("/host-facts", method='GET')  # gather_facts()
     save_facts(facts)
     save_ips_data()
     save_device_data()
+    asyncio.run(sync_rbl())
     logger.info("Sync up done")
     return 0
+
+async def sync_rbl():
+    print("sync_rbl - start")
+    with app.app_context():
+        ips = get_all_ips_on_host()
+        print("sync_rbl - ips", ips)
+        for host, ip_list in ips.items():
+            print("IP", host)
+            results_rbl = check_rbl(host)
+            await save_rbls_to_db(host, results_rbl)
+
+
+async def save_rbls_to_db(host, results_rbl):
+    for item in results_rbl:
+        for key, value in item.items():
+            if value == 1:
+                IpsHosts.query.filter_by()
+                print("RBL", key)
+                rblHosts = RblHosts.query.filter_by(orgName=key).first()
+                print("rblHosts: ", rblHosts)
+                hostIps = HostIps.query.filter_by(ip=host).first()
+                print("hostIps: ", hostIps)
+                ipsHosts = IpsHosts(host_ip_ip=hostIps.ip, rbl_ip_id=rblHosts.id)
+                db.session.add(ipsHosts)
+                db.session.commit()
 
 
 def healthcheck_service():
