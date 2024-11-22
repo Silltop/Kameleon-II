@@ -26,26 +26,22 @@ logging_config = {
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': '[%(asctime)s | %(levelname)s] module:%(module)s: %(message)s ',
+            "()": "core.loggers.ColorFormatter",
+            'format': '[%(asctime)s | %(levelname)s] module:%(module)s: | %(name)s | %(message)s ',
             'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         'detailed': {
-            'format': '[%(asctime)s | %(levelname)s | line:%(lineno)d] | %(module)s: %(message)s',
+            'format': '[%(asctime)s | %(levelname)s | line:%(lineno)d] | %(name)s | %(module)s: %(message)s',
             'datefmt': '%Y-%m-%dT%H:%M:%S%z'
         }
     },
     'handlers': {
         'stdout': {
+
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',
             'formatter': 'default',
-            'level': 'WARNING'
-        },
-        'stderr': {
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stderr',
-            'level': "WARNING",
-            'formatter': 'detailed'
+            'level': 'INFO'
         },
         'file': {
             'class': "logging.handlers.RotatingFileHandler",
@@ -59,7 +55,7 @@ logging_config = {
     "loggers": {
         'root': {
             'level': 'WARNING',
-            'handlers': ['stdout', 'stderr', 'file']
+            'handlers': ['stdout', 'file']
         }
     }
 }

@@ -25,11 +25,13 @@ logging_config = {
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': '[%(asctime)s | %(levelname)s] module:%(module)s: %(message)s',
+            "()": "core.loggers.ColorFormatter",
+            'format': '[%(asctime)s | %(levelname)s] module:%(module)s | %(name)s | %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         'detailed': {
-            'format': '[%(asctime)s | %(levelname)s | line:%(lineno)d] | %(module)s: %(message)s',
+            "()": "core.loggers.ColorFormatter",
+            'format': '[%(asctime)s | %(levelname)s | line:%(lineno)d] | %(name)s | %(module)s: %(message)s',
             'datefmt': '%Y-%m-%dT%H:%M:%S%z'
         }
     },
@@ -39,12 +41,6 @@ logging_config = {
             'stream': 'ext://sys.stdout',
             'formatter': 'default',
             'level': 'DEBUG'
-        },
-        'stderr': {
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stderr',
-            'level': "WARNING",
-            'formatter': 'detailed'
         },
         'file': {
             'class': "logging.handlers.RotatingFileHandler",
@@ -58,7 +54,7 @@ logging_config = {
     "loggers": {
         'root': {
             'level': 'DEBUG',
-            'handlers': ['stdout', 'stderr', 'file']
+            'handlers': ['stdout', 'file']
         }
     }
 }
@@ -71,4 +67,5 @@ def setup_logging():
     schedule_logger.setLevel(level=logging.DEBUG)
     werkzeug_logger = logging.getLogger('werkzeug')
     werkzeug_logger.setLevel(logging.WARNING)
+    werkzeug_logger.propagate = True
     dictConfig(config=logging_config)

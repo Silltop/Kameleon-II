@@ -1,4 +1,10 @@
 {
   "name": "Directadmin users summary",
+  "remote": {
+    "route_STRING": "FUNCTION NAME"
+  },
+  "local": {
+    "route_STRING": "FUNCTION NAME"
+  },
   "route": "/da-users"
 }

@@ -1,3 +1,6 @@
+import os
+
+import yaml
 from flask import render_template, jsonify, redirect, url_for
 
 from ansible_wrapper.ansible_init import PlaybookManager, run_ansible_playbook
@@ -6,6 +9,10 @@ from api.app import app, db, cache
 from configuration import logger
 from configuration.config import ConfigManager
 
+
+# fix me
+# https://stackoverflow.com/questions/41599500/flask-getting-url-prefix-for-blueprint-in-view
+
 def calculate_duration(start_date, end_date):
     if start_date and end_date:
         duration = end_date - start_date
@@ -13,10 +20,16 @@ def calculate_duration(start_date, end_date):
     else:
         return None
 
+
 @app.route('/ansible-wrapper-configuration')
 def ansible_configuration():
+    config_path = os.path.join(os.getcwd(), "ansible_wrapper", "ansible_configuration.yaml")
+    with open(config_path) as file:
+        config = yaml.safe_load(file)
+        print(config)
     PlaybookManager()
-    return render_template('ansible_config_dashboard.html')
+    return render_template('ansible_configuration.html', config=config)
+
 
 @app.route('/ansible-dashboard')
 def ansible_dashboard():
@@ -70,11 +83,13 @@ def get_recent_run(playbook_id):
     else:
         return jsonify({'error': 'No runs found for this playbook'}), 404
 
+
 @app.route('/run_playbook/<int:playbook_id>', methods=['GET'])
 def run_playbook(playbook_id):
     logger.debug(f"Starting runbook with id {playbook_id}")
     run_ansible_playbook(playbook_id)
     return jsonify({'message': 'Runbook will start shortly...'}), 200
+
 
 @app.route('/logs/<int:playbook_id>', methods=['GET'])
 def get_logs(playbook_id):
@@ -86,6 +101,7 @@ def get_logs(playbook_id):
     # Get logs for the most recent run
     logs = LogEntry.query.filter_by(ansible_run_id=ansible_run.id).all()
     return jsonify([log.message for log in logs])
+
 
 @app.route('/display_logs/<int:playbook_id>', methods=['GET'])
 def display_logs(playbook_id):

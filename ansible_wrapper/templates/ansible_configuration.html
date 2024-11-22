@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Ansible Configuration{% endblock %}
+{% block content %}
+
+Playbooks Path: <input type="text" class="form-control" value="{{config.playbooks_path}}" readonly="readonly">
+Inventory Path: <input type="text" class="form-control" value="{{config.inventory_path}}" readonly="readonly">
+Logs Path: <input type="text" class="form-control" value="{{config.logs_path}}" readonly="readonly">
+
+{% endblock %}

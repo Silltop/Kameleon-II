@@ -14,15 +14,20 @@
 </head>
 <body>
     <h5>Logs will update every 5 seconds</h5>
-    <label for="theme-select">Select Theme:</label>
-    <select class="form-control" id="theme-select" >
+    <div class="row justify-content-between">
+    <select class="form-control col-9" id="run-select" >
+        <option value="latest">latest</option>
+        <!-- Add more options as desired -->
+    </select>
+    <label for="theme-select"><i class="fa-solid fa-brush"></i> Theme:</label>
+    <select class="form-control col-sm-1" id="theme-select">
         <option value="default">Default</option>
         <option value="material">Material</option>
         <option value="blackboard">Blackboard</option>
         <option value="darcula">Darcula</option>
         <!-- Add more options as desired -->
     </select>
-
+    </div>
     <!-- CodeMirror editor -->
     <textarea id="log-container" class="codemirror"></textarea>
 

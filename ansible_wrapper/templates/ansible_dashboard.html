@@ -23,13 +23,13 @@ setTimeout(function(){
             <tr>
                 <td>{{ row.playbook_name }}</td>
                 <td>
-                {% if row.status == "success" %}
+                {% if row.status.lower() == "success" %}
                     <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Success </span>
-                {% elif row.status == "unknown" %}
+                {% elif row.status.lower() == "unknown" %}
                     <span class="badge badge-pill"><i class="fa-solid fa-circle-question"></i> Unknown </span>
-                {% elif row.status == "failed" %}
+                {% elif row.status.lower() == "failed" %}
                     <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Failure </span>
-                {% elif row.status == "running" %}
+                {% elif row.status.lower() == "running" %}
                     <span class="badge badge-primary"><i class="fa-solid fa-forward"></i> Running </span>
                 {% endif %}
                 </td>

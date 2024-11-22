@@ -1,3 +1,4 @@
+import logging
 from typing import List, Dict
 import requests
 from configuration import config
@@ -19,7 +20,7 @@ class ApiConnector:
             try:
                 response = requests.get(api_url)
             except requests.exceptions.ConnectionError as e:
-                print(f"ERROR CONNECTING TO {api_url} {e}")
+                logging.warning(f"Unable to connect to {api_url} {e}")
                 continue
             responses[host] = response.json()
         return responses

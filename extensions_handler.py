@@ -7,6 +7,8 @@ from data_management.db_models import ExtensionRoutes
 from api.app import db
 
 
+# todo make blueprints for remote api and local api
+# https://flask.palletsprojects.com/en/3.0.x/blueprints/
 def init_extensions():
     # Define the path to the extensions directory
     extensions_dir = 'extensions'
@@ -31,7 +33,6 @@ def init_extensions():
             extension_module = importlib.import_module(f"{extensions_dir}.{extension}")
             db.create_all()
     logging.info("Extensions lookup done")
-
 
 # def create_prefixed_table(model_class, prefix='extension_'):
 #     table_name = prefix + model_class.__name__.lower()

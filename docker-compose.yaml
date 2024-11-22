@@ -25,6 +25,7 @@ services:
       - ./configuration.yaml:/kameleon/configuration.yaml
       - ./env:/kameleon/env
       - ./ansible_wrapper/playbooks:/kameleon/ansible_wrapper/playbooks
+      - ./core:/kameleon/core
     ports:
       - "127.0.0.1:5000:5000"
 
@@ -39,6 +40,7 @@ services:
         ipv4_address: 192.168.55.3
     volumes:
       - ./agent:/kameleon-agent/
+      - ./core:/kameleon-agent/core
 
   agent_machine_2:
     build:
@@ -51,7 +53,7 @@ services:
         ipv4_address: 192.168.55.4
     volumes:
       - ./agent:/kameleon-agent/
-
+      - ./core:/kameleon-agent/core
   agent_machine_3:
     build:
       context: .
@@ -63,6 +65,7 @@ services:
         ipv4_address: 192.168.55.5
     volumes:
       - ./agent:/kameleon-agent/
+      - ./core:/kameleon-agent/core
 
 networks:
   machine-net:
