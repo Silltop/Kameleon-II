@@ -38,6 +38,11 @@ def uptime():
     return jsonify({"uptime": result})
 
 
+@app.route("/healthcheck", methods=['GET'])
+def healthcheck():
+    return jsonify("up", 200)
+
+
 @app.route("/load-avg", methods=['GET'])
 def load_avg():
     result = execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'").strip('\n')

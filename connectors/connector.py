@@ -32,6 +32,9 @@ class Connection:
     def get_uptime(self):
         return self.api_connector.get_uptime()
 
+    def healthcheck(self):
+        return self.api_connector.healthcheck()
+
     def load_avg(self):
         return self.api_connector.load_avg()
 

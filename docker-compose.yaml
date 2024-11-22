@@ -26,6 +26,7 @@ services:
       - ./env:/kameleon/env
       - ./ansible_wrapper/playbooks:/kameleon/ansible_wrapper/playbooks
       - ./core:/kameleon/core
+      - ./inventory:/kameleon/inventory
     ports:
       - "127.0.0.1:5000:5000"
 

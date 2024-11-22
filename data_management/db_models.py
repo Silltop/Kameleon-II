@@ -2,7 +2,8 @@ import datetime
 import logging
 
 from api.app import db
-from host_management.utils import get_hosts_only, get_rbls_from_json
+from configuration import config
+from host_management.utils import get_rbls_from_json
 
 
 class Host(db.Model):
@@ -40,10 +41,12 @@ class HostIps(db.Model):
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
     is_private = db.Column(db.Boolean, default=False)
 
+
 class IpsHosts(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_ip_ip = db.Column(db.String, db.ForeignKey('host_ips.ip'), nullable=False)
     rbl_ip_id = db.Column(db.Integer, db.ForeignKey('rbl_hosts.id'), nullable=False)
+
 
 class RblHosts(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

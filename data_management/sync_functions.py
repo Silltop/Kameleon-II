@@ -3,7 +3,7 @@ import logging
 import time
 from datetime import datetime
 from connectors.connector import Connection
-from data_management.db_models import HostFacts, HostIps, HostDevices, HostStatus, Host
+from data_management.db_models import HostFacts, HostIps, HostDevices, HostStatus, Host, IpsHosts, RblHosts
 from api.app import db, app
 from connectors.os.remote_data_processor import *
 from configuration import logger
@@ -15,7 +15,7 @@ def save_device_data():
         devices = Connection().get_disk_devices()  # get_disk_devices_status()
         for host, device_list in devices.items():
             for device_details in device_list.get("disk_devices"):
-                logging.debug(f"SYNC | Device of {host} found: {device_details.get('device')}")
+                logging.debug(f"#SYNC# Device of {host} found: {device_details.get('device')}")
                 host_id = Host.query.filter_by(host_ip=host).first()
                 device_entry = HostDevices.query.filter_by(name=device_details.get('device')).filter_by(
                     host_id=host_id.id).first()
@@ -62,23 +62,26 @@ def save_facts(facts):
 
 def sync_all():
     logger.info("Executing sync up with hosts...")
-    facts = call_endpoints("/host-facts", method='GET')  # gather_facts()
+    facts = Connection().host_facts()
+    healthcheck_service()
     save_facts(facts)
     save_ips_data()
     save_device_data()
-    asyncio.run(sync_rbl())
+    #asyncio.run(sync_rbl())
     logger.info("Sync up done")
     return 0
 
+
 async def sync_rbl():
-    print("sync_rbl - start")
+    logging.info("Starting scheduled RBL sync")
     with app.app_context():
         ips = get_all_ips_on_host()
-        print("sync_rbl - ips", ips)
+        #print("sync_rbl - ips", ips)
         for host, ip_list in ips.items():
-            print("IP", host)
+            #print("IP", host)
             results_rbl = check_rbl(host)
             await save_rbls_to_db(host, results_rbl)
+    logging.info("RBL sync done")
 
 
 async def save_rbls_to_db(host, results_rbl):
@@ -97,12 +100,27 @@ async def save_rbls_to_db(host, results_rbl):
 
 
 def healthcheck_service():
-    # make it a thread
-    data = Connection.get_uptime()
-    for ip, output in data.items():
-        print(ip)
-    host_status = HostStatus.query.filter_by(host_id=host_id_to_update).first()
+    def run_healthcheck():
+        data = Connection().healthcheck()  # Assumes this returns a dictionary {ip: status}
 
+        with app.app_context():  # Ensure the correct app context
+            for ip, output in data.items():
+                print(f"Checking IP: {ip}, Status: {output}")
+
+                # Join HostStatus and HostIps based on the IP address
+                host_status = (
+                    db.session.query(HostStatus)
+                    .join(HostIps, HostStatus.host_id == HostIps.host_id)
+                    .filter(HostIps.ip == ip)  # Match based on IP
+                    .first()
+                )
+
+                if host_status:  # If a corresponding HostStatus entry exists
+                    # Update state based on output
+                    host_status.state = bool(output)
+                    db.session.commit()
+                else:
+                    print(f"No host status found for IP: {ip}")
     # if host_status:
     # Update the state in the HostStatus model
     #    host_status.state = new_state

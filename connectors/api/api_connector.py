@@ -28,6 +28,9 @@ class ApiConnector:
     def get_uptime(self):
         return self.call_endpoints("/uptime", method='GET')
 
+    def healthcheck(self):
+        return self.call_endpoints("/healthcheck", method='GET')
+
     def load_avg(self):
         return self.call_endpoints("/load-avg", method='GET')
 
