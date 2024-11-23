@@ -1,0 +1,15 @@
+<!-- Modal HTML Structure -->
+<div class="modal" id="log-modal" tabindex="-1" role="dialog" data-overlay-dismissal-disabled="false" data-esc-dismissal-disabled="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width: 50vw">
+      <a href="#" class="btn close" role="button" aria-label="Close" id="close-modal-btn">
+        <span aria-hidden="true">&times;</span>
+      </a>
+      <h5 class="modal-title">Ansible Playbook Logs</h5>
+      <div id="log-container" class="modal-body" style="max-height: 800px; overflow-y: auto;">
+        <div class="loading-spinner"></div> <!-- Added loading spinner -->
+        Loading...
+      </div>
+    </div>
+  </div>
+</div>

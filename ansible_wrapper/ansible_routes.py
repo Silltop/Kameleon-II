@@ -1,4 +1,7 @@
+import base64
+import logging
 import os
+import time
 
 import yaml
 from flask import render_template, jsonify, redirect, url_for
@@ -8,6 +11,7 @@ from ansible_wrapper.ansible_models import AnsibleRuns, AnsiblePlaybooks, LogEnt
 from api.app import app, db, cache
 from configuration import logger
 from configuration.config import ConfigManager
+from flask import Response, stream_with_context
 
 
 # fix me
@@ -86,9 +90,13 @@ def get_recent_run(playbook_id):
 
 @app.route('/run_playbook/<int:playbook_id>', methods=['GET'])
 def run_playbook(playbook_id):
-    logger.debug(f"Starting runbook with id {playbook_id}")
-    run_ansible_playbook(playbook_id)
-    return jsonify({'message': 'Runbook will start shortly...'}), 200
+    try:
+        logger.debug(f"Starting runbook with id {playbook_id}")
+        ansible_run_id = run_ansible_playbook(playbook_id)
+        return jsonify({"status": "started", "run_id": ansible_run_id}), 202
+    except Exception as e:
+        logger.debug(f"Error {e}")
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route('/logs/<int:playbook_id>', methods=['GET'])
@@ -97,8 +105,6 @@ def get_logs(playbook_id):
     ansible_run = AnsibleRuns.query.filter_by(playbook_id=playbook_id).order_by(AnsibleRuns.start_time.desc()).first()
     if not ansible_run:
         return jsonify([])  # Return empty array if no runs found
-
-    # Get logs for the most recent run
     logs = LogEntry.query.filter_by(ansible_run_id=ansible_run.id).all()
     return jsonify([log.message for log in logs])
 
@@ -106,3 +112,33 @@ def get_logs(playbook_id):
 @app.route('/display_logs/<int:playbook_id>', methods=['GET'])
 def display_logs(playbook_id):
     return render_template('log_display.html', playbook_id=playbook_id)
+
+
+@app.route('/logs-stream/<int:ansible_run_id>')
+def stream_logs(ansible_run_id):
+    ansible_run = AnsibleRuns.query.get(ansible_run_id)
+    time.sleep(2)
+
+    def generate_logs():
+        last_sent_id = None  # This will track the ID of the last sent log entry
+        while True:
+            if last_sent_id:
+                log_entries = LogEntry.query.filter(LogEntry.ansible_run_id == ansible_run_id,
+                                                    LogEntry.id > last_sent_id).all()  # noqa E501
+            else:
+                log_entries = LogEntry.query.filter_by(ansible_run_id=ansible_run_id).all()
+            if log_entries:
+                logging.debug(f"Found {len(log_entries)} new log entries. sending stream...")
+
+                for log in log_entries:
+                    encoded_message = base64.b64encode(log.message.encode('utf-8')).decode('utf-8')
+                    yield f"data: {encoded_message}\n\n"
+                    last_sent_id = log.id
+
+            elif ansible_run.result != "running":
+                yield f"event: close\ndata: Playbook completed with result: {ansible_run.result}\n\n"
+                logging.debug("Closing stream.")
+                break  # Exit the loop to end the stream
+            time.sleep(0.5)
+
+    return Response(stream_with_context(generate_logs()), content_type='text/event-stream')

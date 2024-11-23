@@ -13,7 +13,7 @@ if not os.path.exists(logging_path):
 
 
 def get_handler_by_name(name):
-    logger = logging.getLogger("")
+    logger = logging.getLogger("Kameleon")
     for handler in logger.handlers:
         if handler.name == name:
             return handler
