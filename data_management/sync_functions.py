@@ -1,12 +1,20 @@
-import asyncio
 import logging
 import time
 from datetime import datetime
-from connectors.connector import Connection
-from data_management.db_models import HostFacts, HostIps, HostDevices, HostStatus, Host, IpsHosts, RblHosts
+
 from api.app import db, app
-from connectors.os.remote_data_processor import *
 from configuration import logger
+from connectors.connector import Connection
+from connectors.os.remote_data_processor import *
+from data_management.db_models import (
+    HostFacts,
+    HostIps,
+    HostDevices,
+    HostStatus,
+    Host,
+    IpsHosts,
+    RblHosts,
+)
 from host_management.rbl_checker import check_rbl
 
 
@@ -15,14 +23,22 @@ def save_device_data():
         devices = Connection().get_disk_devices()  # get_disk_devices_status()
         for host, device_list in devices.items():
             for device_details in device_list.get("disk_devices"):
-                logging.debug(f"#SYNC# Device of {host} found: {device_details.get('device')}")
+                logging.debug(
+                    f"#SYNC# Device of {host} found: {device_details.get('device')}"
+                )
                 host_id = Host.query.filter_by(host_ip=host).first()
-                device_entry = HostDevices.query.filter_by(name=device_details.get('device')).filter_by(
-                    host_id=host_id.id).first()
+                device_entry = (
+                    HostDevices.query.filter_by(name=device_details.get("device"))
+                    .filter_by(host_id=host_id.id)
+                    .first()
+                )
                 if device_entry is None:
-                    device_entry = HostDevices(name=device_details.get('device'), host_id=host_id.id,
-                                               mountpoint=device_details.get('mountpoint'),
-                                               size=device_details.get("size"))
+                    device_entry = HostDevices(
+                        name=device_details.get("device"),
+                        host_id=host_id.id,
+                        mountpoint=device_details.get("mountpoint"),
+                        size=device_details.get("size"),
+                    )
                     db.session.add(device_entry)
         db.session.commit()
 
@@ -31,14 +47,16 @@ def save_ips_data():
     with app.app_context():
         ips = get_all_ips_on_host()
         for host, ip_list in ips.items():
-            for ip in ip_list['ips']:
+            for ip in ip_list["ips"]:
                 logging.debug(f"SYNC | IP found: {ip}")
-                if 'Error' in ip:
+                if "Error" in ip:
                     ip = host
                 ip_entry = HostIps.query.filter_by(ip=ip).first()
                 if ip_entry is None:
                     host_id = Host.query.filter_by(host_ip=host).first()
-                    ip_entry = HostIps(ip=ip, host_id=host_id.id, is_private=is_private_ip(ip))
+                    ip_entry = HostIps(
+                        ip=ip, host_id=host_id.id, is_private=is_private_ip(ip)
+                    )
                     db.session.add(ip_entry)
         db.session.commit()
 
@@ -67,7 +85,7 @@ def sync_all():
     save_facts(facts)
     save_ips_data()
     save_device_data()
-    #asyncio.run(sync_rbl())
+    # asyncio.run(sync_rbl())
     logger.info("Sync up done")
     return 0
 
@@ -76,9 +94,9 @@ async def sync_rbl():
     logging.info("Starting scheduled RBL sync")
     with app.app_context():
         ips = get_all_ips_on_host()
-        #print("sync_rbl - ips", ips)
+        # print("sync_rbl - ips", ips)
         for host, ip_list in ips.items():
-            #print("IP", host)
+            # print("IP", host)
             results_rbl = check_rbl(host)
             await save_rbls_to_db(host, results_rbl)
     logging.info("RBL sync done")
@@ -101,7 +119,9 @@ async def save_rbls_to_db(host, results_rbl):
 
 def healthcheck_service():
     def run_healthcheck():
-        data = Connection().healthcheck()  # Assumes this returns a dictionary {ip: status}
+        data = (
+            Connection().healthcheck()
+        )  # Assumes this returns a dictionary {ip: status}
 
         with app.app_context():  # Ensure the correct app context
             for ip, output in data.items():
@@ -121,6 +141,7 @@ def healthcheck_service():
                     db.session.commit()
                 else:
                     print(f"No host status found for IP: {ip}")
+
     # if host_status:
     # Update the state in the HostStatus model
     #    host_status.state = new_state
@@ -129,5 +150,6 @@ def healthcheck_service():
     # Handle the case where the HostStatus record does not exist for the specified host_id
     #    pass
     time.sleep(config.check_interval)
+
 
 # healthcheck_service()

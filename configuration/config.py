@@ -2,9 +2,10 @@ import threading
 from typing import List
 
 import yaml
+
 from configuration import logger
 
-dns_ip = '8.8.8.8'
+dns_ip = "8.8.8.8"
 check_interval = 60
 max_concurrent_connections = 10
 
@@ -25,12 +26,13 @@ class ConfigManager:
         self.ip_list = self.load_ips()
 
     def load_content(self) -> None:
-        with open('configuration.yaml') as stream:
+        with open("configuration.yaml") as stream:
             try:
                 self.file_content = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 logger.exception(
-                    f"Unable to load configuration file make sure that .yaml file is valid. more info: {repr(exc)}")
+                    f"Unable to load configuration file make sure that .yaml file is valid. more info: {repr(exc)}"
+                )
 
     def validate(self):
         # todo add validation

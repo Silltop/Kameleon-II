@@ -1,6 +1,6 @@
+from api.app import app, db
 from api.routes import render_template
 from connectors.os import remote_data_processor
-from api.app import app, db
 from connectors.os.os_connector import execute_command_v2
 from extensions.directadmin.database_model import HostDAInfo, DAUserDetails
 
@@ -41,20 +41,24 @@ def sync_da():
                 db.session.add(hdi)
             current_users = da_users.get(ip)
             print(f"current users {current_users}")
-            emails = da_user_email.get(ip).split('\n')
+            emails = da_user_email.get(ip).split("\n")
             for entry in emails:
-                user, email = entry.split(':')
+                user, email = entry.split(":")
             print(f"e : {user}, {email}")
-            dad = DAUserDetails(host_id=ip, user_name=da_users.get(ip),
-                                email=da_user_email.get(ip), is_suspended=da_suspended_users.get(ip),
-                                package=da_user_packages.get(ip), quota=da_user_quota.get(ip)
-                                )
+            dad = DAUserDetails(
+                host_id=ip,
+                user_name=da_users.get(ip),
+                email=da_user_email.get(ip),
+                is_suspended=da_suspended_users.get(ip),
+                package=da_user_packages.get(ip),
+                quota=da_user_quota.get(ip),
+            )
             # db.session.add(dad)
 
-    # device_entry = HostDevices.query.filter_by(name=device_details.get('device')).filter_by(
-    #     host_id=host_id.id).first()
-    # if device_entry is None:
-    # host_facts = HostFacts.query.filter_by(host_id=host.id).first()
+        # device_entry = HostDevices.query.filter_by(name=device_details.get('device')).filter_by(
+        #     host_id=host_id.id).first()
+        # if device_entry is None:
+        # host_facts = HostFacts.query.filter_by(host_id=host.id).first()
         db.session.commit()
     return "ok"
 
@@ -77,9 +81,9 @@ class DAReport:
 
     @staticmethod
     def get_user_email():
-        command = '''for user in /usr/local/directadmin/data/users/*; do user=${user##*/}; [ "$user" != "root" ] && [ \
+        command = """for user in /usr/local/directadmin/data/users/*; do user=${user##*/}; [ "$user" != "root" ] && [ \
                   "$user" != "admin" ] && path="/usr/local/directadmin/data/users/$user/user.conf"; [ -f "$path" ] \
-                  && email=$(cat "$path" | grep "email=" | sed "s/email=//;s/\\\\n//") && echo "$user: $email"; done'''
+                  && email=$(cat "$path" | grep "email=" | sed "s/email=//;s/\\\\n//") && echo "$user: $email"; done"""
         hom = execute_command_v2(command, default_on_error="")
         return hom.get_output_per_host(merge_output=True)
 
@@ -106,7 +110,9 @@ class DAReport:
 
     @staticmethod
     def get_user_package():
-        command = 'output=$(for user in /usr/local/directadmin/data/users/*; do user=${user##*/}; ' \
-                  'path="/usr/local/directadmin/data/users/$user/user.conf"; [ -f "$path" ] && package=$(grep ' \
-                  '"package=" "$path" | sed "s/package=//") && echo "$user: $package"; done); echo "$output"'
+        command = (
+            "output=$(for user in /usr/local/directadmin/data/users/*; do user=${user##*/}; "
+            'path="/usr/local/directadmin/data/users/$user/user.conf"; [ -f "$path" ] && package=$(grep '
+            '"package=" "$path" | sed "s/package=//") && echo "$user: $package"; done); echo "$output"'
+        )
         return remote_data_processor.execute_command(command)

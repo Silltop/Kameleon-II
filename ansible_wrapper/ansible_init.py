@@ -1,17 +1,15 @@
-import asyncio
-import concurrent.futures
 import glob
 import logging
 import os
 import threading
 from dataclasses import dataclass
 from typing import List
+
 import ansible_runner
 import yaml
+
 from ansible_wrapper.ansible_models import *
 from api import app, db
-from configuration import logger
-from sqlalchemy.orm import sessionmaker, scoped_session
 
 
 @dataclass
@@ -33,11 +31,15 @@ def run_playbook(playbook_id, ansible_run_id, playbook_path):
                 raise ValueError(f"Ansible run with ID {ansible_run_id} not found")
 
             def callback(event_data):
-                stdout_str = event_data.get('stdout')
+                stdout_str = event_data.get("stdout")
                 if stdout_str:
                     # Use Flask's app context here
                     with app.app_context():
-                        log_entry = LogEntry(playbook_id=playbook_id, ansible_run_id=ansible_run_id, message=stdout_str)
+                        log_entry = LogEntry(
+                            playbook_id=playbook_id,
+                            ansible_run_id=ansible_run_id,
+                            message=stdout_str,
+                        )
                         db.session.add(log_entry)
                         db.session.commit()
 
@@ -48,12 +50,12 @@ def run_playbook(playbook_id, ansible_run_id, playbook_path):
             r = ansible_runner.run(
                 private_data_dir=f"{os.getcwd()}/tmp",
                 playbook=playbook_path,
-                event_handler=callback
+                event_handler=callback,
             )
             logger.info(f"{r.status}: {r.rc}")
 
             for each_host_event in r.events:
-                logger.info(each_host_event['event'])
+                logger.info(each_host_event["event"])
 
             # Update final status based on playbook run result
             if r.rc == 0:
@@ -85,13 +87,15 @@ def run_ansible_playbook(playbook_id):
             playbook_id=playbook.playbook_id,
             start_time=datetime.datetime.utcnow(),
             result="Running",
-            end_time=None
+            end_time=None,
         )
         db.session.add(ansible_run)
         db.session.commit()
         runid = ansible_run.id
         logging.info(f"Starting playbook thread for run {ansible_run.id}...")
-        thread = threading.Thread(target=run_playbook, args=(playbook_id, runid, playbook.playbook_path))
+        thread = threading.Thread(
+            target=run_playbook, args=(playbook_id, runid, playbook.playbook_path)
+        )
         thread.daemon = True
         thread.start()
         return runid
@@ -102,7 +106,9 @@ class PlaybookManager:
         print(__file__)
         print(os.getcwd())
         if playbook_location == "":
-            self.playbook_location = os.path.join(os.getcwd(), "ansible_wrapper", "playbooks")
+            self.playbook_location = os.path.join(
+                os.getcwd(), "ansible_wrapper", "playbooks"
+            )
         else:
             self.playbook_location = playbook_location
         self.playbook_definitions: List[PlaybookDefinition] = []
@@ -110,8 +116,8 @@ class PlaybookManager:
 
     @staticmethod
     def get_playbook_list(playbook_location) -> List:
-        path_yaml = f'{playbook_location}/*.yaml'
-        path_yml = f'{playbook_location}/*.yml'
+        path_yaml = f"{playbook_location}/*.yaml"
+        path_yml = f"{playbook_location}/*.yml"
         files = glob.glob(path_yaml) + glob.glob(path_yml)
         return files
 
@@ -127,10 +133,14 @@ class PlaybookManager:
                     ansible_template = yaml.safe_load(file)[0]
                     print(f"ansible template: {ansible_template}")
                     playbook_model = AnsiblePlaybooks.query.filter_by(
-                        playbook_name=ansible_template.get("name")).first()
+                        playbook_name=ansible_template.get("name")
+                    ).first()
                     if playbook_model:
                         continue
-                    new_playbook = AnsiblePlaybooks(playbook_name=ansible_template.get("name"), playbook_path=playbook)
+                    new_playbook = AnsiblePlaybooks(
+                        playbook_name=ansible_template.get("name"),
+                        playbook_path=playbook,
+                    )
                     db.session.add(new_playbook)
                     print(new_playbook)
             db.session.commit()

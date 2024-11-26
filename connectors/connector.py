@@ -1,12 +1,9 @@
-from abc import ABC, abstractmethod
-
 import configuration.config
 from connectors.api.api_connector import ApiConnector
 
 cfg = configuration.config.ConfigManager().file_content
 host_list = cfg.get("hosts")
 print(host_list)
-
 
 
 def separate_hosts():

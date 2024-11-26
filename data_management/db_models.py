@@ -10,19 +10,19 @@ class Host(db.Model):
     # change id to IP?
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_ip = db.Column(db.String, unique=True, nullable=False)
-    host_ips = db.relationship('HostIps', backref='host', lazy='selectin')
-    host_devices = db.relationship('HostDevices', backref='host', lazy='selectin')
+    host_ips = db.relationship("HostIps", backref="host", lazy="selectin")
+    host_devices = db.relationship("HostDevices", backref="host", lazy="selectin")
 
 
 class HostStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey("host.id"), nullable=False)
     state = db.Column(db.Boolean, default=False)
 
 
 class HostFacts(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey("host.id"), nullable=False)
     hostname = db.Column(db.String, nullable=False, default="Unknown")
     sync_timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     kernel = db.Column(db.String, nullable=False, default="Unknown")
@@ -32,20 +32,20 @@ class HostFacts(db.Model):
 
 class HostUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    host_id = db.Column(db.Integer, db.ForeignKey('host.id'))
+    host_id = db.Column(db.Integer, db.ForeignKey("host.id"))
     user = db.Column(db.String)
 
 
 class HostIps(db.Model):
     ip = db.Column(db.String, nullable=False, unique=True, primary_key=True)
-    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey("host.id"), nullable=False)
     is_private = db.Column(db.Boolean, default=False)
 
 
 class IpsHosts(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    host_ip_ip = db.Column(db.String, db.ForeignKey('host_ips.ip'), nullable=False)
-    rbl_ip_id = db.Column(db.Integer, db.ForeignKey('rbl_hosts.id'), nullable=False)
+    host_ip_ip = db.Column(db.String, db.ForeignKey("host_ips.ip"), nullable=False)
+    rbl_ip_id = db.Column(db.Integer, db.ForeignKey("rbl_hosts.id"), nullable=False)
 
 
 class RblHosts(db.Model):
@@ -57,7 +57,7 @@ class RblHosts(db.Model):
 
 class HostDevices(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    host_id = db.Column(db.Integer, db.ForeignKey('host.id'))
+    host_id = db.Column(db.Integer, db.ForeignKey("host.id"))
     name = db.Column(db.String, nullable=False, default="Unknown")
     mountpoint = db.Column(db.String, nullable=False, default="Unknown")
     size = db.Column(db.String, nullable=False, default="Unknown")

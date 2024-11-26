@@ -1,5 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from api.app import app, db
+from api.app import db
 
 
 class HostDAInfo(db.Model):
@@ -9,7 +8,9 @@ class HostDAInfo(db.Model):
 
 class DAUserDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    host_id = db.Column(db.Integer, db.ForeignKey('host_da_info.host_ip'), nullable=False)
+    host_id = db.Column(
+        db.Integer, db.ForeignKey("host_da_info.host_ip"), nullable=False
+    )
     user_name = db.Column(db.String, nullable=False, default="Unknown")
     email = db.Column(db.String, nullable=False, default="Unknown")
     is_suspended = db.Column(db.Boolean)
@@ -19,9 +20,8 @@ class DAUserDetails(db.Model):
 
 class Domains(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('da_user_details.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("da_user_details.id"), nullable=False)
     domain_name = db.Column(db.String, nullable=False, default="Unknown")
     dns_a = db.Column(db.String, nullable=False, default="Unknown")
     dns_mx = db.Column(db.String, nullable=False, default="Unknown")
     dns_ns = db.Column(db.String, nullable=False, default="Unknown")
-

@@ -1,11 +1,12 @@
 import json
+import logging
 import os
 from logging.config import dictConfig
-import logging
 from os import getcwd
-from api import app
+
 from werkzeug.exceptions import default_exceptions
-import routes
+
+from api import app
 
 logger = logging.getLogger("Kameleon-agent")
 logging_path = f"{getcwd()}/logs"
@@ -22,42 +23,36 @@ def get_handler_by_name(name):
 
 
 logging_config = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'default': {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
             "()": "core.loggers.ColorFormatter",
-            'format': '[%(asctime)s | %(levelname)s] module:%(module)s: | %(name)s | %(message)s ',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
+            "format": "[%(asctime)s | %(levelname)s] module:%(module)s: | %(name)s | %(message)s ",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
-        'detailed': {
-            'format': '[%(asctime)s | %(levelname)s | line:%(lineno)d] | %(name)s | %(module)s: %(message)s',
-            'datefmt': '%Y-%m-%dT%H:%M:%S%z'
-        }
+        "detailed": {
+            "format": "[%(asctime)s | %(levelname)s | line:%(lineno)d] | %(name)s | %(module)s: %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+        },
     },
-    'handlers': {
-        'stdout': {
-
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stdout',
-            'formatter': 'default',
-            'level': 'INFO'
+    "handlers": {
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "formatter": "default",
+            "level": "INFO",
         },
-        'file': {
-            'class': "logging.handlers.RotatingFileHandler",
-            'level': "WARNING",
-            'formatter': 'detailed',
-            'filename': f'{logging_path}/kameleon-error.log',
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "WARNING",
+            "formatter": "detailed",
+            "filename": f"{logging_path}/kameleon-error.log",
             "maxBytes": 1000000,
-            "backupCount": 3
+            "backupCount": 3,
         },
     },
-    "loggers": {
-        'root': {
-            'level': 'WARNING',
-            'handlers': ['stdout', 'file']
-        }
-    }
+    "loggers": {"root": {"level": "WARNING", "handlers": ["stdout", "file"]}},
 }
 
 
@@ -70,9 +65,13 @@ def _handle_flask_exception(exception_object):
     response = exception_object.get_response()
     http_error_code = exception_object.code
     if 400 <= http_error_code < 500:
-        error_description = "This is a client error, make sure you provided correct data."
+        error_description = (
+            "This is a client error, make sure you provided correct data."
+        )
     elif 500 <= http_error_code < 600:
-        error_description = "This is a server error, please provide this error to support team."
+        error_description = (
+            "This is a server error, please provide this error to support team."
+        )
     else:
         error_description = "Unknown error"
     response_data = {
@@ -82,7 +81,9 @@ def _handle_flask_exception(exception_object):
     }
     response.data = json.dumps(response_data)  # Convert data to JSON string
     response.content_type = "application/json"  # Set content type
-    logging.error(f"API returned error: {http_error_code}, with description: {exception_object.description}")
+    logging.error(
+        f"API returned error: {http_error_code}, with description: {exception_object.description}"
+    )
     return response
 
 

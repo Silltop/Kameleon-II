@@ -1,6 +1,8 @@
 import logging
-from typing import List, Dict
+from typing import Dict
+
 import requests
+
 from configuration import config
 
 
@@ -9,7 +11,9 @@ class ApiConnector:
         self.hosts = hosts
 
     @staticmethod
-    def call_endpoints(endpoint, hosts: tuple = None, method: str = 'GET', https=False) -> Dict:
+    def call_endpoints(
+        endpoint, hosts: tuple = None, method: str = "GET", https=False
+    ) -> Dict:
         # todo method handler
         # hosts, users = get_managed_hosts()
         if hosts is None:
@@ -26,16 +30,16 @@ class ApiConnector:
         return responses
 
     def get_uptime(self):
-        return self.call_endpoints("/uptime", method='GET')
+        return self.call_endpoints("/uptime", method="GET")
 
     def healthcheck(self):
-        return self.call_endpoints("/healthcheck", method='GET')
+        return self.call_endpoints("/healthcheck", method="GET")
 
     def load_avg(self):
-        return self.call_endpoints("/load-avg", method='GET')
+        return self.call_endpoints("/load-avg", method="GET")
 
     def get_facts(self):
-        return self.call_endpoints("/host-facts", method='GET')
+        return self.call_endpoints("/host-facts", method="GET")
 
     def get_disk_devices(self):
-        return self.call_endpoints("/disk-devices", method='GET')
+        return self.call_endpoints("/disk-devices", method="GET")

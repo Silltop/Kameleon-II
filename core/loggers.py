@@ -15,7 +15,7 @@ class ColorFormatter(logging.Formatter):
         logging.INFO: green,
         logging.WARNING: yellow,
         logging.ERROR: red,
-        logging.CRITICAL: bold_red
+        logging.CRITICAL: bold_red,
     }
 
     def format(self, record):
