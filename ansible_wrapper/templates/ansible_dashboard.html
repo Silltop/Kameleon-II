@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Ansible Dashboard{% endblock %}
 {% block content %}
-<!--<script language="javascript">-->
-<!--setTimeout(function(){-->
-<!--   window.location.reload(1);-->
-<!--}, 5000);-->
-<!--</script>-->
+<script src="{{ url_for('static', filename='js/color-log.js') }}"></script>
 <script src="{{ url_for('static', filename='js/log_fetch.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ansible_status_refresh.js') }}"></script>
 {% include 'log_modal.html' %}
 <script>
 function callAndNotifyAndOpenModal(endpoint, runbookid) {
@@ -16,17 +13,17 @@ function callAndNotifyAndOpenModal(endpoint, runbookid) {
             console.error('Error starting the runbook:', error);
             return;
         }
-
-        // Extract the run_id from the server response
         const ansibleRunId = response.run_id;
-
-        // Open the modal
         halfmoon.toggleModal('log-modal');
-
-        // Fetch logs for the specific run_id
         fetchLogs(ansibleRunId);
     });
 }
+var playbookNames = [];
+setInterval(() => {
+    playbookNames.forEach(playbookName => {
+        updatePlaybookStatus(playbookName);
+    });
+}, 10000); // 5000 milliseconds = 5 seconds
 </script>
 
 <table class="table table-hover">
@@ -42,9 +39,12 @@ function callAndNotifyAndOpenModal(endpoint, runbookid) {
   </thead>
   <tbody>
             {% for row in table_data %}
-            <tr>
+            <tr id="{{ row.id }}">
                 <td>{{ row.playbook_name }}</td>
                 <td>
+                <script>
+                    playbookNames.push("{{ row.id }}");
+                </script>
                 {% if row.status.lower() == "success" %}
                     <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Success </span>
                 {% elif row.status.lower() == "unknown" %}
@@ -62,16 +62,9 @@ function callAndNotifyAndOpenModal(endpoint, runbookid) {
 <!--                    <button onclick="callAndNotify('/run_playbook/{{ row.id }}')" class="btn btn-primary"> Run now </button>-->
                     <button onclick="callAndNotifyAndOpenModal('/run_playbook/{{ row.id }}', {{ row.id }})" class="btn btn-primary">Run now</button>
                     <a href="/display_logs/{{ row.id }}"><button class="btn btn-primary"> Show recent logs </button></a>
-                    <a href="#log-modal" class="btn btn-primary" role="button">Logs</a>
                 </td>
             </tr>
             {% endfor %}
-<!--<tr><td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Success </span></td><td></td><td></td></tr>-->
-<!--<tr><td><span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Failure </span></td><td></td><td></td></tr>-->
-<!--<tr><td><span class="badge badge-primary"><i class="fa-solid fa-forward"></i> Running </span></td><td></td><td></td></tr>-->
-<!--<tr><td><span class="badge badge-pill"><i class="fa-solid fa-circle-question"></i> Unknown </span></td><td></td><td></td></tr>-->
-
-
   </tbody>
 </table>
 

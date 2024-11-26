@@ -73,6 +73,17 @@ def ansible_dashboard():
     return render_template('ansible_dashboard.html', table_data=table_data)
 
 
+@app.route('/recent_run_status/<int:playbook_id>', methods=['GET'])
+def recent_run_status(playbook_id):
+    recent_run = AnsibleRuns.query.filter_by(playbook_id=playbook_id).order_by(AnsibleRuns.start_time.desc()).first()
+    if recent_run:
+        return jsonify({
+            'result': recent_run.result,
+        })
+    else:
+        return jsonify({'error': 'No runs found for this playbook'}), 404
+
+
 @app.route('/recent_run/<int:playbook_id>', methods=['GET'])
 def get_recent_run(playbook_id):
     recent_run = AnsibleRuns.query.filter_by(playbook_id=playbook_id).order_by(AnsibleRuns.start_time.desc()).first()
@@ -121,6 +132,9 @@ def stream_logs(ansible_run_id):
 
     def generate_logs():
         last_sent_id = None  # This will track the ID of the last sent log entry
+        with app.app_context():
+            time_string = f'Runbook started at <span class="cyan">{ansible_run.start_time}</span>'
+            yield f"data: {base64.b64encode(time_string.encode('utf-8')).decode('utf-8')}\n\n"
         while True:
             if last_sent_id:
                 log_entries = LogEntry.query.filter(LogEntry.ansible_run_id == ansible_run_id,

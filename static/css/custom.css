@@ -87,3 +87,23 @@
 .loading-spinner.hidden {
   display: none;
 }
+
+/* Style for fatal keyword */
+.fatal {
+    color: #DC143C;
+    font-weight: bold;
+}
+
+/* Style for error keyword */
+.red {
+    color: red;
+}
+
+/* Style for warning keyword */
+.orange {
+    color: orange;
+    font-weight: bold;
+}
+.cyan{
+    color: #00FFFF;
+}

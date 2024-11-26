@@ -5,7 +5,10 @@ function decodeBase64(encodedMessage) {
 
 document.addEventListener('DOMContentLoaded', function () {
     var logContainer = document.getElementById('log-container');
+    if (!logContainer) return; // Ensure logContainer exists
+
     var loadingSpinner = logContainer.querySelector('.loading-spinner');
+    if (!loadingSpinner) return; // Ensure loadingSpinner exists
 
     // Simulate loading with a delay (replace this with your actual log-fetching logic)
     setTimeout(function () {
@@ -17,26 +20,19 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function fetchLogs(ansibleRunId) {
-    // Create an EventSource connection for Server-Sent Events (SSE)
     var logContainer = document.getElementById('log-container');
     var loadingSpinner = logContainer.querySelector('.loading-spinner');
+
     loadingSpinner.classList.remove('hidden');
 
     const eventSource = new EventSource('/logs-stream/' + ansibleRunId);
 
-    // Listen for new log messages from the server
     eventSource.onmessage = function(event) {
-        const logContainer = document.getElementById('log-container');
-
-        // Create a new <p> element to hold the decoded log message
         const logMessage = document.createElement('p');
         let decodedLog = decodeBase64(event.data);  // Decode the log message
         console.log(decodedLog);
-        // Set the text content of the <p> element to the decoded log message
-        logMessage.textContent = decodedLog;
-        // Append the <p> element to the log container
+        logMessage.innerHTML = highlightKeywords(decodedLog);
         logContainer.appendChild(logMessage);
-        // Scroll to the bottom of the log container for new messages
         logContainer.scrollTop = logContainer.scrollHeight;
     };
 
@@ -51,6 +47,4 @@ function fetchLogs(ansibleRunId) {
         console.log('Stream closed:', event.data);
         eventSource.close();  // Gracefully close the connection
     });
-
-
 }
