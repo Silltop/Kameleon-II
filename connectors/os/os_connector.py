@@ -2,13 +2,14 @@
 1. OS CONNECTION VARIETY (BASE SSH - PARAMIKO)
 2. OS DISCOVERY INCLUDING PACKAGE MANAGER 0 os_functionalities
 3. command execution?
-
 """
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, List, Dict
+
 from pssh.clients import ParallelSSHClient
 from pssh.exceptions import ConnectionError
-from host_management.utils import get_hosts_only
+
+from configuration import config
 
 
 @dataclass
@@ -24,9 +25,9 @@ class HostOutput:
         """Return data in one string, merge stdout, stderr and exception"""
         return_str = ""
         if self.stdout is not None:
-            return_str += '\n'.join(self.stdout)
+            return_str += "\n".join(self.stdout)
         if self.stderr is not None:
-            return_str += '\n'.join(self.stderr)
+            return_str += "\n".join(self.stderr)
         return_str += str(self.exception_details)
         return return_str
 
@@ -55,14 +56,22 @@ class HostOutputManager:
         self.host_output_list.append(host_output)
 
     def get_output_per_host(self, merge_output: bool = False):
-        return {k: v for entry in self.host_output_list for k, v in entry.get_ip_with_output(merge_output).items()}
+        return {
+            k: v
+            for entry in self.host_output_list
+            for k, v in entry.get_ip_with_output(merge_output).items()
+        }
 
 
-def execute_command_v2(command, hosts: tuple = None, default_on_error=None) -> HostOutputManager:
+def execute_command_v2(
+    command, hosts: tuple = None, default_on_error=None
+) -> HostOutputManager:
     # hosts, users = get_managed_hosts()
     if hosts is None:
-        hosts = get_hosts_only()
-    client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=1, retry_delay=1, num_retries=1)
+        hosts = config.ConfigManager().ip_list
+    client = ParallelSSHClient(
+        hosts, user="root", pkey="./env/id_ed", timeout=1, retry_delay=1, num_retries=1
+    )
     command_output = client.run_command(command, stop_on_errors=False)
     hom = HostOutputManager()
     for entry in command_output:

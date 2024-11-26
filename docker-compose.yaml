@@ -1,13 +1,72 @@
 version: '3.8'
 services:
-  main_machine:
+  kameleon_machine:
     build:
-      context: docker/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/app.Dockerfile
     deploy:
-      replicas: 3
+      replicas: 1
     networks:
       machine-net:
+        ipv4_address: 192.168.55.2
+    volumes:
+      - ./main.py:/kameleon/main.py
+      - ./extensions_handler.py:/kameleon/extensions_handler.py
+      - ./ansible_wrapper:/kameleon/ansible_wrapper
+      - ./api:/kameleon/api
+      - ./configuration:/kameleon/configuration
+      - ./connectors:/kameleon/connectors
+      - ./data_management:/kameleon/data_management
+      - ./db:/kameleon/db
+      - ./extensions:/kameleon/extensions
+      - ./host_management:/kameleon/host_management
+      - ./templates:/kameleon/templates
+      - ./static:/kameleon/static
+      - ./configuration.yaml:/kameleon/configuration.yaml
+      - ./env:/kameleon/env
+      - ./ansible_wrapper/playbooks:/kameleon/ansible_wrapper/playbooks
+      - ./core:/kameleon/core
+      - ./inventory:/kameleon/inventory
+    ports:
+      - "127.0.0.1:5000:5000"
+
+  agent_machine_1:
+    build:
+      context: .
+      dockerfile: docker/target_host.Dockerfile
+    deploy:
+      replicas: 1
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.3
+    volumes:
+      - ./agent:/kameleon-agent/
+      - ./core:/kameleon-agent/core
+
+  agent_machine_2:
+    build:
+      context: .
+      dockerfile: docker/target_host.Dockerfile
+    deploy:
+      replicas: 1
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.4
+    volumes:
+      - ./agent:/kameleon-agent/
+      - ./core:/kameleon-agent/core
+  agent_machine_3:
+    build:
+      context: .
+      dockerfile: docker/target_host.Dockerfile
+    deploy:
+      replicas: 1
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.5
+    volumes:
+      - ./agent:/kameleon-agent/
+      - ./core:/kameleon-agent/core
 
 networks:
   machine-net:

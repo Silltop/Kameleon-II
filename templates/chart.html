@@ -28,10 +28,10 @@ function updateChart() {
     .then(data => {
       // Extract the IPs and load averages from the data
       const ips = Object.keys(data);
-      const loadAvgs = ips.map(ip => {
-        const loadAvgData = data[ip][0].split(' '); // Split the load avg string into an array
-        return parseFloat(loadAvgData[2]); // Get the 5-minute load average as a float
-      });
+        const loadAvgs = Object.values(data).map(entry => {
+          const loadAvgData = entry['load-avg'].split(' '); // Split the load avg string into an array
+          return parseFloat(loadAvgData[2]); // Get the 5-minute load average as a float
+        });
 
       // Create a new pie chart
       window.loadAvgChart = new Chart(ctx, {

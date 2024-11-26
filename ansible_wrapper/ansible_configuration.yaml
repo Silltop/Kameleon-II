@@ -1,0 +1,3 @@
+inventory_path: './inventory.yaml'
+playbooks_path: './playbooks/'
+logs_path: './logs/'

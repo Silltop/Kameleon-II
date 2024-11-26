@@ -1,20 +1,22 @@
 from functools import wraps
 
-from flask import url_for, redirect, session, request, jsonify
+import yaml
 from flask import render_template as base_render_template
+from flask import url_for, redirect, session, request, jsonify
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
-from connectors import remote_data_processor
-from .charts import Chart, ChartDataElement, chart_from_column_elements
-from data_management.db_models import HostFacts, Host, ExtensionRoutes
 # from ansible_wrapper import check_service_status
 from api.app import app, db, cache
-from host_management.rbl_checker import check_rbl
-from connectors.remote_data_processor import get_disk_devices_status
+from configuration import config
+from configuration.config import ConfigManager
+from connectors.connector import Connection
+from data_management.db_models import HostFacts, Host, ExtensionRoutes
 from data_management.sync_functions import sync_all
-from host_management.utils import get_managed_hosts, get_hosts_only, ip_address_is_valid
 from host_management import admin_functions
+from host_management.rbl_checker import check_rbl
+from host_management.utils import ip_address_is_valid
+from .charts import Chart, ChartDataElement, chart_from_column_elements
 
 
 def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 minutes)
@@ -36,18 +38,19 @@ def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 min
 
 
 def render_template(*args, **kwargs):
-    # automatic add of navbar items as override to base flask function
+    """Dynamic list of navbar items as override to base flask function"""
     extension_routes = db.session.query(ExtensionRoutes).all()
     return base_render_template(*args, **kwargs, extension_routes=extension_routes)
 
 
-@app.route("/active-crontabs", methods=['GET'])
+@app.route("/active-crontabs", methods=["GET"])
 def get_crontabs():
-    res = remote_data_processor.execute_command("crontab -l")
-    return render_template('crontab.html', result=res)
+    #  res = remote_data_processor.execute_command("crontab -l")
+    res = Connection().load_avg()
+    return render_template("crontab.html", result=res)
 
 
-@app.route("/query-rbl/<ip>", methods=['GET'])
+@app.route("/query-rbl/<ip>", methods=["GET"])
 def query_rbl_db(ip):
     if ip_address_is_valid(ip):
         result = check_rbl(ip)
@@ -55,32 +58,36 @@ def query_rbl_db(ip):
     return render_template("rbl_result.html", ip=ip, success=False)
 
 
-@app.route('/load-avg', methods=['GET'])
+@app.route("/load-avg", methods=["GET"])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def get_load_avg():
-    return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
+    #  raise NotImplementedError
+    return Connection().load_avg()
+    #  return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
 
 
-@app.route('/uptime', methods=['GET'])
+@app.route("/uptime", methods=["GET"])
 @cached_endpoint(timeout=60)  # Cache for 60 seconds
 def uptime():
-    return remote_data_processor.execute_command("uptime")
+    return Connection().get_uptime()
+    #  return remote_data_processor.execute_command("uptime")
 
 
 @app.route("/admin-functions")
 def admin_functions_render():
-    results = session.pop('results', [])
-    return render_template("admin_functions.html", host_list=get_hosts_only(), results=results)
+    results = session.pop("results", [])
+    host_list = config.ConfigManager().ip_list
+    return render_template("admin_functions.html", host_list=host_list, results=results)
 
 
-@app.route("/run-function/<functionname>", methods=['POST'])
+@app.route("/run-function/<functionname>", methods=["POST"])
 def run_admin_function(functionname):
-    hosts = request.form.get('host', None)
+    hosts = request.form.get("host", None)
     if hosts is not None:
         hosts = (hosts,)
     adm_function = getattr(admin_functions, functionname)
-    session['results'] = adm_function(hosts)
-    return redirect(url_for('admin_functions_render'))
+    session["results"] = adm_function(hosts)
+    return redirect(url_for("admin_functions_render"))
 
 
 @app.route("/login")
@@ -90,13 +97,13 @@ def login():
 
 @app.route("/config")
 def configuration_page():
-    mh = get_managed_hosts()
-    return render_template("config.html", managed_hosts=mh)
+    file = ConfigManager().file_content
+    return render_template("config.html", file_content=yaml.dump(file))
 
 
 @app.route("/disks")
 def disk_status():
-    disk_data = get_disk_devices_status()
+    disk_data = Connection().get_disk_devices()
     print(disk_data)
     return render_template("disks-status.html", disk_data=disk_data)
 
@@ -104,24 +111,47 @@ def disk_status():
 @app.route("/sync-all")
 def synchronize_data():
     sync_all()
-    return redirect(url_for('index'))
+    return (
+        jsonify(
+            {
+                "message": "Data will be synchronized, please wait and refresh page after some time..."
+            }
+        ),
+        200,
+    )
 
 
 @app.route("/")
 def index():
     host_details_list = []
-    host_details_list = db.session.query(Host, HostFacts) \
-        .join(HostFacts, Host.id == HostFacts.host_id) \
-        .options(subqueryload(Host.host_ips)) \
-        .options(subqueryload(Host.host_ips)) \
+    host_details_list = (
+        db.session.query(Host, HostFacts)
+        .join(HostFacts, Host.id == HostFacts.host_id)
+        .options(subqueryload(Host.host_ips))
+        .options(subqueryload(Host.host_ips))
         .all()
+    )
     print(host_details_list)
-    kernel_chart = chart_from_column_elements(HostFacts.kernel, title='Kernels')
-    distro_chart = chart_from_column_elements(HostFacts.distro, title='Distributions')
+    kernel_chart = chart_from_column_elements(HostFacts.kernel, title="Kernels")
+    distro_chart = chart_from_column_elements(HostFacts.distro, title="Distributions")
     hosts_all = db.session.query(HostFacts).count()
-    hosts_down = db.session.query(func.count()).filter(HostFacts.hostname.like('%connection error%')).scalar()
-    de1 = ChartDataElement('Hosts up', int(hosts_all - hosts_down))
-    de2 = ChartDataElement('Hosts down', int(hosts_down))
-    chart = Chart(name="hosts_up", title="Host Status", w="200em", h="150em", chart_type="pie", chart_data=[de1, de2])
-    return render_template("index.html", host_details_list=host_details_list,
-                           charts=[chart, kernel_chart, distro_chart])
+    hosts_down = (
+        db.session.query(func.count())
+        .filter(HostFacts.hostname.like("%connection error%"))
+        .scalar()
+    )
+    de1 = ChartDataElement("Hosts up", int(hosts_all - hosts_down))
+    de2 = ChartDataElement("Hosts down", int(hosts_down))
+    chart = Chart(
+        name="hosts_up",
+        title="Host Status",
+        w="200em",
+        h="150em",
+        chart_type="pie",
+        chart_data=[de1, de2],
+    )
+    return render_template(
+        "index.html",
+        host_details_list=host_details_list,
+        charts=[chart, kernel_chart, distro_chart],
+    )

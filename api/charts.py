@@ -6,17 +6,24 @@ from sqlalchemy import func
 from data_management.db_models import *
 
 
-def chart_from_column_elements(column, title='', type="bar"):
-    hostname_counts = db.session.query(column, func.count().label('count')) \
-        .group_by(column) \
-        .all()
+def chart_from_column_elements(column, title="", type="bar"):
+    hostname_counts = (
+        db.session.query(column, func.count().label("count")).group_by(column).all()
+    )
     # Convert the result into a dictionary for easy printing
     hostname_counts_dict = {hostname: count for hostname, count in hostname_counts}
     # Print the key-value pairs
     data = []
     for hostname, count in hostname_counts_dict.items():
         data.append(ChartDataElement(hostname, count))
-    return Chart(name=token_hex(10), title=title, w="250em", h="150em", chart_type=type, chart_data=data)
+    return Chart(
+        name=token_hex(10),
+        title=title,
+        w="250em",
+        h="150em",
+        chart_type=type,
+        chart_data=data,
+    )
 
 
 class ChartDataElement:

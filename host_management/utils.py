@@ -1,43 +1,28 @@
+import ipaddress
+import json
 import os
 
 import dns.resolver
-import ipaddress
+
 from configuration import config
 
 
-def get_managed_hosts():
-    with open(f'{os.getcwd()}/inventory/hosts', 'r') as f:
-        file_data = f.readlines()
-        to_return = []
-        for line in file_data:
-            line = line.split(' ')
-            host = line[0]
-            user = line[1].replace("ansible_user=", '')
-            to_return.append((host, user))
-        return to_return
-
-
-def get_hosts_only():
-    # todo remove hosts from db when not in file
-    with open(f'{os.getcwd()}/inventory/hosts', 'r') as f:
-        file_data = f.readlines()
-        to_return = []
-        for line in file_data:
-            line = line.split(' ')
-            to_return.append(line[0])
-        return to_return
+def get_rbls_from_json():
+    with open(f"{os.getcwd()}/inventory/rbl.json", "r") as f:
+        file_data = json.load(f)
+        return file_data
 
 
 def dns_resolve_ip(domain: str):
     resolver = dns.resolver.Resolver()
     resolver.nameservers = [config.dns_ip]
-    return resolver.resolve(domain, 'A')[0]
+    return resolver.resolve(domain, "A")[0]
 
 
 def dns_resolve_ns(domain: str):
     resolver = dns.resolver.Resolver()
     resolver.nameservers = [config.dns_ip]
-    return resolver.resolve(domain, 'NS')[0]
+    return resolver.resolve(domain, "NS")[0]
 
 
 def ip_address_is_valid(ip_string):

@@ -1,8 +1,11 @@
 import threading
+from typing import List
+
 import yaml
+
 from configuration import logger
 
-dns_ip = '8.8.8.8'
+dns_ip = "8.8.8.8"
 check_interval = 60
 max_concurrent_connections = 10
 
@@ -18,13 +21,28 @@ class ConfigManager:
         return cls._instance
 
     def __init__(self):
-        self.inventory = {}
-        self.load_inventory()
+        self.file_content = {}
+        self.load_content()
+        self.ip_list = self.load_ips()
 
-    def load_inventory(self):
-        print("HI")
-        with open('inventory/inventory.yaml') as stream:
+    def load_content(self) -> None:
+        with open("configuration.yaml") as stream:
             try:
-                self.inventory = yaml.safe_load(stream)
+                self.file_content = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
-                logger.exception(exc)
+                logger.exception(
+                    f"Unable to load configuration file make sure that .yaml file is valid. more info: {repr(exc)}"
+                )
+
+    def validate(self):
+        # todo add validation
+        raise NotImplementedError
+
+    def load_ips(self) -> List:
+        host_list = self.file_content.get("hosts", {})
+        if len(host_list) <= 0:
+            logger.warning("No hosts specified in the configuration!")
+        ip_list = []
+        for host_name, host_definition in host_list.items():
+            ip_list.append(host_definition.get("ip"))
+        return ip_list

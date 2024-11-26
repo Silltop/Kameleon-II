@@ -1,0 +1,222 @@
+[
+  {
+    "NAME": "spam.spamrats.com",
+    "URL": "http://www.spamrats.com"
+  },
+  {
+    "NAME": "spamguard.leadmon.net",
+    "URL": "http://www.leadmon.net/SpamGuard/"
+  },
+  {
+    "NAME": "rbl-plus.mail-abuse.org",
+    "URL": "http://www.mail-abuse.com/lookup.html"
+  },
+  {
+    "NAME": "web.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "ix.dnsbl.manitu.net",
+    "URL": "http://www.dnsbl.manitu.net"
+  },
+  {
+    "NAME": "virus.rbl.jp",
+    "URL": "http://www.rbl.jp"
+  },
+  {
+    "NAME": "dul.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "bogons.cymru.com",
+    "URL": "http://www.team-cymru.org/Services/Bogons/"
+  },
+  {
+    "NAME": "psbl.surriel.com",
+    "URL": "http://psbl.surriel.com"
+  },
+  {
+    "NAME": "misc.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "httpbl.abuse.ch",
+    "URL": "http://dnsbl.abuse.ch"
+  },
+  {
+    "NAME": "combined.njabl.org",
+    "URL": "http://combined.njabl.org"
+  },
+  {
+    "NAME": "smtp.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "korea.services.net",
+    "URL": "http://korea.services.net"
+  },
+  {
+    "NAME": "drone.abuse.ch",
+    "URL": "http://dnsbl.abuse.ch"
+  },
+  {
+    "NAME": "rbl.efnetrbl.org",
+    "URL": "http://rbl.efnetrbl.org"
+  },
+  {
+    "NAME": "cbl.anti-spam.org.cn",
+    "URL": "http://www.anti-spam.org.cn/?Locale=en_US"
+  },
+  {
+    "NAME": "b.barracudacentral.org",
+    "URL": "http://www.barracudacentral.org/rbl/removal-request"
+  },
+  {
+    "NAME": "bl.spamcannibal.org",
+    "URL": "http://www.spamcannibal.org"
+  },
+  {
+    "NAME": "xbl.spamhaus.org",
+    "URL": "http://www.spamhaus.org/xbl/"
+  },
+  {
+    "NAME": "zen.spamhaus.org",
+    "URL": "http://www.spamhaus.org/zen/"
+  },
+  {
+    "NAME": "rbl.suresupport.com",
+    "URL": "http://suresupport.com/postmaster"
+  },
+  {
+    "NAME": "db.wpbl.info",
+    "URL": "http://www.wpbl.info"
+  },
+  {
+    "NAME": "sbl.spamhaus.org",
+    "URL": "http://www.spamhaus.org/sbl/"
+  },
+  {
+    "NAME": "http.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "csi.cloudmark.com",
+    "URL": "http://www.cloudmark.com/en/products/cloudmark-sender-intelligence/index"
+  },
+  {
+    "NAME": "rbl.interserver.net",
+    "URL": "http://rbl.interserver.net"
+  },
+  {
+    "NAME": "ubl.unsubscore.com",
+    "URL": "http://www.lashback.com/blacklist/"
+  },
+  {
+    "NAME": "dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "virbl.bit.nl",
+    "URL": "http://virbl.bit.nl"
+  },
+  {
+    "NAME": "pbl.spamhaus.org",
+    "URL": "http://www.spamhaus.org/pbl/"
+  },
+  {
+    "NAME": "socks.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "short.rbl.jp",
+    "URL": "http://www.rbl.jp"
+  },
+  {
+    "NAME": "dnsbl.dronebl.org",
+    "URL": "http://www.dronebl.org"
+  },
+  {
+    "NAME": "blackholes.mail-abuse.org",
+    "URL": "http://www.mail-abuse.com/lookup.html"
+  },
+  {
+    "NAME": "truncate.gbudb.net",
+    "URL": "http://www.gbudb.com/truncate/index.jsp"
+  },
+  {
+    "NAME": "dyna.spamrats.com",
+    "URL": "http://www.spamrats.com"
+  },
+  {
+    "NAME": "spamrbl.imp.ch",
+    "URL": "http://antispam.imp.ch"
+  },
+  {
+    "NAME": "spam.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "wormrbl.imp.ch",
+    "URL": "http://antispam.imp.ch"
+  },
+  {
+    "NAME": "query.senderbase.org",
+    "URL": "http://www.senderbase.org/about"
+  },
+  {
+    "NAME": "opm.tornevall.org",
+    "URL": "http://dnsbl.tornevall.org"
+  },
+  {
+    "NAME": "netblock.pedantic.org",
+    "URL": "http://pedantic.org"
+  },
+  {
+    "NAME": "access.redhawk.org",
+    "URL": "http://www.redhawk.org/index.php?option=com_wrapper&Itemid=33"
+  },
+  {
+    "NAME": "cdl.anti-spam.org.cn",
+    "URL": "http://www.anti-spam.org.cn/?Locale=en_US"
+  },
+  {
+    "NAME": "multi.surbl.org",
+    "URL": "http://www.surbl.org"
+  },
+  {
+    "NAME": "noptr.spamrats.com",
+    "URL": "http://www.spamrats.com"
+  },
+  {
+    "NAME": "dnsbl.inps.de",
+    "URL": "http://dnsbl.inps.de/index.cgi?lang=en"
+  },
+  {
+    "NAME": "bl.spamcop.net",
+    "URL": "http://bl.spamcop.net"
+  },
+  {
+    "NAME": "cbl.abuseat.org",
+    "URL": "http://cbl.abuseat.org"
+  },
+  {
+    "NAME": "dsn.rfc-ignorant.org",
+    "URL": "http://www.rfc-ignorant.org/policy-dsn.php"
+  },
+  {
+    "NAME": "zombie.dnsbl.sorbs.net",
+    "URL": "http://www.sorbs.net"
+  },
+  {
+    "NAME": "dnsbl.njabl.org",
+    "URL": "http://dnsbl.njabl.org"
+  },
+  {
+    "NAME": "relays.mail-abuse.org",
+    "URL": "http://www.mail-abuse.com/lookup.html"
+  },
+  {
+    "NAME": "rbl.spamlab.com",
+    "URL": "http://tools.appriver.com/index.aspx?tool=rbl"
+  }
+]

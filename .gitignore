@@ -1,6 +1,6 @@
 .idea/
 artifacts/
-env/
+env/*
 hosts
-db
-authorized_keys
+db/*
+env/authorized_keys

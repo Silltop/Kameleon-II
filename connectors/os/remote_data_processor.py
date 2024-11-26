@@ -6,17 +6,21 @@ Notes:
     3. Of course, I tested, locally keys using ssh -i command.
 """
 import ipaddress
-from secrets import token_hex
-from host_management.utils import get_hosts_only
+
+# from host_management.utils import get_hosts_only
 from pssh.clients import ParallelSSHClient
 from pssh.exceptions import ConnectionErrorException
+
+from configuration import config
 
 
 def execute_command(command, hosts: tuple = None):
     # hosts, users = get_managed_hosts()
     if hosts is None:
-        hosts = get_hosts_only()
-    client = ParallelSSHClient(hosts, user='root', pkey='./env/id_ed', timeout=1, retry_delay=1, num_retries=1)
+        hosts = config.ConfigManager().ip_list
+    client = ParallelSSHClient(
+        hosts, user="root", pkey="./env/id_ed", timeout=1, retry_delay=1, num_retries=1
+    )
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
@@ -38,7 +42,10 @@ def execute_command(command, hosts: tuple = None):
 
 
 def parse_output_to_dict(result_to_parse, assignment_key):
-    parsed_output = {host: {assignment_key: res[0].strip("\n")} for host, res in result_to_parse.items()}
+    parsed_output = {
+        host: {assignment_key: res[0].strip("\n")}
+        for host, res in result_to_parse.items()
+    }
     return parsed_output
 
 
@@ -47,16 +54,22 @@ def parse_device_results(values):
     for list_entry in values:
         if len(list_entry.split(" ")) != 5:
             parsed_results.append(
-                {'device': 'unknown', 'size': 0, 'used': 0, 'percentage': 0, 'mountpoint':'unknown', 'randomid': token_hex(10)})
+                {
+                    "device": "unknown",
+                    "size": 0,
+                    "used": 0,
+                    "percentage": 0,
+                    "mountpoint": "unknown",
+                }
+            )
             break
         device, size, used, percentage, mountpoint = list_entry.split(" ")
         parsed_result = {
-            'device': device,
-            'size': size,
-            'used': used,
-            'percentage': percentage,
-            'mountpoint': mountpoint.strip("%\n"),
-            'randomid': token_hex(10)
+            "device": device,
+            "size": size,
+            "used": used,
+            "percentage": percentage,
+            "mountpoint": mountpoint.strip("%\n"),
         }
         parsed_results.append(parsed_result)
     return parsed_results
@@ -72,7 +85,7 @@ def get_disk_devices_status(hosts: tuple = None):
 
 def get_disk_devices_names(hosts: tuple = None):
     results = execute_command("df -h | awk 'NR>1 {print $1, $6}'")
-    return {host: {'devices': values} for host, values in results.items()}
+    return {host: {"devices": values} for host, values in results.items()}
 
 
 def get_disk_usage_per_user(hosts: tuple = None):
@@ -99,9 +112,10 @@ def is_private_ip(ip):
 
 
 def get_all_ips_on_host(hosts: tuple = None):
-    result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1", hosts)
-    return {host: {'ips': values} for host, values in result.items()}
-
+    result = execute_command(
+        "ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1", hosts
+    )
+    return {host: {"ips": values} for host, values in result.items()}
 
 
 def read_remote_file(remote_file_path):

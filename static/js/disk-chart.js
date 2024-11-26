@@ -1,6 +1,5 @@
-function createDiskSpaceChart(usedSpaceBytes, totalSpaceBytes, chartId) {
-  // Convert bytes to the highest appropriate unit and format as a string
-  function formatBytes(bytes, decimals = 2) {
+// Provided formatBytes function
+function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -10,59 +9,67 @@ function createDiskSpaceChart(usedSpaceBytes, totalSpaceBytes, chartId) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  }
+}
 
-  const usedSpace = formatBytes(usedSpaceBytes);
-  const totalSpace = formatBytes(totalSpaceBytes);
-  const freeSpaceBytes = totalSpaceBytes - usedSpaceBytes;
-  const freeSpace = formatBytes(freeSpaceBytes);
+// Function to create a disk usage chart
+function createDiskChart(canvasId, inputData) {
+    // Convert disk space values to decimals using formatBytes function
+    inputData.forEach(entry => {
+        entry.size = formatBytes(parseInt(entry.size));
+        entry.used = formatBytes(parseInt(entry.used));
+    });
 
-  // Calculate the percentage of used and free space
-  const usedSpacePercentage = (usedSpaceBytes / totalSpaceBytes) * 100;
-  const freeSpacePercentage = (freeSpaceBytes / totalSpaceBytes) * 100;
+    // Extracting data for labels and datasets
+    const labels = inputData.map(entry => entry.mountpoint); // Extract mountpoints for labels
+    const usedSpaceData = inputData.map(entry => parseFloat(entry.used)); // Extract used space data
+    const availableSpaceData = inputData.map(entry => parseFloat(entry.size) - parseFloat(entry.used)); // Calculate available space data
 
-  new Chart(
-    document.getElementById(chartId),
-    {
-      type: 'doughnut',
-      data: {
-        labels: ['Used Space', 'Free Space'],
+
+    // Creating the Chart.js compatible data object
+    const data = {
+        labels: labels,
         datasets: [{
-          data: [usedSpacePercentage, freeSpacePercentage],
-          backgroundColor: [
-            'rgba(204, 0, 0, 0.7)', // Red for Used Space
-            'rgba(0, 153, 0, 0.7)',     // Green for Free Space
-          ],
-        }],
-      },
-      options: {
-        animation: false,
-        responsive: false,
+            label: 'Used Space',
+            data: usedSpaceData,
+            backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red for used space
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }, {
+            label: 'Available Space',
+            data: availableSpaceData,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Blue for available space
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
 
-        plugins: {
-           title: {
-            display: true,
-            text: 'Total Space: ' + totalSpace,
-            position: 'bottom',
-            },
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            enabled: true,
-            callbacks: {
-              label: function (context) {
-                const dataIndex = context.dataIndex;
-                if (context.dataIndex === 0) {
-                  return 'Used Space: ' + usedSpace + ' (' + usedSpacePercentage.toFixed(2) + '%)';
-                } else {
-                  return 'Free Space: ' + freeSpace + ' (' + freeSpacePercentage.toFixed(2) + '%)';
+    // Configuration for the chart
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            indexAxis: 'y', // Display bars horizontally
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Disk Storage Status'
                 }
-              },
             },
-          },
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true
+                }
+            }
         },
-      },
-    }
-  );
+    };
+
+    // Get the canvas element
+    const ctx = document.getElementById(canvasId).getContext('2d');
+
+    // Create the chart
+    new Chart(ctx, config);
 }

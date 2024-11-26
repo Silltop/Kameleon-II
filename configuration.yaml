@@ -1,0 +1,13 @@
+hosts:
+  host1:
+    ip: 192.168.55.3
+    port: 6622
+    method: agent
+  host2:
+    ip: 192.168.55.4
+    port: 6622
+    method: agent
+  host3:
+    ip: 192.168.55.5
+    port: 6622
+    method: agent
