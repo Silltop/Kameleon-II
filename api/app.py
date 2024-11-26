@@ -15,11 +15,8 @@ def generate_random_secret_key(length):
 
 def find_extensions_templates():
     base_dir = os.path.join(os.getcwd(), "extensions")
-    # Define the pattern to look for template directories
     pattern = os.path.join(base_dir, "*", "templates")
-    # Use glob to find all directories that match the pattern
     template_dirs = glob.glob(pattern)
-    # Now, the template_dirs variable will contain a list of full paths to the template directories
     return template_dirs
 
 

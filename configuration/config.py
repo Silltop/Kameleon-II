@@ -39,7 +39,9 @@ class ConfigManager:
         raise NotImplementedError
 
     def load_ips(self) -> List:
-        host_list = self.file_content.get("hosts")
+        host_list = self.file_content.get("hosts", {})
+        if len(host_list) <= 0:
+            logger.warning("No hosts specified in the configuration!")
         ip_list = []
         for host_name, host_definition in host_list.items():
             ip_list.append(host_definition.get("ip"))
