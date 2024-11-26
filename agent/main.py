@@ -3,23 +3,13 @@ import logging
 import os
 from logging.config import dictConfig
 from os import getcwd
-
 from werkzeug.exceptions import default_exceptions
-
-from api import app
-
+from api import app  # noqa E401
+import routes  # noqa E401
 logger = logging.getLogger("Kameleon-agent")
 logging_path = f"{getcwd()}/logs"
 if not os.path.exists(logging_path):
     os.mkdir(logging_path)
-
-
-def get_handler_by_name(name):
-    logger = logging.getLogger("")
-    for handler in logger.handlers:
-        if handler.name == name:
-            return handler
-    return None
 
 
 logging_config = {
@@ -52,7 +42,9 @@ logging_config = {
             "backupCount": 3,
         },
     },
-    "loggers": {"root": {"level": "WARNING", "handlers": ["stdout", "file"]}},
+    "loggers": {"root": {"level": "WARNING", "handlers": ["stdout", "file"]},
+                "werkzeug": {"level": "INFO", "propagate": True}
+                },
 }
 
 

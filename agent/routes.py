@@ -1,7 +1,5 @@
 import subprocess
-
 from flask import jsonify, abort
-
 from api import app
 
 
@@ -88,7 +86,7 @@ def disk_devices():
 
 @app.route("/", methods=["GET"])
 def index():
-    result = {"Welcome page": "This is api response"}
+    result = {"Welcome": "This is api response"}
     return jsonify(result)
 
 

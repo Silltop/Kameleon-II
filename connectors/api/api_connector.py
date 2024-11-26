@@ -30,17 +30,17 @@ class ApiConnector:
             responses[host] = response.json()
         return responses
 
-    def get_uptime(self) -> Dict[dict]:
+    def get_uptime(self):
         return self.call_endpoints("/uptime", method="GET")
 
-    def healthcheck(self) -> Dict:
+    def healthcheck(self):
         return self.call_endpoints("/healthcheck", method="GET")
 
-    def load_avg(self) -> Dict:
+    def load_avg(self):
         return self.call_endpoints("/load-avg", method="GET")
 
-    def get_facts(self) -> Dict:
+    def get_facts(self):
         return self.call_endpoints("/host-facts", method="GET")
 
-    def get_disk_devices(self) -> Dict:
+    def get_disk_devices(self):
         return self.call_endpoints("/disk-devices", method="GET")

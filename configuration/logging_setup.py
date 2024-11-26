@@ -9,14 +9,6 @@ if not os.path.exists(logging_path):
     os.mkdir(logging_path)
 
 
-def get_handler_by_name(name):
-    logger = logging.getLogger("Kameleon")
-    for handler in logger.handlers:
-        if handler.name == name:
-            return handler
-    return None
-
-
 logging_config = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -48,16 +40,14 @@ logging_config = {
             "backupCount": 3,
         },
     },
-    "loggers": {"root": {"level": "DEBUG", "handlers": ["stdout", "file"]}},
+    "loggers": {"root": {"level": "DEBUG", "handlers": ["stdout", "file"]},
+                "werkzeug": {"level": "INFO", "propagate": True},
+                "pssh": {"level": "WARNING", "propagate": True},
+                "schedule": {"level": "WARNING", "propagate": True},
+                "urllib3": {"level": "WARNING", "propagate": True}
+                },
 }
 
 
 def setup_logging():
-    pssh_logger = logging.getLogger("pssh")
-    pssh_logger.setLevel(logging.CRITICAL)
-    schedule_logger = logging.getLogger("schedule")
-    schedule_logger.setLevel(level=logging.DEBUG)
-    werkzeug_logger = logging.getLogger("werkzeug")
-    werkzeug_logger.setLevel(logging.WARNING)
-    werkzeug_logger.propagate = True
     dictConfig(config=logging_config)

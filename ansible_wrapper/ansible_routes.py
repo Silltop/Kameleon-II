@@ -32,7 +32,6 @@ def ansible_configuration():
     )
     with open(config_path) as file:
         config = yaml.safe_load(file)
-        print(config)
     PlaybookManager()
     return render_template("ansible_configuration.html", config=config)
 
@@ -83,7 +82,6 @@ def ansible_dashboard():
                 "duration": duration,
             }
         )
-    print(table_data)
     return render_template("ansible_dashboard.html", table_data=table_data)
 
 

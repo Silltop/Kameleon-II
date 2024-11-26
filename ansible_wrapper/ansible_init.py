@@ -4,13 +4,10 @@ import os
 import threading
 from dataclasses import dataclass
 from typing import List
-
 import ansible_runner
 import yaml
-
 from ansible_wrapper.ansible_models import *
 from api import app, db
-
 
 @dataclass
 class PlaybookDefinition:
@@ -131,7 +128,6 @@ class PlaybookManager:
             for playbook in self.get_playbook_list(self.playbook_location):
                 with open(playbook) as file:
                     ansible_template = yaml.safe_load(file)[0]
-                    print(f"ansible template: {ansible_template}")
                     playbook_model = AnsiblePlaybooks.query.filter_by(
                         playbook_name=ansible_template.get("name")
                     ).first()
@@ -142,5 +138,4 @@ class PlaybookManager:
                         playbook_path=playbook,
                     )
                     db.session.add(new_playbook)
-                    print(new_playbook)
             db.session.commit()

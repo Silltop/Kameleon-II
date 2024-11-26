@@ -4,3 +4,5 @@ env/*
 hosts
 db/*
 env/authorized_keys
+logs/*
+agent/logs/*

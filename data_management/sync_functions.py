@@ -24,7 +24,7 @@ def save_device_data():
         for host, device_list in devices.items():
             for device_details in device_list.get("disk_devices"):
                 logging.debug(
-                    f"#SYNC# Device of {host} found: {device_details.get('device')}"
+                    f"SYNC Device of {host} found: {device_details.get('device')}"
                 )
                 host_id = Host.query.filter_by(host_ip=host).first()
                 device_entry = (
