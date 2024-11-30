@@ -2,6 +2,43 @@
 {% block title %}Directadmin Summary of all hosts{% endblock %}
 {% block content %}
 
+{% for host, users in data.items() %}
+<h3>{{host}}</h3>
 
+
+<table class="table table-no-outer-padding">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Email</th>
+      <th>Quota</th>
+      <th>Package</th>
+      <th>Domains</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for username, output in users.items() %}
+    <tr>
+      <th>{{username}}</th>
+      <td>
+        {{output.email}}
+      </td>
+      <td>
+        {{output.quota}}
+      </td>
+      <td>
+        {{output.package}}
+      </td>
+      <td>
+        {% for domain in output.domains %}
+        {{domain}}<br>
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endfor %}
 
 {% endblock %}

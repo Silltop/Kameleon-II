@@ -27,6 +27,8 @@ class ApiConnector:
             except requests.exceptions.ConnectionError as e:
                 logging.warning(f"Unable to connect to {api_url} {e}")
                 continue
+            if response.status_code == 211:
+                continue
             responses[host] = response.json()
         return responses
 
@@ -44,3 +46,9 @@ class ApiConnector:
 
     def get_disk_devices(self):
         return self.call_endpoints("/disk-devices", method="GET")
+
+    def get_da_info(self):
+        return self.call_endpoints("/get-da-all-info", method="GET")
+
+    def get_da_suspended(self):
+        return self.call_endpoints("/get-suspended-users", method="GET")

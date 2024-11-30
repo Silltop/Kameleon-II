@@ -4,13 +4,15 @@ import os
 from logging.config import dictConfig
 from os import getcwd
 from werkzeug.exceptions import default_exceptions
+
+from utils import register_blueprints
 from api import app  # noqa E401
 import routes  # noqa E401
+
 logger = logging.getLogger("Kameleon-agent")
 logging_path = f"{getcwd()}/logs"
 if not os.path.exists(logging_path):
     os.mkdir(logging_path)
-
 
 logging_config = {
     "version": 1,
@@ -83,8 +85,12 @@ def setup_logging():
     dictConfig(config=logging_config)
 
 
+
+
 if __name__ == "__main__":
     setup_logging()
 
     _override_flask_exceptions()
+    register_blueprints()
     app.run(host="0.0.0.0", debug=True, use_reloader=True, port=6622)
+

@@ -27,14 +27,16 @@ def init_extensions():
         if os.path.isfile(json_file):
             with open(json_file, "r") as f:
                 json_data = json.loads(f.read())
-                name = json_data["name"]
-                exists = ExtensionRoutes.query.filter_by(name=name).first()
-                if not exists:
-                    er = ExtensionRoutes(
-                        name=json_data["name"], route=json_data["route"]
-                    )
-                    logging.info(f"Extension found: {name}")
-                    db.session.add(er)
+                extension_name = json_data["name"]
+                logging.info(f"Extension found: {extension_name}")
+                routes = json_data["routes"]
+                for routename, route in routes.items():
+                    exists = ExtensionRoutes.query.filter_by(name=routename).first()
+                    if not exists:
+                        er = ExtensionRoutes(
+                            name=routename, route=route
+                        )
+                        db.session.add(er)
             db.session.commit()
             extension_module = importlib.import_module(f"{extensions_dir}.{extension}")
             db.create_all()

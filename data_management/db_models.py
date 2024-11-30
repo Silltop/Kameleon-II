@@ -7,7 +7,6 @@ from host_management.utils import get_rbls_from_json
 
 
 class Host(db.Model):
-    # change id to IP?
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     host_ip = db.Column(db.String, unique=True, nullable=False)
     host_ips = db.relationship("HostIps", backref="host", lazy="selectin")

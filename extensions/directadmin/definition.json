@@ -1,10 +1,7 @@
 {
-  "name": "Directadmin users summary",
-  "remote": {
-    "route_STRING": "FUNCTION NAME"
-  },
-  "local": {
-    "route_STRING": "FUNCTION NAME"
-  },
-  "route": "/da-users"
+  "name": "Directadmin",
+  "routes": {
+    "Directadmin users summary": "/da-users",
+    "Directadmin suspended users": "/da-suspended-users"
+  }
 }

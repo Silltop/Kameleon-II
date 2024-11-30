@@ -1,7 +1,7 @@
 
 FROM debian:stable-slim
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN apt-get update && apt-get install -y openssh-server python3 python3-pip iproute2 exim4
+RUN apt-get update && apt-get install -y openssh-server python3 python3-pip iproute2 exim4 curl
 RUN mkdir -p /root/.ssh
 RUN mkdir /var/run/sshd
 RUN chown -R root:root /root/.ssh

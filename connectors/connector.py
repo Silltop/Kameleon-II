@@ -48,3 +48,9 @@ class Connection:
 
     def get_all_ips_on_host(self):
         pass
+
+    def get_da_info(self):
+        return self.api_connector.get_da_info()
+
+    def get_da_suspended(self):
+        return self.api_connector.get_da_suspended()
