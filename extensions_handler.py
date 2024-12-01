@@ -31,10 +31,10 @@ def init_extensions():
                 logging.info(f"Extension found: {extension_name}")
                 routes = json_data["routes"]
                 for routename, route in routes.items():
-                    exists = ExtensionRoutes.query.filter_by(name=routename).first()
+                    exists = ExtensionRoutes.query.filter_by(route_name=routename).first()
                     if not exists:
                         er = ExtensionRoutes(
-                            name=routename, route=route
+                            extension_name=extension_name, route_name=routename, route_endpoint=route
                         )
                         db.session.add(er)
             db.session.commit()

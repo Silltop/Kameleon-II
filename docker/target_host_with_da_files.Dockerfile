@@ -32,6 +32,43 @@ RUN bash -c ' \
         fi \
     done'
 
+RUN mkdir -p /usr/local/directadmin/scripts
+
+# Mock the da command with a script that simulates `da build versions`
+RUN echo '#!/bin/bash' > /usr/local/bin/da && \
+    echo 'if [ "$1" == "build" ] && [ "$2" == "versions" ]; then' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of Apache: 2.4.62"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of Apache: 2.4.62"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of Pure-FTPd: 1.0.52"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of Pure-FTPd: 1.0.52"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of ImageMagick: 7.1.1-41"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of ImageMagick: 7.1.1-41"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of WP-CLI: 2.11.0"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of WP-CLI: 2.11.0"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of Imapsync: 2.229"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of Imapsync: 2.229"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of AWstats: 7.9"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of AWstats: 7.9"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of Dovecot: 2.3.21.1"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of Dovecot: 2.3.21.1"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of dovecot.conf: 0.4"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of dovecot.conf: 0.4"' >> /usr/local/bin/da && \
+    echo '' >> /usr/local/bin/da && \
+    echo '  echo "Latest version of Exim: 4.98"' >> /usr/local/bin/da && \
+    echo '  echo "Installed version of Exim: 4.98"' >> /usr/local/bin/da && \
+    echo '  echo "------------------------------------------------"' >> /usr/local/bin/da && \
+    echo 'else' >> /usr/local/bin/da && \
+    echo '  echo "Command not recognized"' >> /usr/local/bin/da && \
+    echo 'fi' >> /usr/local/bin/da && \
+    chmod +x /usr/local/bin/da
+
 # Set up working directory for the agent
 WORKDIR /kameleon-agent
 COPY ./agent/requirements.txt .

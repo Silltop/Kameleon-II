@@ -45,6 +45,24 @@ def get_suspended_users():
     return jsonify(data), 200
 
 
+@da.route("/provide-da-apps-versions")
+def get_suspended_users():
+    if not os.path.exists("/usr/local/directadmin"):
+        return jsonify({"info": "Directadmin not installed"}), 211
+    command_output = run_command("da build versions")
+    version_data = {}
+
+    # Parse the output line by line
+    for line in command_output:
+        if line.startswith("Latest version of") or line.startswith("Installed version of"):
+            parts = line.split(":")
+            name = parts[0].replace("Latest version of", "").replace("Installed version of", "").strip()
+            version = parts[1].strip()
+            version_data[name] = version
+    logging.critical(command_output)
+    # return jsonify(data), 200
+
+
 @da.route("/get-da-all-info")
 def get_da_all_info():
     try:

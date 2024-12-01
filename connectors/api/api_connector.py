@@ -52,3 +52,6 @@ class ApiConnector:
 
     def get_da_suspended(self):
         return self.call_endpoints("/get-suspended-users", method="GET")
+
+    def provide_da_apps_versions(self):
+        return self.call_endpoints("/provide_da_apps_versions", method="GET")

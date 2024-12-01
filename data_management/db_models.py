@@ -64,8 +64,9 @@ class HostDevices(db.Model):
 
 class ExtensionRoutes(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String, nullable=False, default="Unknown")
-    route = db.Column(db.String, nullable=False, default="Unknown")
+    extension_name = db.Column(db.String, nullable=False, default="Unknown")
+    route_name = db.Column(db.String, nullable=False, default="Unknown")
+    route_endpoint = db.Column(db.String, nullable=False, default="Unknown")
 
 
 def init_db_tables_with_data():

@@ -54,3 +54,6 @@ class Connection:
 
     def get_da_suspended(self):
         return self.api_connector.get_da_suspended()
+
+    def provide_da_apps_versions(self):
+        return self.api_connector.provide_da_apps_versions()

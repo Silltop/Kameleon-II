@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Directadmin suspended users{% endblock %}
+{% block title %}Directadmin apps version{% endblock %}
 {% block content %}
 
 <div class="small-margin">
@@ -8,11 +8,12 @@
   <thead>
     <tr>
       <th>Host</th>
-      <th>User</th>
-      <th>Days ago</th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
-  <tbody>{% for host, host_data in data.items() %}
+  <tbody>
+{% for host, host_data in data.items() %}
 {% for user, time in host_data.items() %}
     <tr>
       <th>{{host}}</th>
