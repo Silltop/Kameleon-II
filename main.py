@@ -4,10 +4,9 @@ from threading import Event
 from threading import Thread
 import schedule
 import extensions_handler
-from api import app
+from web import app
 from configuration import setup_logging, logger
 from data_management import db_models, sync_functions
-
 from ansible_wrapper import ansible_routes, ansible_init  # noqa E401
 
 

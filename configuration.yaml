@@ -11,3 +11,7 @@ hosts:
     ip: 192.168.55.5
     port: 6622
     method: agent
+  host4:
+    ip: 192.168.55.6
+    port: 6622
+    method: agent

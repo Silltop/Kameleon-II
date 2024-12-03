@@ -1,6 +1,6 @@
 import datetime
 
-from api.app import db
+from web.app import db
 
 
 class AnsiblePlaybooks(db.Model):

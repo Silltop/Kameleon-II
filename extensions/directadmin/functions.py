@@ -1,25 +1,18 @@
-from connectors.connector import Connection
-from api.app import app, db
-from api.routes import render_template
-from connectors.os import remote_data_processor
-from connectors.os.os_connector import execute_command_v2
-from extensions.directadmin.database_model import HostDAInfo, DAUserDetails
+from connectors.api.api_connector import ApiConnector
+from web.app import app
+from web.views import render_template
 
 
 @app.route("/da-users")
 def da_users_dashboard():
-    data = Connection().get_da_info()
-    print(data)
-    return render_template("da_users_dashboard.html", data=data)
+    return render_template("da_users_dashboard.html", data=ApiConnector().call_hosts("/get-da-all-info"))
 
 
 @app.route("/da-suspended-users")
 def sync_da():
-    data = Connection().get_da_suspended()
-    return render_template("da_suspended_dashboard.html", data=data)
+    return render_template("da_suspended_dashboard.html", data=ApiConnector().call_hosts("/get-da-all-info"))
 
 
 @app.route("/da-apps-versions")
 def da_apps_versions():
-    data = Connection().provide_da_apps_versions()
-    return render_template("da_apps_versions.html", data=data)
+    return render_template("da_apps_versions.html", data=ApiConnector().call_hosts("/get-da-all-info"))

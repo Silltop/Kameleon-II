@@ -1,8 +1,9 @@
 import glob
 import os
 import secrets
+from functools import wraps
 
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 
@@ -19,6 +20,23 @@ def find_extensions_templates():
     template_dirs = glob.glob(pattern)
     return template_dirs
 
+
+def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 minutes)
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            cache_key = request.full_path
+            cached_data = cache.get(cache_key)
+            if cached_data is None:
+                data = f(*args, **kwargs)
+                cache.set(cache_key, data, timeout=timeout)
+            else:
+                data = cached_data
+            return jsonify(data)
+
+        return decorated_function
+
+    return decorator
 
 config = {
     "DEBUG": True,  # some Flask specific configs

@@ -86,10 +86,11 @@ def disk_devices():
 
 @app.route("/", methods=["GET"])
 def index():
-    result = {"Welcome": "This is api response"}
+    result = {"Welcome": "This is web response"}
     return jsonify(result)
 
 
 @app.route("/error", methods=["GET"])
 def error_page():
     return abort(400)
+

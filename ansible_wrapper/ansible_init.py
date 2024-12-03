@@ -7,7 +7,7 @@ from typing import List
 import ansible_runner
 import yaml
 from ansible_wrapper.ansible_models import *
-from api import app, db
+from web import app, db
 
 @dataclass
 class PlaybookDefinition:

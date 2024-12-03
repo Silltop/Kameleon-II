@@ -1,10 +1,9 @@
 import logging
 import time
 from datetime import datetime
-
-from api.app import db, app
+from connectors.api.api_connector import ApiConnector
+from web.app import db, app
 from configuration import logger
-from connectors.connector import Connection
 from connectors.os.remote_data_processor import *
 from data_management.db_models import (
     HostFacts,
@@ -20,7 +19,7 @@ from host_management.rbl_checker import check_rbl
 
 def save_device_data():
     with app.app_context():
-        devices = Connection().get_disk_devices()  # get_disk_devices_status()
+        devices = ApiConnector().call_hosts("/disk-devices")
         for host, device_list in devices.items():
             for device_details in device_list.get("disk_devices"):
                 logging.debug(
@@ -80,7 +79,7 @@ def save_facts(facts):
 
 def sync_all():
     logger.info("Executing sync up with hosts...")
-    facts = Connection().host_facts()
+    facts = ApiConnector().call_hosts("/host-facts")
     healthcheck_service()
     save_facts(facts)
     save_ips_data()
@@ -120,7 +119,7 @@ async def save_rbls_to_db(host, results_rbl):
 def healthcheck_service():
     def run_healthcheck():
         data = (
-            Connection().healthcheck()
+            ApiConnector().call_hosts("/healthcheck")
         )  # Assumes this returns a dictionary {ip: status}
 
         with app.app_context():  # Ensure the correct app context

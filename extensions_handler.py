@@ -3,11 +3,11 @@ import json
 import logging
 import os
 
-from api.app import db
+from web.app import db
 from data_management.db_models import ExtensionRoutes
 
 
-# todo make blueprints for remote api and local api
+# todo make blueprints for remote web and local web
 # https://flask.palletsprojects.com/en/3.0.x/blueprints/
 def init_extensions():
     # Define the path to the extensions directory

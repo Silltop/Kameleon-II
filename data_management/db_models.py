@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from api.app import db
+from web.app import db
 from configuration import config
 from host_management.utils import get_rbls_from_json
 

@@ -1,15 +1,13 @@
 import logging
-from typing import Dict, List
-
+from typing import Dict
 import requests
-from requests import Response
-
 from configuration import config
+from connectors.connector import Connector
 
 
-class ApiConnector:
-    def __init__(self, hosts):
-        self.hosts = hosts
+class ApiConnector(Connector):
+    def __init__(self):
+        super().__init__()
 
     @staticmethod
     def call_endpoints(
@@ -32,26 +30,26 @@ class ApiConnector:
             responses[host] = response.json()
         return responses
 
-    def get_uptime(self):
-        return self.call_endpoints("/uptime", method="GET")
+    def call_hosts(self, endpoint):
+        return self.call_endpoints(endpoint, method="GET")
 
-    def healthcheck(self):
-        return self.call_endpoints("/healthcheck", method="GET")
-
-    def load_avg(self):
-        return self.call_endpoints("/load-avg", method="GET")
-
-    def get_facts(self):
-        return self.call_endpoints("/host-facts", method="GET")
-
-    def get_disk_devices(self):
-        return self.call_endpoints("/disk-devices", method="GET")
-
-    def get_da_info(self):
-        return self.call_endpoints("/get-da-all-info", method="GET")
-
-    def get_da_suspended(self):
-        return self.call_endpoints("/get-suspended-users", method="GET")
-
-    def provide_da_apps_versions(self):
-        return self.call_endpoints("/provide_da_apps_versions", method="GET")
+    # def healthcheck(self):
+    #     return self.call_endpoints("/healthcheck", method="GET")
+    #
+    # def load_avg(self):
+    #     return self.call_endpoints("/load-avg", method="GET")
+    #
+    # def get_facts(self):
+    #     return self.call_endpoints("/host-facts", method="GET")
+    #
+    # def get_disk_devices(self):
+    #     return self.call_endpoints("/disk-devices", method="GET")
+    #
+    # def get_da_info(self):
+    #     return self.call_endpoints("/get-da-all-info", method="GET")
+    #
+    # def get_da_suspended(self):
+    #     return self.call_endpoints("/get-suspended-users", method="GET")
+    #
+    # def provide_da_apps_versions(self):
+    #     return self.call_endpoints("/provide_da_apps_versions", method="GET")

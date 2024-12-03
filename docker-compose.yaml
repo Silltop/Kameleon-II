@@ -13,7 +13,7 @@ services:
       - ./main.py:/kameleon/main.py
       - ./extensions_handler.py:/kameleon/extensions_handler.py
       - ./ansible_wrapper:/kameleon/ansible_wrapper
-      - ./api:/kameleon/api
+      - ./web:/kameleon/web
       - ./configuration:/kameleon/configuration
       - ./connectors:/kameleon/connectors
       - ./data_management:/kameleon/data_management

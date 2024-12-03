@@ -2,7 +2,6 @@ from connectors.os.remote_data_processor import get_service_status
 
 
 def check_mailing_services(hosts: tuple = None):
-    print(hosts)
     dovecot = get_service_status("dovecot", hosts)
     exim = get_service_status("exim4", hosts)
     spamassasin = get_service_status("spamassasin", hosts)

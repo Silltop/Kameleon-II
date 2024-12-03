@@ -1,6 +1,6 @@
 import sys
 
-from api.app import db, app
+from web.app import db, app
 from data_management.db_models import RblHosts
 
 # Loading dns module.

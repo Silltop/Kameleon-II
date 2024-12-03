@@ -1,4 +1,4 @@
-from api.app import db
+from web.app import db
 
 
 class HostDAInfo(db.Model):

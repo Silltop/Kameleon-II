@@ -9,7 +9,7 @@ from flask import render_template, jsonify
 
 from ansible_wrapper.ansible_init import PlaybookManager, run_ansible_playbook
 from ansible_wrapper.ansible_models import AnsibleRuns, AnsiblePlaybooks, LogEntry
-from api.app import app, db
+from web.app import app, db
 from configuration import logger
 
 

@@ -7,10 +7,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
 # from ansible_wrapper import check_service_status
-from api.app import app, db, cache
+from web.app import app, db, cache
 from configuration import config
 from configuration.config import ConfigManager
-from connectors.connector import Connection
+from connectors.api.api_connector import ApiConnector
 from data_management.db_models import HostFacts, Host, ExtensionRoutes
 from data_management.sync_functions import sync_all
 from host_management import admin_functions
@@ -19,35 +19,10 @@ from host_management.utils import ip_address_is_valid
 from .charts import Chart, ChartDataElement, chart_from_column_elements
 
 
-def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 minutes)
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            cache_key = request.full_path
-            cached_data = cache.get(cache_key)
-            if cached_data is None:
-                data = f(*args, **kwargs)
-                cache.set(cache_key, data, timeout=timeout)
-            else:
-                data = cached_data
-            return jsonify(data)
-
-        return decorated_function
-
-    return decorator
-
-
 def render_template(*args, **kwargs):
     """Dynamic list of navbar items as override to base flask function"""
     extension_routes = db.session.query(ExtensionRoutes).all()
     return base_render_template(*args, **kwargs, extension_routes=extension_routes)
-
-
-@app.route("/active-crontabs", methods=["GET"])
-def get_crontabs():
-    #  res = remote_data_processor.execute_command("crontab -l")
-    res = Connection().load_avg()
-    return render_template("crontab.html", result=res)
 
 
 @app.route("/query-rbl/<ip>", methods=["GET"])
@@ -56,21 +31,6 @@ def query_rbl_db(ip):
         result = check_rbl(ip)
         return render_template("rbl_result.html", ip=ip, result=result, success=True)
     return render_template("rbl_result.html", ip=ip, success=False)
-
-
-@app.route("/load-avg", methods=["GET"])
-@cached_endpoint(timeout=60)  # Cache for 60 seconds
-def get_load_avg():
-    #  raise NotImplementedError
-    return Connection().load_avg()
-    #  return remote_data_processor.execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'")
-
-
-@app.route("/uptime", methods=["GET"])
-@cached_endpoint(timeout=60)  # Cache for 60 seconds
-def uptime():
-    return Connection().get_uptime()
-    #  return remote_data_processor.execute_command("uptime")
 
 
 @app.route("/admin-functions")
@@ -103,8 +63,7 @@ def configuration_page():
 
 @app.route("/disks")
 def disk_status():
-    disk_data = Connection().get_disk_devices()
-    print(disk_data)
+    disk_data = ApiConnector().call_hosts("/disk-devices")
     return render_template("disks-status.html", disk_data=disk_data)
 
 
