@@ -9,6 +9,7 @@ import yaml
 from ansible_wrapper.ansible_models import *
 from web import app, db
 
+
 @dataclass
 class PlaybookDefinition:
     name: str

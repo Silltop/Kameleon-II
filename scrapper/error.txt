@@ -1,0 +1,13 @@
+Fatal error
+PHP Warning
+Critical error
+Access denied
+wystąpił błąd
+wystapil blad
+błąd krytyczny
+blad krytyczny
+skontaktuj się z administratorem
+strona nie działa
+tymczasowy błąd
+awaria
+Awaria

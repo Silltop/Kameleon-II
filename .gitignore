@@ -6,3 +6,4 @@ db/*
 env/authorized_keys
 logs/*
 agent/logs/*
+__pycache__

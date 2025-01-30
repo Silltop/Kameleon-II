@@ -11,3 +11,7 @@ parallel-ssh
 schedule==1.2.1
 flask-caching
 flask-wtf
+pyjwt
+aiohttp
+beautifulsoup4
+chardet
