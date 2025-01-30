@@ -3,6 +3,7 @@ import os
 from flask import Blueprint, jsonify
 from datetime import datetime
 from utils import run_command
+from extensions.directadmin.data_retrival import get_user_list
 
 da = Blueprint('da', __name__)
 
@@ -44,23 +45,31 @@ def get_suspended_users():
     logging.critical(suspended_users_command)
     return jsonify(data), 200
 
+@da.route("/get-da-user-websites")
+def get_da_user_websites():
+    versions = {}
+    return versions
+
 
 @da.route("/provide-da-apps-versions")
 def get_da_apps_versions():
     if not os.path.exists("/usr/local/directadmin"):
         return jsonify({"info": "Directadmin not installed"}), 211
-    command_output = run_command("da build versions")
-    version_data = {}
-
-    # Parse the output line by line
-    for line in command_output:
-        if line.startswith("Latest version of") or line.startswith("Installed version of"):
-            parts = line.split(":")
-            name = parts[0].replace("Latest version of", "").replace("Installed version of", "").strip()
-            version = parts[1].strip()
-            version_data[name] = version
-    logging.critical(command_output)
-    # return jsonify(data), 200
+    versions = {}
+    versions['OS'] = run_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"'", "unknown")
+    versions['DirectAdmin'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of DirectAdmin' | awk -F: '{print $2}'", "unknown")
+    versions['Apache'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Apache' | awk -F: '{print $2}'", "unknown")
+    versions['FTPD'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Pure-FTPd' | awk -F: '{print $2}'", "unknown")
+    versions['Dovecot'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Dovecot' | awk -F: '{print $2}'", "unknown")
+    versions['Exim'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Exim' | awk -F: '{print $2}'", "unknown")
+    versions['SpamAssassin'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of SpamAssassin' | awk -F: '{print $2}'", "unknown")
+    versions['RoundCube'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of RoundCube' | awk -F: '{print $2}'", "unknown")
+    versions['phpMyAdmin'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of phpMyAdmin' | awk -F: '{print $2}'", "unknown")
+    versions['Database'] = run_command("mysql --version | awk -F, '{print $1}'", "unknown")
+    versions['PHP'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of PHP' | awk -F: '{print $2}'", "unknown")
+    versions['PHP mode'] = run_command("grep php1_mode /usr/local/directadmin/custombuild/options.conf | awk -F= '{print $2}'", "unknown")
+    versions['LetsEncrypt'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of LetsEncrypt' | awk -F: '{print $2}'", "unknown")
+    return versions
 
 
 @da.route("/get-da-all-info")
@@ -69,8 +78,7 @@ def get_da_all_info():
         if not os.path.exists("/usr/local/directadmin"):
             return jsonify({"info": "Directadmin not installed"}), 211
 
-        da_users = run_command("find /usr/local/directadmin/data/users -mindepth 1 -maxdepth 1 -type d -printf '%f\n'")
-        users = da_users  # .strip().split('\n')  # Convert command output to a list of usernames
+        users = get_user_list()
 
         # Initialize a list to store user-specific data
         user_data = {}

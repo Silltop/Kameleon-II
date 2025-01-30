@@ -14,7 +14,7 @@ from data_management.db_models import (
     IpsHosts,
     RblHosts,
 )
-from host_management.rbl_checker import check_rbl
+from host_management.rbl_checker import RblChecker
 
 
 def save_device_data():
@@ -96,7 +96,7 @@ async def sync_rbl():
         # print("sync_rbl - ips", ips)
         for host, ip_list in ips.items():
             # print("IP", host)
-            results_rbl = check_rbl(host)
+            results_rbl = RblChecker().check_rbl(host)
             await save_rbls_to_db(host, results_rbl)
     logging.info("RBL sync done")
 

@@ -2,28 +2,24 @@ import importlib.util
 import logging
 import os
 import subprocess
-from functools import wraps
-
-from flask import Flask, Blueprint, jsonify
-
+from flask import Blueprint
 from api import app
-
-
-def run_command(command: str) -> list:
-    try:
-        # Run the command and capture the output
-        result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
-        return result.stdout.splitlines()  # Split the output into a list of strings
-    except subprocess.CalledProcessError as e:
-        # If the command fails, raise an exception with error details
-        logging.error(f"Command failed: {e.stderr}")
-        return ["error"]
-
 
 extensions_dir = './extensions'
 
+def run_command(command: str, default: str = "default output") -> str:
+    try:
+        # Run the command and capture the output
+        result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
+        output = ' '.join(result.stdout.split())  # Merge all lines into a single string
+        return output if output else default
+    except subprocess.CalledProcessError as e:
+        # If the command fails, raise an exception with error details
+        logging.error(f"Command failed: {e.stderr}")
+        return "error"
 
-def register_blueprints():
+
+def register_blueprints() -> None:
     # Loop through each directory in the 'extensions' directory
     for dirpath, dirnames, filenames in os.walk(extensions_dir):
         # Check if there is an 'endpoints.py' in the current directory

@@ -15,4 +15,11 @@ def sync_da():
 
 @app.route("/da-apps-versions")
 def da_apps_versions():
-    return render_template("da_apps_versions.html", data=ApiConnector().call_hosts("/get-da-all-info"))
+    data = ApiConnector().call_hosts("/provide-da-apps-versions")
+    table_headers = ["Server"] + list(next(iter(data.values())).keys()) if data else []    
+    return render_template("da_apps_versions.html", table_headers=table_headers, table_data=data)
+
+@app.route("/da-user-websites")
+def da_websites():
+    data = ApiConnector().call_hosts("/get-da-user-websites")
+    return render_template("da_user_websites.html", table_data=data)

@@ -3,7 +3,7 @@ import logging
 
 from web.app import db
 from configuration import config
-from host_management.utils import get_rbls_from_json
+from host_management.rbl_checker import RblChecker
 
 
 class Host(db.Model):
@@ -82,7 +82,7 @@ def init_db_tables_with_data():
             host_facts = HostFacts(host_id=hst.id)
             db.session.add(host_facts)
 
-    rbls = get_rbls_from_json()
+    rbls = RblChecker.get_rbls_from_json()
     for entry in rbls:
         rblHosts = RblHosts(orgName=entry["NAME"], url=entry["URL"], use=True)
         db.session.add(rblHosts)

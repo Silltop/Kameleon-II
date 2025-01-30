@@ -1,16 +1,6 @@
 import ipaddress
-import json
-import os
-
 import dns.resolver
-
 from configuration import config
-
-
-def get_rbls_from_json():
-    with open(f"{os.getcwd()}/inventory/rbl.json", "r") as f:
-        file_data = json.load(f)
-        return file_data
 
 
 def dns_resolve_ip(domain: str):

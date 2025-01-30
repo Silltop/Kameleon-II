@@ -7,11 +7,12 @@ function fetchAndUpdateStatus() {
       const rows = document.querySelectorAll(".t-row");  // Get all rows once
 
       rows.forEach((row) => {
-        const nameCell = row.firstElementChild;
-        const iconElement = nameCell.firstElementChild;
+        const cells = row.children;
+        const iconElement = cells[0].firstElementChild;
 
-        // Extract IP from the row content (assumes the IP is present in the text)
-        const rowIP = nameCell.textContent.trim();
+        // Extract IP from the correct column
+        const ipCell = cells[3];
+        const rowIP = ipCell.textContent.trim();  // Extract IP correctly
 
         if (rdata[rowIP]) {  // Check if the IP exists in the fetched data
           const uptime = rdata[rowIP].uptime;

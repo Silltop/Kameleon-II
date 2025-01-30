@@ -2,7 +2,6 @@ import glob
 import os
 import secrets
 from functools import wraps
-
 from flask import Flask, request, jsonify
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
