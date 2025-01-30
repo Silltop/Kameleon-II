@@ -55,7 +55,7 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
-  agent_machine_3:
+  agent_machine_da_1:
     build:
       context: .
       dockerfile: docker/target_host_with_da_files.Dockerfile
@@ -67,7 +67,7 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
-  agent_machine_4:
+  agent_machine_da_2:
     build:
       context: .
       dockerfile: docker/target_host_with_da_files.Dockerfile

@@ -3,7 +3,7 @@ import os
 from flask import Blueprint, jsonify
 from datetime import datetime
 from utils import run_command
-from extensions.directadmin.data_retrival import get_user_list
+from extensions.directadmin.data_retrival import get_user_list, get_user_domains
 
 da = Blueprint('da', __name__)
 
@@ -47,8 +47,12 @@ def get_suspended_users():
 
 @da.route("/get-da-user-websites")
 def get_da_user_websites():
-    versions = {}
-    return versions
+    user_domains = {}
+    users = get_user_list()
+    for user in users:
+        domains = get_user_domains(user)
+        user_domains[user] = domains
+    return jsonify(user_domains), 200
 
 
 @da.route("/provide-da-apps-versions")
@@ -77,18 +81,14 @@ def get_da_all_info():
     try:
         if not os.path.exists("/usr/local/directadmin"):
             return jsonify({"info": "Directadmin not installed"}), 211
-
         users = get_user_list()
-
         # Initialize a list to store user-specific data
         user_data = {}
-
         # Step 2: Loop over each user to gather their data
         for user in users:
             # Skip admin and root users for security reasons
             if user in ["root", "admin"]:
                 continue
-
             # Create a dictionary for the user-specific data
             user_info = {}
 
@@ -102,11 +102,7 @@ def get_da_all_info():
                 else:
                     user_info["email"] = None  # Set to None if no email is found
 
-            # Get user domains
-            domains_list_path = f"/usr/local/directadmin/data/users/{user}/domains.list"
-            if os.path.isfile(domains_list_path):
-                domains = run_command(f"cat {domains_list_path}")  # .strip().split('\n')
-                user_info["domains"] = domains
+            user_info["domains"] = get_user_domains(user)
 
             # Get user quota
             usage_path = f"/usr/local/directadmin/data/users/{user}/user.usage"

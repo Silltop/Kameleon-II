@@ -4,7 +4,7 @@ from utils import run_command
 
 def get_user_list():
     da_users = run_command("find /usr/local/directadmin/data/users -mindepth 1 -maxdepth 1 -type d -printf '%f\n'")
-    users = da_users  # .strip().split('\n')  # Convert command output to a list of usernames
+    users = da_users.split(" ")  # Convert command output to a list of usernames
     return users
 
 def get_php_list():

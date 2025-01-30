@@ -22,4 +22,5 @@ def da_apps_versions():
 @app.route("/da-user-websites")
 def da_websites():
     data = ApiConnector().call_hosts("/get-da-user-websites")
-    return render_template("da_user_websites.html", table_data=data)
+    table_headers = ["User", "Domain"]
+    return render_template("da_user_websites.html", table_headers=table_headers, table_data=data)
