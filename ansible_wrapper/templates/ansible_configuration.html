@@ -2,10 +2,13 @@
 {% block title %}Ansible Configuration{% endblock %}
 {% block content %}
 
-
-Playbooks Path: <input type="text" class="form-control" value="{{config.playbooks_path}}" readonly="readonly">
-Inventory Path: <input type="text" class="form-control" value="{{config.inventory_path}}" readonly="readonly">
-Ansible Logs Path: <input type="text" class="form-control" value="{{config.logs_path}}" readonly="readonly">
-
+<div class="small-padding">
+    <form method="post" action="/ansible/update_configuration">
+        Playbooks Path: <input type="text" name="playbooks_path" class="form-control" value="{{config.playbooks_path}}">
+        Inventory Path: <input type="text" name="inventory_path" class="form-control" value="{{config.inventory_path}}">
+        Ansible Logs Path: <input type="text" name="logs_path" class="form-control" value="{{config.logs_path}}">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
 
 {% endblock %}

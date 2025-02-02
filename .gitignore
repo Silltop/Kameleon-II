@@ -7,3 +7,5 @@ env/authorized_keys
 logs/*
 agent/logs/*
 __pycache__
+.pytest_cache
+.vscode

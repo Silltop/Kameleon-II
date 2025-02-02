@@ -1,5 +1,8 @@
+from flask import Blueprint
 from web.app import app, cached_endpoint
 from connectors.api.api_connector import ApiConnector
+
+api = Blueprint("api", __name__)  # fix me
 
 
 @app.route("/load-avg", methods=["GET"])

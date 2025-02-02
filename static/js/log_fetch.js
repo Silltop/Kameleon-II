@@ -25,9 +25,9 @@ function fetchLogs(ansibleRunId) {
 
     loadingSpinner.classList.remove('hidden');
 
-    const eventSource = new EventSource('/logs-stream/' + ansibleRunId);
+    const eventSource = new EventSource('/ansible/logs-stream/' + ansibleRunId);
 
-    eventSource.onmessage = function(event) {
+    eventSource.onmessage = function (event) {
         const logMessage = document.createElement('p');
         let decodedLog = decodeBase64(event.data);  // Decode the log message
         console.log(decodedLog);
@@ -37,13 +37,13 @@ function fetchLogs(ansibleRunId) {
     };
 
     // Handle errors during log fetching
-    eventSource.onerror = function(event) {
+    eventSource.onerror = function (event) {
         console.error('Error fetching logs:', event);
         eventSource.close();  // Close the connection on error
     };
 
     // Handle stream closure if the backend signals completion
-    eventSource.addEventListener('close', function(event) {
+    eventSource.addEventListener('close', function (event) {
         console.log('Stream closed:', event.data);
         eventSource.close();  // Gracefully close the connection
     });

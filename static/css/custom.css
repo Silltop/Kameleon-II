@@ -50,6 +50,10 @@
     margin: 1%;
 }
 
+.small-padding{
+    padding: 2%;
+}
+
 .dark-mode .dashboard-content .card{
     background-color: #17191c;
 }

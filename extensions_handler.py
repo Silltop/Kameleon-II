@@ -2,64 +2,57 @@ import importlib
 import json
 import logging
 import os
-
 from web.app import db
 from data_management.db_models import ExtensionRoutes
+from web.app import app
 
 
-# todo make blueprints for remote web and local web
-# https://flask.palletsprojects.com/en/3.0.x/blueprints/
-def init_extensions():
-    # Define the path to the extensions directory
-    extensions_dir = "extensions"
-    # cleanup all extensions on start up
-    db.session.query(ExtensionRoutes).delete()
-    # List all directories (potential extensions) inside the extensions directory
-    extensions = [
-        d
-        for d in os.listdir(extensions_dir)
-        if os.path.isdir(os.path.join(extensions_dir, d))
-    ]
-    # Iterate over each extension and import its __init__.py
-    logging.info("Searching for extensions...")
-    for extension in extensions:
-        json_file = os.path.join(extensions_dir, extension, "definition.json")
+class ExtensionHandler:
+    def __init__(self, extensions_dir="extensions"):
+        self.extensions_dir = extensions_dir
+
+    def init_extensions(self):
+        self.cleanup_extensions()
+        extensions = self.list_extensions()
+        logging.info("Searching for extensions...")
+        for extension in extensions:
+            self.process_extension(extension)
+        logging.info("Extensions lookup done")
+
+    def cleanup_extensions(self):
+        db.session.query(ExtensionRoutes).delete()
+
+    def list_extensions(self):
+        return [d for d in os.listdir(self.extensions_dir) if os.path.isdir(os.path.join(self.extensions_dir, d))]
+
+    def process_extension(self, extension):
+        json_file = os.path.join(self.extensions_dir, extension, "definition.json")
         if os.path.isfile(json_file):
             with open(json_file, "r") as f:
                 json_data = json.loads(f.read())
                 extension_name = json_data["name"]
                 logging.info(f"Extension found: {extension_name}")
                 routes = json_data["routes"]
-                for routename, route in routes.items():
-                    exists = ExtensionRoutes.query.filter_by(route_name=routename).first()
-                    if not exists:
-                        er = ExtensionRoutes(
-                            extension_name=extension_name, route_name=routename, route_endpoint=route
-                        )
-                        db.session.add(er)
-            db.session.commit()
-            extension_module = importlib.import_module(f"{extensions_dir}.{extension}")
+                self.register_routes(extension_name, routes)
+            self.import_extension_module(extension, extension_name)
+            self.log_registered_routes()
             db.create_all()
-    logging.info("Extensions lookup done")
 
+    def register_routes(self, extension_name, routes):
+        for routename, route in routes.items():
+            exists = ExtensionRoutes.query.filter_by(route_name=routename).first()
+            if not exists:
+                er = ExtensionRoutes(extension_name=extension_name, route_name=routename, route_endpoint=route)
+                db.session.add(er)
+        db.session.commit()
 
-# def create_prefixed_table(model_class, prefix='extension_'):
-#     table_name = prefix + model_class.__name__.lower()
-#
-#     # Create the table
-#     columns = []
-#     for column in model_class.__table__.columns:
-#         columns.append(column.copy())
-#
-#     table = type(table_name, (db.Model,), {
-#         '__tablename__': table_name,
-#         '__module__': model_class.__module__,
-#         'id': db.Column(db.Integer, primary_key=True),
-#         **{column.name: column for column in columns}
-#     })
-#
-#     # Add the table to the metadata
-#     db.metadata.create_all(db.engine, tables=[table.__table__])
-#
-# def create_table(model_class):
-#     create_prefixed_table(model_class)
+    def import_extension_module(self, extension, extension_name):
+        extension_module = importlib.import_module(f"{self.extensions_dir}.{extension}.functions")
+        if hasattr(extension_module, "plugin"):
+            blueprint = getattr(extension_module, "plugin")
+            logging.info(f"Registering blueprint for extension: {extension_name}")
+            app.register_blueprint(blueprint)
+
+    def log_registered_routes(self):
+        for rule in app.url_map.iter_rules():
+            logging.info(f"Route registered: {rule.endpoint} -> {rule.rule}")

@@ -4,7 +4,7 @@ import secrets
 from functools import wraps
 from flask import Flask, request, jsonify
 from flask_caching import Cache
-from flask_sqlalchemy import SQLAlchemy
+from web.db_init import db
 
 
 def generate_random_secret_key(length):
@@ -13,11 +13,11 @@ def generate_random_secret_key(length):
     return secrets.token_hex(length // 2)
 
 
-def find_extensions_templates():
-    base_dir = os.path.join(os.getcwd(), "extensions")
-    pattern = os.path.join(base_dir, "*", "templates")
-    template_dirs = glob.glob(pattern)
-    return template_dirs
+# def find_extensions_templates():
+#     base_dir = os.path.join(os.getcwd(), "extensions")
+#     pattern = os.path.join(base_dir, "*", "templates")
+#     template_dirs = glob.glob(pattern)
+#     return template_dirs
 
 
 def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 minutes)
@@ -37,6 +37,7 @@ def cached_endpoint(timeout=300):  # Default cache timeout is 300 seconds (5 min
 
     return decorator
 
+
 config = {
     "DEBUG": True,  # some Flask specific configs
     "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
@@ -46,14 +47,12 @@ template_dir = "../templates"
 static_dir = "../static"
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = generate_random_secret_key(32)
-for directory in find_extensions_templates():
-    app.jinja_loader.searchpath.append(directory)
-app.jinja_loader.searchpath.append(
-    os.path.join(os.getcwd(), "ansible_wrapper/templates")
-)
+# for directory in find_extensions_templates():
+#     app.jinja_loader.searchpath.append(directory)
+# app.jinja_loader.searchpath.append(os.path.join(os.getcwd(), "ansible_wrapper/templates"))
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.getcwd()}/db/kameleon.db"
-db = SQLAlchemy()
+
 db.init_app(app)
 app.config.from_mapping(config)
 cache = Cache(app)

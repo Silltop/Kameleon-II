@@ -1,9 +1,9 @@
 {
   "name": "Directadmin",
   "routes": {
-    "Directadmin users summary": "/da-users",
-    "Directadmin suspended users": "/da-suspended-users",
-    "Directadmin apps versions": "/da-apps-versions",
-    "Directadmin user websites": "/da-user-websites"
+    "Directadmin users summary": "/da/users",
+    "Directadmin suspended users": "/da/suspended-users",
+    "Directadmin apps versions": "/da/apps-versions",
+    "Directadmin user websites": "/da/user-websites"
   }
 }
