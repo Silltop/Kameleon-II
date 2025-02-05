@@ -44,9 +44,10 @@ logging_config = {
             "backupCount": 3,
         },
     },
-    "loggers": {"root": {"level": "WARNING", "handlers": ["stdout", "file"]},
-                "werkzeug": {"level": "INFO", "propagate": True}
-                },
+    "loggers": {
+        "root": {"level": "WARNING", "handlers": ["stdout", "file"]},
+        "werkzeug": {"level": "INFO", "propagate": True},
+    },
 }
 
 
@@ -59,13 +60,9 @@ def _handle_flask_exception(exception_object):
     response = exception_object.get_response()
     http_error_code = exception_object.code
     if 400 <= http_error_code < 500:
-        error_description = (
-            "This is a client error, make sure you provided correct data."
-        )
+        error_description = "This is a client error, make sure you provided correct data."
     elif 500 <= http_error_code < 600:
-        error_description = (
-            "This is a server error, please provide this error to support team."
-        )
+        error_description = "This is a server error, please provide this error to support team."
     else:
         error_description = "Unknown error"
     response_data = {
@@ -75,16 +72,12 @@ def _handle_flask_exception(exception_object):
     }
     response.data = json.dumps(response_data)  # Convert data to JSON string
     response.content_type = "application/json"  # Set content type
-    logging.error(
-        f"API returned error: {http_error_code}, with description: {exception_object.description}"
-    )
+    logging.error(f"API returned error: {http_error_code}, with description: {exception_object.description}")
     return response
 
 
 def setup_logging():
     dictConfig(config=logging_config)
-
-
 
 
 if __name__ == "__main__":
@@ -93,4 +86,3 @@ if __name__ == "__main__":
     _override_flask_exceptions()
     register_blueprints()
     app.run(host="0.0.0.0", debug=True, use_reloader=True, port=6622)
-

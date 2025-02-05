@@ -30,6 +30,22 @@ services:
     ports:
       - "127.0.0.1:5000:5000"
 
+  keycloak:
+    # http://localhost:8080/admin/master/console/
+    image: quay.io/keycloak/keycloak:latest
+    networks:
+      machine-net:
+        ipv4_address: 192.168.55.222
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_LOG_LEVEL_ORG_KEYCLOAK=ERROR # Set log level to ERROR
+    ports:
+      - "8080:8080" # Expose Keycloak on port 8080
+    volumes:
+      - ./kameleon-realm.json:/opt/keycloak/data/import/kameleon-realm.json # Mount realm JSON file
+    entrypoint: "/opt/keycloak/bin/kc.sh start-dev --import-realm"
+
   agent_machine_1:
     build:
       context: .

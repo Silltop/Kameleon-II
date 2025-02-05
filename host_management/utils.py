@@ -30,3 +30,11 @@ def convert_to_gb(quota):
         return f"{quota_gb}GB"
     except ValueError:
         return "Unknown"
+
+
+def is_private_ip(ip):
+    try:
+        ip_obj = ipaddress.IPv4Address(ip)
+        return ip_obj.is_private
+    except ipaddress.AddressValueError:
+        return False

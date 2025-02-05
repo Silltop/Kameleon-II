@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import time
 from datetime import datetime
 from connectors.api.api_connector import ApiConnector
+from host_management.utils import is_private_ip
 from web.app import db, app
 from configuration import logger
 from connectors.os.remote_data_processor import *
@@ -22,14 +24,10 @@ def save_device_data():
         devices = ApiConnector().call_hosts("/disk-devices")
         for host, device_list in devices.items():
             for device_details in device_list.get("disk_devices"):
-                logging.debug(
-                    f"SYNC Device of {host} found: {device_details.get('device')}"
-                )
+                logging.debug(f"SYNC Device of {host} found: {device_details.get('device')}")
                 host_id = Host.query.filter_by(host_ip=host).first()
                 device_entry = (
-                    HostDevices.query.filter_by(name=device_details.get("device"))
-                    .filter_by(host_id=host_id.id)
-                    .first()
+                    HostDevices.query.filter_by(name=device_details.get("device")).filter_by(host_id=host_id.id).first()
                 )
                 if device_entry is None:
                     device_entry = HostDevices(
@@ -53,9 +51,7 @@ def save_ips_data():
                 ip_entry = HostIps.query.filter_by(ip=ip).first()
                 if ip_entry is None:
                     host_id = Host.query.filter_by(host_ip=host).first()
-                    ip_entry = HostIps(
-                        ip=ip, host_id=host_id.id, is_private=is_private_ip(ip)
-                    )
+                    ip_entry = HostIps(ip=ip, host_id=host_id.id, is_private=is_private_ip(ip))
                     db.session.add(ip_entry)
         db.session.commit()
 
@@ -84,7 +80,7 @@ def sync_all():
     save_facts(facts)
     save_ips_data()
     save_device_data()
-    # asyncio.run(sync_rbl())
+    asyncio.run(sync_rbl())
     logger.info("Sync up done")
     return 0
 
@@ -95,7 +91,9 @@ async def sync_rbl():
         ips = get_all_ips_on_host()
         # print("sync_rbl - ips", ips)
         for host, ip_list in ips.items():
-            # print("IP", host)
+            if is_private_ip(host):
+                logger.info(f"Skipping private IP: {host}")
+                continue
             results_rbl = RblChecker().check_rbl(host)
             await save_rbls_to_db(host, results_rbl)
     logging.info("RBL sync done")
@@ -106,11 +104,11 @@ async def save_rbls_to_db(host, results_rbl):
         for key, value in item.items():
             if value == 1:
                 IpsHosts.query.filter_by()
-                print("RBL", key)
+                # print("RBL", key)
                 rblHosts = RblHosts.query.filter_by(orgName=key).first()
-                print("rblHosts: ", rblHosts)
+                # print("rblHosts: ", rblHosts)
                 hostIps = HostIps.query.filter_by(ip=host).first()
-                print("hostIps: ", hostIps)
+                # print("hostIps: ", hostIps)
                 ipsHosts = IpsHosts(host_ip_ip=hostIps.ip, rbl_ip_id=rblHosts.id)
                 db.session.add(ipsHosts)
                 db.session.commit()
@@ -118,9 +116,7 @@ async def save_rbls_to_db(host, results_rbl):
 
 def healthcheck_service():
     def run_healthcheck():
-        data = (
-            ApiConnector().call_hosts("/healthcheck")
-        )  # Assumes this returns a dictionary {ip: status}
+        data = ApiConnector().call_hosts("/healthcheck")  # Assumes this returns a dictionary {ip: status}
 
         with app.app_context():  # Ensure the correct app context
             for ip, output in data.items():

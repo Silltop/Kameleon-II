@@ -50,8 +50,16 @@
     <!-- Navbar form (inline form) -->
     <div class="form-inline d-none d-md-flex ml-auto">
         <!-- d-none = display: none, d-md-flex = display: flex on medium screens and up (width > 768px), ml-auto = margin-left: auto -->
+        {% if user["user"] is not none %}
+        <span class="navbar-text">
+            <h3>{{ user["preferred_username"] }}</h3>
+        </span>
+        {% else %}
         <a href="#login-modal" class="btn btn-primary" role="button">Log In</a>
-
+        {% endif %}
+        {% if user["user"] is not none %}
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary ml-2" role="button">Log Out</a>
+        {% endif %}
         <button class="btn" onclick="halfmoon.toggleDarkMode()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars"
                 viewBox="0 0 16 16">

@@ -5,6 +5,7 @@ Notes:
     2. Parallel-ssh also seem to have a weird issue with pkeys, this lib is only able to authenticate using ed25519 key, weird.
     3. Of course, I tested, locally keys using ssh -i command.
 """
+
 import ipaddress
 
 # from host_management.utils import get_hosts_only
@@ -18,9 +19,7 @@ def execute_command(command, hosts: tuple = None):
     # hosts, users = get_managed_hosts()
     if hosts is None:
         hosts = config.ConfigManager().ip_list
-    client = ParallelSSHClient(
-        hosts, user="root", pkey="./env/id_ed", timeout=1, retry_delay=1, num_retries=1
-    )
+    client = ParallelSSHClient(hosts, user="root", pkey="./env/id_ed", timeout=1, retry_delay=1, num_retries=1)
     output = client.run_command(command, stop_on_errors=False)
     response_dict = {}
     for host_out in output:
@@ -42,10 +41,7 @@ def execute_command(command, hosts: tuple = None):
 
 
 def parse_output_to_dict(result_to_parse, assignment_key):
-    parsed_output = {
-        host: {assignment_key: res[0].strip("\n")}
-        for host, res in result_to_parse.items()
-    }
+    parsed_output = {host: {assignment_key: res[0].strip("\n")} for host, res in result_to_parse.items()}
     return parsed_output
 
 
@@ -103,18 +99,8 @@ def restart_service(service_name, hosts: tuple = None):
     return execute_command(f"service {service_name} status", hosts)
 
 
-def is_private_ip(ip):
-    try:
-        ip_obj = ipaddress.IPv4Address(ip)
-        return ip_obj.is_private
-    except ipaddress.AddressValueError:
-        return False
-
-
 def get_all_ips_on_host(hosts: tuple = None):
-    result = execute_command(
-        "ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1", hosts
-    )
+    result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1", hosts)
     return {host: {"ips": values} for host, values in result.items()}
 
 

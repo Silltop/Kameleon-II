@@ -1,17 +1,38 @@
 import subprocess
-from flask import jsonify, abort
+from flask import jsonify, abort, request
 from api import app
+import hashlib
+
+API_KEY = "your_api_key_here"  # Replace with your actual API key
+
+
+# todo make HMAC
+def validate_api_key():
+    api_key = request.headers.get("X-API-KEY")
+    hashed_api_key = hashlib.sha256(API_KEY.encode()).hexdigest() if API_KEY else None
+    if hashed_api_key != api_key:
+        abort(401, description="Invalid API key")
+
+
+def validate_certificate():
+    if not request.is_secure:
+        abort(403, description="SSL certificate required")
+    cert = request.headers.get("X-SSL-CERT")
+    if not cert:
+        abort(403, description="Client certificate required")
+
+
+@app.before_request
+def before_request():
+    validate_api_key()
+    # validate_certificate()
 
 
 def execute_command(command):
     try:
-        result = subprocess.check_output(
-            command, shell=True, executable="/bin/bash", stderr=subprocess.STDOUT
-        )
-
+        result = subprocess.check_output(command, shell=True, executable="/bin/bash", stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as cpe:
         result = cpe.output
-
     finally:
         return result.decode("utf-8")
 
@@ -25,8 +46,7 @@ def gather_facts():
         "'/^PRETTY_NAME/{print $2}' | tr -d '\"' "
     ).strip("\n")
     users = execute_command(
-        'awk -F: \'$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print "0" '
-        "}' /etc/passwd"
+        'awk -F: \'$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print "0" ' "}' /etc/passwd"
     ).strip("\n")
     to_return = {
         "hostname": hostname,
@@ -39,12 +59,8 @@ def gather_facts():
 
 @app.route("/get-all-ips-on-host", methods=["GET"])
 def get_all_ips_on_host():
-    result = execute_command(
-        "ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1"
-    )
-    return jsonify(
-        list(filter(None, result.split("\n")))
-    )  # filter will remove empty list entries
+    result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1")
+    return jsonify(list(filter(None, result.split("\n"))))  # filter will remove empty list entries
 
 
 @app.route("/uptime", methods=["GET"])
@@ -93,4 +109,3 @@ def index():
 @app.route("/error", methods=["GET"])
 def error_page():
     return abort(400)
-
