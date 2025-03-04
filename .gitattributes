@@ -1,4 +1,4 @@
 *.py linguist-language=Python
-static/js/halfmoon-module.js linguist-vendored
-static/js/halfmoon.js linguist-vendored
-static/js/halfmoon.min.js linguist-vendored
+static/js/halfmoon*.js linguist-vendored
+static/css/halfmoon*.css linguist-vendored
+static/css/fontawesome*.css linguist-vendored
