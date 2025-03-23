@@ -28,7 +28,8 @@ def da_apps_versions():
 @plugin.route("/user-websites")
 def da_websites():
     data = ApiConnector().call_hosts("/get-da-user-websites")
+    for ip, host_data in data.items():
+        print(host_data)
     table_headers = ["User", "Domain"]
-    print(data)
-    # data["data"]["user_domains"] = data["data"].get("user_domains", "").split(",")
+    # print(data)
     return extended_render_template("da_user_websites.html", table_headers=table_headers, table_data=data)

@@ -1,9 +1,11 @@
 import logging
 import os
-from flask import Blueprint, jsonify
 from datetime import datetime
+
+from flask import Blueprint, jsonify
 from utils import run_command
-from extensions.directadmin.data_retrival import get_user_list, get_user_domains
+
+from extensions.directadmin.data_retrival import get_user_domains, get_user_list
 
 da = Blueprint("da", __name__)
 

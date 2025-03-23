@@ -2,9 +2,9 @@ import importlib
 import json
 import logging
 import os
-from web.app import db
+
 from data_management.db_models import ExtensionRoutes
-from web.app import app
+from web.app import app, db
 
 
 class ExtensionHandler:
@@ -36,7 +36,8 @@ class ExtensionHandler:
                 self.register_routes(extension_name, routes)
             self.import_extension_module(extension, extension_name)
             self.log_registered_routes()
-            db.create_all()
+            self.create_db_tables(extension, extension_name)
+            # db.create_all()
 
     def register_routes(self, extension_name, routes):
         for routename, route in routes.items():
@@ -52,6 +53,10 @@ class ExtensionHandler:
             blueprint = getattr(extension_module, "plugin")
             logging.info(f"Registering blueprint for extension: {extension_name}")
             app.register_blueprint(blueprint)
+
+    def create_db_tables(self, extension, extension_name):
+        importlib.import_module(f"{self.extensions_dir}.{extension}.db_models")
+        db.create_all()
 
     def log_registered_routes(self):
         rules = [f"{rule.endpoint} -> {rule.rule}" for rule in app.url_map.iter_rules()]
