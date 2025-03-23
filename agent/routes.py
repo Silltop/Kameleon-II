@@ -1,9 +1,11 @@
-import subprocess
-from flask import jsonify, abort, request
-from api import app
 import hashlib
+import subprocess
+
+from flask import Blueprint, abort, jsonify, request
 
 API_KEY = "your_api_key_here"  # Replace with your actual API key
+
+api_bp = Blueprint("api", __name__)
 
 
 # todo make HMAC
@@ -22,13 +24,14 @@ def validate_certificate():
         abort(403, description="Client certificate required")
 
 
-@app.before_request
+@api_bp.before_request
 def before_request():
     validate_api_key()
     # validate_certificate()
 
 
 def execute_command(command):
+    result = b"Error"
     try:
         result = subprocess.check_output(command, shell=True, executable="/bin/bash", stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as cpe:
@@ -37,7 +40,7 @@ def execute_command(command):
         return result.decode("utf-8")
 
 
-@app.route("/host-facts", methods=["GET"])
+@api_bp.route("/host-facts", methods=["GET"])
 def gather_facts():
     hostname = execute_command("hostname").strip("\n")
     kernel = execute_command("uname -r").strip("\n")
@@ -46,7 +49,8 @@ def gather_facts():
         "'/^PRETTY_NAME/{print $2}' | tr -d '\"' "
     ).strip("\n")
     users = execute_command(
-        'awk -F: \'$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print "0" ' "}' /etc/passwd"
+        'awk -F: \'$6 ~ /^\/home/ { count++ } END { if (count > 0) print count; else print "0" '
+        "}' /etc/passwd"  # noqa: W605
     ).strip("\n")
     to_return = {
         "hostname": hostname,
@@ -57,30 +61,30 @@ def gather_facts():
     return jsonify(to_return)
 
 
-@app.route("/get-all-ips-on-host", methods=["GET"])
+@api_bp.route("/get-all-ips-on-host", methods=["GET"])
 def get_all_ips_on_host():
     result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1")
     return jsonify(list(filter(None, result.split("\n"))))  # filter will remove empty list entries
 
 
-@app.route("/uptime", methods=["GET"])
+@api_bp.route("/uptime", methods=["GET"])
 def uptime():
     result = execute_command("uptime").strip("\n")
     return jsonify({"uptime": result})
 
 
-@app.route("/healthcheck", methods=["GET"])
+@api_bp.route("/healthcheck", methods=["GET"])
 def healthcheck():
     return jsonify("up", 200)
 
 
-@app.route("/load-avg", methods=["GET"])
+@api_bp.route("/load-avg", methods=["GET"])
 def load_avg():
     result = execute_command("cat /proc/loadavg | awk '{print $1, $2, $3}'").strip("\n")
     return jsonify({"load-avg": result})
 
 
-@app.route("/disk-devices", methods=["GET"])
+@api_bp.route("/disk-devices", methods=["GET"])
 def disk_devices():
     result = execute_command("df | awk 'NR>1 {print $1, $2, $3, $5, $6}'").split("\n")
     extracted_result = []
@@ -100,12 +104,12 @@ def disk_devices():
     return jsonify({"disk_devices": extracted_result})
 
 
-@app.route("/", methods=["GET"])
+@api_bp.route("/", methods=["GET"])
 def index():
     result = {"Welcome": "This is web response"}
     return jsonify(result)
 
 
-@app.route("/error", methods=["GET"])
+@api_bp.route("/error", methods=["GET"])
 def error_page():
     return abort(400)

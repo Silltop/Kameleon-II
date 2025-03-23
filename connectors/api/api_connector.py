@@ -1,5 +1,5 @@
 import logging
-from typing import Dict
+from typing import Dict, Optional
 import requests
 from configuration import config
 from connectors.connector import Connector
@@ -19,7 +19,7 @@ class TokenManager:
         if not cls._instance:
             with cls._lock:
                 if not cls._instance:
-                    cls._instance = super(TokenManager, cls).__new__(cls)
+                    cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -65,7 +65,7 @@ class ApiConnector(Connector):
         self.token_manager = TokenManager()
         self.api_key = "your_api_key_here"
 
-    def create_headers(self) -> Dict[str, str]:
+    def create_headers(self) -> dict[str, str]:
         hashed_api_key = hashlib.sha256(self.api_key.encode()).hexdigest()
         headers = {"X-API-KEY": hashed_api_key, "Content-Type": "application/json"}
         return headers
@@ -73,12 +73,12 @@ class ApiConnector(Connector):
     def call_endpoints(
         self,
         endpoint,
-        hosts: tuple = None,
+        hosts: Optional[tuple] = None,
         method: str = "GET",
-        data: dict = None,
-        json_data: dict = None,
+        data: Optional[dict] = None,
+        json_data: Optional[dict] = None,
         https: bool = False,
-    ) -> Dict:
+    ) -> dict:
         if hosts is None:
             hosts = config.ConfigManager().ip_list
 

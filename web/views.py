@@ -1,30 +1,32 @@
 import os
-import yaml
-from flask import render_template as base_render_template
-from flask import url_for, redirect, session, request, jsonify
-from sqlalchemy import func
-from sqlalchemy.orm import subqueryload
 from functools import wraps
 
-# from ansible_wrapper import check_service_status
-from web.app import app, db, keycloak
+import yaml
+from flask import jsonify, redirect, render_template, request, session, url_for
+from sqlalchemy import func
+from sqlalchemy.orm import subqueryload
+
+import web.api  # noqa: F401
 from configuration import config
 from configuration.config import ConfigManager
 from connectors.api.api_connector import ApiConnector
-from data_management.db_models import HostFacts, Host, ExtensionRoutes
+from data_management.db_models import ExtensionRoutes, Host, HostFacts
 from data_management.sync_functions import sync_all
 from host_management import admin_functions
 from host_management.rbl_checker import RblChecker
 from host_management.utils import ip_address_is_valid
+
+# from ansible_wrapper import check_service_status
+from web.app import app, db, keycloak
+
 from .charts import Chart, ChartDataElement, chart_from_column_elements
-import web.api  # noqa: F401
 
 
-def render_template(*args, **kwargs):
+def extended_render_template(*args, **kwargs):
     """Dynamic list of navbar items as override to base flask function"""
     extension_routes = db.session.query(ExtensionRoutes).all()
     user = session.get("user_claims", None)
-    return base_render_template(*args, **kwargs, user=user, extension_routes=extension_routes)
+    return render_template(*args, **kwargs, user=user, extension_routes=extension_routes)
 
 
 def login_required(f):
@@ -61,8 +63,8 @@ def before_request():
 def query_rbl_db(ip):
     if ip_address_is_valid(ip):
         result = RblChecker().check_rbl(ip)
-        return render_template("rbl_result.html", ip=ip, result=result, success=True)
-    return render_template("rbl_result.html", ip=ip, success=False)
+        return extended_render_template("rbl_result.html", ip=ip, result=result, success=True)
+    return extended_render_template("rbl_result.html", ip=ip, success=False)
 
 
 @app.route("/admin-functions")
@@ -70,7 +72,7 @@ def query_rbl_db(ip):
 def admin_functions_render():
     results = session.pop("results", [])
     host_list = config.ConfigManager().ip_list
-    return render_template("admin_functions.html", host_list=host_list, results=results)
+    return extended_render_template("admin_functions.html", host_list=host_list, results=results)
 
 
 @app.route("/run-function/<functionname>", methods=["POST"])
@@ -109,14 +111,14 @@ def auth():
 @login_required
 def configuration_page():
     file = ConfigManager().file_content
-    return render_template("config.html", file_content=yaml.dump(file))
+    return extended_render_template("config.html", file_content=yaml.dump(file))
 
 
 @app.route("/disks")
 @login_required
 def disk_status():
     disk_data = ApiConnector().call_hosts("/disk-devices")
-    return render_template("disks-status.html", disk_data=disk_data)
+    return extended_render_template("disks-status.html", disk_data=disk_data)
 
 
 @app.route("/sync-all")
@@ -154,7 +156,7 @@ def index():
         chart_type="pie",
         chart_data=[de1, de2],
     )
-    return render_template(
+    return extended_render_template(
         "index.html",
         host_details_list=host_details_list,
         charts=[chart, kernel_chart, distro_chart],

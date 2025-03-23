@@ -1,5 +1,7 @@
+from unittest.mock import mock_open, patch
+
 import pytest
-from unittest.mock import mock_open, patch, MagicMock
+
 from configuration.config import ConfigManager  # Adjust import based on your project structure
 
 valid_yaml_content = """
@@ -43,8 +45,9 @@ def test_load_content_success(mock_yaml_file):
 
 
 def test_load_ips(mock_yaml_file):
-    with patch("yaml.safe_load",
-               return_value={"hosts": {"host1": {"ip": "192.168.1.1"}, "host2": {"ip": "192.168.1.2"}}}):
+    with patch(
+        "yaml.safe_load", return_value={"hosts": {"host1": {"ip": "192.168.1.1"}, "host2": {"ip": "192.168.1.2"}}}
+    ):
         config = ConfigManager()
         assert config.load_ips() == ["192.168.1.1", "192.168.1.2"]
 

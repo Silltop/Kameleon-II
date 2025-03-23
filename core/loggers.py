@@ -1,4 +1,5 @@
 import logging
+import re
 
 
 class ColorFormatter(logging.Formatter):
@@ -22,3 +23,11 @@ class ColorFormatter(logging.Formatter):
         color = self.COLORS.get(record.levelno)
         message = super().format(record)  # Use the existing format set in the logger
         return f"{color}{message}{self.reset}"
+
+
+class FilterOutDateFromWerkzeugLog(logging.Filter):
+    pattern: re.Pattern = re.compile(r' - - \[.+?] "')
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        record.msg = self.pattern.sub(' - "', record.msg)
+        return True

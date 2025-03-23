@@ -71,7 +71,7 @@
   margin-right: 6px;
 }
 .status-dot-green{
-    background-color: #green;
+    background-color: green;
 }
 
 /* Loading spinner animation */
@@ -114,4 +114,25 @@
 }
 .cyan{
     color: #00FFFF;
+}
+
+.table-caption {
+    text-align: left;
+    font-weight: bold;
+    font-size: medium;
+    padding: 0.5rem;
+    color: white;
+}
+
+.table-margin{
+    margin-bottom: 2vh;
+}
+
+.footer-container{
+    
+}
+
+body{
+    display: flex;
+    flex-direction: column-reverse;
 }

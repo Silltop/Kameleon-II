@@ -18,7 +18,7 @@ RUN mkdir -p /usr/local/directadmin/data/users
 
 # Generate random user data
 RUN bash -c ' \
-    user_list="user1 user2 user3 suspended_user"; \
+    user_list="user1 user2 user3 suspended_user suspended_user2"; \
     for user in $user_list; do \
         mkdir -p /usr/local/directadmin/data/users/$user; \
         echo "email=${user}@example.com" > /usr/local/directadmin/data/users/$user/user.conf; \
@@ -29,7 +29,12 @@ RUN bash -c ' \
             echo "suspended=yes" >> /usr/local/directadmin/data/users/$user/user.conf; \
             suspend_time=$(date -d "5 days ago" +%s); \
             echo "suspend_time=$suspend_time" >> /usr/local/directadmin/data/users/$user/user.conf; \
-        fi \
+        fi; \
+        if [ "$user" = "suspended_user2" ]; then \
+            echo "suspended=yes" >> /usr/local/directadmin/data/users/$user/user.conf; \
+            suspend_time=$(date -d "8 days ago" +%s); \
+            echo "suspend_time=$suspend_time" >> /usr/local/directadmin/data/users/$user/user.conf; \
+        fi; \
     done'
 
 RUN mkdir -p /usr/local/directadmin/scripts

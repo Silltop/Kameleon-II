@@ -29,7 +29,7 @@ logging_config = {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
             "formatter": "default",
-            "level": "DEBUG",
+            "level": "INFO",
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
@@ -40,12 +40,18 @@ logging_config = {
             "backupCount": 3,
         },
     },
-    "loggers": {"root": {"level": "DEBUG", "handlers": ["stdout", "file"]},
-                "werkzeug": {"level": "INFO", "propagate": True},
-                "pssh": {"level": "WARNING", "propagate": True},
-                "schedule": {"level": "WARNING", "propagate": True},
-                "urllib3": {"level": "WARNING", "propagate": True}
-                },
+    "filters": {
+        "filter_out_date": {
+            "()": "core.loggers.FilterOutDateFromWerkzeugLog",
+        },
+    },
+    "loggers": {
+        "root": {"level": "DEBUG", "handlers": ["stdout", "file"]},
+        "werkzeug": {"level": "INFO", "propagate": True, "filters": ["filter_out_date"]},
+        "pssh": {"level": "WARNING", "propagate": True},
+        "schedule": {"level": "WARNING", "propagate": True},
+        "urllib3": {"level": "WARNING", "propagate": True},
+    },
 }
 
 

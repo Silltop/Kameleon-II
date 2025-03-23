@@ -1,14 +1,15 @@
 import os
 import time
+
 import yaml
-from flask import Blueprint, Response, request, stream_with_context
-from flask import render_template, jsonify
+from flask import Blueprint, Response, jsonify, request, stream_with_context
+
 from ansible_wrapper.ansible_init import PlaybookManager, run_ansible_playbook
 from ansible_wrapper.ansible_models import AnsibleRuns, LogEntry
 from ansible_wrapper.db_ops import fetch_playbook_runs
-from configuration import logger
 from ansible_wrapper.stream import generate_logs
-
+from configuration import logger
+from web.views import extended_render_template
 
 ansible = Blueprint("ansible", __name__, url_prefix="/ansible", static_folder="static", template_folder="templates")
 
@@ -27,7 +28,7 @@ def ansible_configuration():
     with open(config_path) as file:
         config = yaml.safe_load(file)
     PlaybookManager()
-    return render_template("ansible_configuration.html", config=config)
+    return extended_render_template("ansible_configuration.html", config=config)
 
 
 @ansible.route("/update_configuration", methods=["POST"])
@@ -61,7 +62,7 @@ def ansible_dashboard():
                 "duration": duration,
             }
         )
-    return render_template("ansible_dashboard.html", table_data=table_data)
+    return extended_render_template("ansible_dashboard.html", table_data=table_data)
 
 
 @ansible.route("/recent_run_status/<int:playbook_id>", methods=["GET"])
@@ -116,7 +117,7 @@ def get_logs(playbook_id):
 
 @ansible.route("/display_logs/<int:playbook_id>", methods=["GET"])
 def display_logs(playbook_id):
-    return render_template("log_display.html", playbook_id=playbook_id)
+    return extended_render_template("log_display.html", playbook_id=playbook_id)
 
 
 @ansible.route("/logs-stream/<int:ansible_run_id>")

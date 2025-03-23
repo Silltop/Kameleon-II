@@ -1,49 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>Kameleon - {% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/halfmoon.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome-all.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/halfmoon-variables.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/anim.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon"/>
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/halfmoon.css') }}">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/font-awesome-all.css') }}">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/halfmoon-variables.css') }}">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/logo-anim.css') }}">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon" />
     <script src="{{ url_for('static', filename='js/halfmoon.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/font-awesome-all.js') }}"></script>
+    <script
+      src="{{ url_for('static', filename='js/font-awesome-all.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/send-to-backend.js') }}"></script>
-<!--    <script src="{{ url_for('static', filename='js/halfmoon-module.js') }}"></script>-->
+    <script
+      src="{{ url_for('static', filename='js/send-to-backend.js') }}"></script>
+    <!--    <script src="{{ url_for('static', filename='js/halfmoon-module.js') }}"></script>-->
     <script>
       // Dark mode toggle demo
       function toggleDemo() {
         halfmoon.toggleDarkMode();
       }
     </script>
-</head>
-<body>
-<div class="page-wrapper with-navbar">
+  </head>
+  <body>
+    <div class="page-wrapper with-navbar with-footer">
 
-{% include 'toast.html' %}
-{% include 'navbar.html' %}
-{% include 'login-modal.html' %}
+      {% include 'toast.html' %}
+      {% include 'navbar.html' %}
+      {% include 'login-modal.html' %}
 
-<div class="content-wrapper">
-{% block content %}
+      <div class="content-wrapper">
+        {% block content %}
 
-{% endblock %}
-</div>
-<script>
- // Make sure that the cookie exists
- if (halfmoon.readCookie("halfmoon_preferredMode")) {
-   if (halfmoon.readCookie("halfmoon_preferredMode") == "light-mode") {
-     // Light mode is preferred
-   }
-   else if (halfmoon.readCookie("halfmoon_preferredMode") == "dark-mode") {
-     halfmoon.toggleDarkMode();
-   }
- }
-</script>
-</div>
-</body>
+        {% endblock %}
+      </div>
+      <script>
+  // Make sure that the cookie exists
+  if (halfmoon.readCookie("halfmoon_preferredMode")) {
+    if (halfmoon.readCookie("halfmoon_preferredMode") == "light-mode") {
+      // Light mode is preferred
+    }
+    else if (halfmoon.readCookie("halfmoon_preferredMode") == "dark-mode") {
+      halfmoon.toggleDarkMode();
+    }
+  }
+  </script>
+      {% include 'footer.html' %}
+    </div>
+
+  </body>
 </html>

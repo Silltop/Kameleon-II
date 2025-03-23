@@ -3,23 +3,30 @@
 {% block content %}
 
 {% for host, data in table_data.items() %}
-<h3>{{host}}</h3>
-<table class="table table-no-outer-padding">
-  <thead>
-    <tr>
-      {% for header in table_headers %}
+<div class="table-responsive table-margin">
+  <table class="table table-outer-bordered" label="test">
+    <caption class="table-caption">{{ host }}</caption>
+    <thead>
+      <tr>
+        {% for header in table_headers %}
         <th>{{ header }}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for user, user_domains in data.items() %}
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for user, user_domains in data.items() %}
       <tr>
         <td>{{ user }}</td>
-        <td>{{ user_domains }}</td>
+        <td>
+          {% for domain in user_domains %}
+          {{domain}} <br>
+          {% endfor %}
+        </td>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endfor %}
+
 {% endblock %}

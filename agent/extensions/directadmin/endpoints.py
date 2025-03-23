@@ -5,7 +5,7 @@ from datetime import datetime
 from utils import run_command
 from extensions.directadmin.data_retrival import get_user_list, get_user_domains
 
-da = Blueprint('da', __name__)
+da = Blueprint("da", __name__)
 
 
 def calculate_duration_days(date_str):
@@ -19,7 +19,8 @@ def calculate_duration_days(date_str):
 def get_suspended_users():
     if not os.path.exists("/usr/local/directadmin"):
         return jsonify({"info": "Directadmin not installed"}), 211
-    suspended_users_command = run_command('''
+    suspended_users_command = run_command(
+        """
     output=$(for path in /usr/local/directadmin/data/users/*/user.conf; do 
         [ -f "$path" ] && 
         user=$(basename $(dirname "$path")) && 
@@ -27,23 +28,22 @@ def get_suspended_users():
             suspend_time=$(grep -m1 "suspend_time=" "$path" | cut -d'=' -f2)
             if [ -n "$suspend_time" ]; then
                 suspend_date=$(date -d "@$suspend_time" "+%Y-%m-%d %H:%M:%S")
-                echo "$user|$suspend_date"
+                echo "$user|$suspend_date;"
             else
-                echo "$user|N/A"
+                echo "$user|N/A;"
             fi
         fi
     done); echo "$output"
-    ''')
-    data = {}
-    for entry in suspended_users_command:
-        entry = entry.split("|")
-        user, time = entry[0], entry[1]
-        if "N/A" not in time:
-            data[user] = calculate_duration_days(time)
-        else:
-            data[user] = "N/A"
+    """
+    )
+    data = {
+        entry.split("|")[0]: calculate_duration_days(entry.split("|")[1]) if "N/A" not in entry.split("|")[1] else "N/A"
+        for entry in suspended_users_command.split(";")
+        if entry.strip() and len(entry.split("|")) == 2
+    }
     logging.critical(suspended_users_command)
     return jsonify(data), 200
+
 
 @da.route("/get-da-user-websites")
 def get_da_user_websites():
@@ -60,19 +60,51 @@ def get_da_apps_versions():
     if not os.path.exists("/usr/local/directadmin"):
         return jsonify({"info": "Directadmin not installed"}), 211
     versions = {}
-    versions['OS'] = run_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"'", "unknown")
-    versions['DirectAdmin'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of DirectAdmin' | awk -F: '{print $2}'", "unknown")
-    versions['Apache'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Apache' | awk -F: '{print $2}'", "unknown")
-    versions['FTPD'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Pure-FTPd' | awk -F: '{print $2}'", "unknown")
-    versions['Dovecot'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Dovecot' | awk -F: '{print $2}'", "unknown")
-    versions['Exim'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Exim' | awk -F: '{print $2}'", "unknown")
-    versions['SpamAssassin'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of SpamAssassin' | awk -F: '{print $2}'", "unknown")
-    versions['RoundCube'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of RoundCube' | awk -F: '{print $2}'", "unknown")
-    versions['phpMyAdmin'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of phpMyAdmin' | awk -F: '{print $2}'", "unknown")
-    versions['Database'] = run_command("mysql --version | awk -F, '{print $1}'", "unknown")
-    versions['PHP'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of PHP' | awk -F: '{print $2}'", "unknown")
-    versions['PHP mode'] = run_command("grep php1_mode /usr/local/directadmin/custombuild/options.conf | awk -F= '{print $2}'", "unknown")
-    versions['LetsEncrypt'] = run_command("/usr/local/directadmin/custombuild/build versions | grep 'Installed version of LetsEncrypt' | awk -F: '{print $2}'", "unknown")
+    versions["OS"] = run_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"'", "unknown")
+    versions["DirectAdmin"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of DirectAdmin' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["Apache"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Apache' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["FTPD"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Pure-FTPd' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["Dovecot"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Dovecot' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["Exim"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of Exim' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["SpamAssassin"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of SpamAssassin' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["RoundCube"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of RoundCube' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["phpMyAdmin"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of phpMyAdmin' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["Database"] = run_command("mysql --version | awk -F, '{print $1}'", "unknown")
+    versions["PHP"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of PHP' | awk -F: '{print $2}'",
+        "unknown",
+    )
+    versions["PHP mode"] = run_command(
+        "grep php1_mode /usr/local/directadmin/custombuild/options.conf | awk -F= '{print $2}'", "unknown"
+    )
+    versions["LetsEncrypt"] = run_command(
+        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of LetsEncrypt' | awk -F: '{print $2}'",
+        "unknown",
+    )
     return versions
 
 

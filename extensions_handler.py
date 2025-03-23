@@ -54,5 +54,5 @@ class ExtensionHandler:
             app.register_blueprint(blueprint)
 
     def log_registered_routes(self):
-        for rule in app.url_map.iter_rules():
-            logging.info(f"Route registered: {rule.endpoint} -> {rule.rule}")
+        rules = [f"{rule.endpoint} -> {rule.rule}" for rule in app.url_map.iter_rules()]
+        logging.info(f"Routes registered: {', '.join(rules)}")

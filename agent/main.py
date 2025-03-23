@@ -3,11 +3,11 @@ import logging
 import os
 from logging.config import dictConfig
 from os import getcwd
-from werkzeug.exceptions import default_exceptions
 
-from utils import register_blueprints
 from api import app  # noqa E401
-import routes  # noqa E401
+from routes import api_bp
+from utils import register_blueprints
+from werkzeug.exceptions import default_exceptions
 
 logger = logging.getLogger("Kameleon-agent")
 logging_path = f"{getcwd()}/logs"
@@ -44,9 +44,14 @@ logging_config = {
             "backupCount": 3,
         },
     },
+    "filters": {
+        "filter_out_date": {
+            "()": "core.loggers.FilterOutDateFromWerkzeugLog",
+        },
+    },
     "loggers": {
         "root": {"level": "WARNING", "handlers": ["stdout", "file"]},
-        "werkzeug": {"level": "INFO", "propagate": True},
+        "werkzeug": {"level": "INFO", "propagate": True, "filters": ["filter_out_date"]},
     },
 }
 
@@ -82,7 +87,7 @@ def setup_logging():
 
 if __name__ == "__main__":
     setup_logging()
-
+    app.register_blueprint(api_bp)
     _override_flask_exceptions()
     register_blueprints()
     app.run(host="0.0.0.0", debug=True, use_reloader=True, port=6622)

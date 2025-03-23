@@ -2,21 +2,22 @@ import asyncio
 import logging
 import time
 from datetime import datetime
-from connectors.api.api_connector import ApiConnector
-from host_management.utils import is_private_ip
-from web.app import db, app
+
 from configuration import logger
+from connectors.api.api_connector import ApiConnector
 from connectors.os.remote_data_processor import *
 from data_management.db_models import (
+    Host,
+    HostDevices,
     HostFacts,
     HostIps,
-    HostDevices,
     HostStatus,
-    Host,
     IpsHosts,
     RblHosts,
 )
 from host_management.rbl_checker import RblChecker
+from host_management.utils import is_private_ip
+from web.app import app, db
 
 
 def save_device_data():
@@ -92,7 +93,7 @@ async def sync_rbl():
         # print("sync_rbl - ips", ips)
         for host, ip_list in ips.items():
             if is_private_ip(host):
-                logger.info(f"Skipping private IP: {host}")
+                logger.debug(f"Skipping private IP: {host}")
                 continue
             results_rbl = RblChecker().check_rbl(host)
             await save_rbls_to_db(host, results_rbl)
