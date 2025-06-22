@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import secrets
 from functools import wraps
 from flask import Flask, request, jsonify
@@ -40,7 +41,7 @@ template_dir = "../templates"
 static_dir = "../static"
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = generate_random_secret_key(32)
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.getcwd()}/db/kameleon.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{Path.cwd()}/db/kameleon.db"
 
 db.init_app(app)
 app.config.from_mapping(config)

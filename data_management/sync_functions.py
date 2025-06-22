@@ -5,7 +5,8 @@ from datetime import datetime
 
 from configuration import logger
 from connectors.api.api_connector import ApiConnector
-from connectors.os.remote_data_processor import *
+
+# from connectors.os.remote_data_processor import *
 from data_management.db_models import (
     Host,
     HostDevices,

@@ -53,9 +53,8 @@ def logout():
 
 @app.before_request
 def before_request():
-    if request.endpoint not in ["login", "auth", "static"]:
-        if "user_claims" not in session:
-            return redirect(url_for("login"))
+    if request.endpoint not in ["login", "auth", "static"] and "user_claims" not in session:
+        return redirect(url_for("login"))
 
 
 @app.route("/query-rbl/<ip>", methods=["GET"])

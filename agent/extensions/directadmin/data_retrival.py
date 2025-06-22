@@ -1,4 +1,5 @@
-import os
+import logging
+from pathlib import Path
 
 from utils import run_command
 
@@ -13,7 +14,7 @@ def get_php_list():
     try:
         php_list = []
         local_path = "/usr/local/directadmin/custombuild/options.conf"
-        if os.path.exists(local_path):
+        if Path(local_path).exists():
             with open(local_path, "r") as rfile:
                 lines = rfile.readlines()
         else:
@@ -26,6 +27,7 @@ def get_php_list():
                     php_list.append(founded_line)
         return php_list
     except Exception as e:
+        logging.error(f"Error reading options.conf: {str(e)}")
         return "Unable to find options.conf"
 
 
@@ -35,7 +37,7 @@ def get_user_domains(user) -> list:
         user = user.replace("\n", "")
         path = f"/usr/local/directadmin/data/users/{user}/domains.list"
 
-        if not os.path.exists(path):
+        if not Path(path).exists():
             return ["Unable to find domains list"]
 
         with open(path) as rfile:
@@ -45,13 +47,14 @@ def get_user_domains(user) -> list:
 
         return domains
     except Exception as e:
-        return [f"Error occurred: {str(e)}"]
+        logging.error(f"Error retrieving domains for user {user}: {str(e)}")
+        return [f"Unable to find domains list for user {user}"]
 
 
 def get_user_php_version(user, domain):
     try:
         path = f"/usr/local/directadmin/data/users/{user}/domains/{domain}.conf"
-        if not os.path.exists(path):
+        if not Path(path).exists():
             return "Unable to find domain configuration"
 
         with open(path, "r") as rfile:

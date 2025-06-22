@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Directadmin Summary of all hosts{% endblock %}
 {% block content %}
-
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+#todo fixme
+<div class="record-container" id = "record-container">
 {% for host, users in data.items() %}
 <h3>{{host}}</h3>
-
 
 <table class="table table-no-outer-padding">
   <thead>
@@ -14,6 +15,9 @@
       <th>Quota</th>
       <th>Package</th>
       <th>Domains</th>
+      <th>DNS A (google)</th>
+      <th>MX</th>
+      <th>NS</th>
     </tr>
   </thead>
   <tbody>
@@ -34,11 +38,16 @@
         {{domain}}<br>
         {% endfor %}
       </td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
 {% endfor %}
+</div>
 
 {% endblock %}

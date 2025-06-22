@@ -1,14 +1,15 @@
 import atexit
 import time
-from threading import Event
-from threading import Thread
+from threading import Event, Thread
+
 import schedule
+
+from ansible_wrapper import ansible_init, ansible_routes  # noqa E401
+from ansible_wrapper.ansible_routes import ansible  # noqa E401
+from configuration import logger, setup_logging
+from data_management import db_models, sync_functions
 from extensions_handler import ExtensionHandler
 from web import app
-from configuration import setup_logging, logger
-from data_management import db_models, sync_functions
-from ansible_wrapper import ansible_routes, ansible_init  # noqa E401
-from ansible_wrapper.ansible_routes import ansible  # noqa E401
 
 
 def run_scheduled_jobs(event):

@@ -64,7 +64,7 @@ def get_da_apps_versions():
     versions = {}
     versions["OS"] = run_command("cat /etc/*-release | awk -F '=' '/^PRETTY_NAME/{print $2}' | tr -d '\"'", "unknown")
     versions["DirectAdmin"] = run_command(
-        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of DirectAdmin' | awk -F: '{print $2}'",
+        "da version",
         "unknown",
     )
     versions["Apache"] = run_command(
@@ -104,8 +104,8 @@ def get_da_apps_versions():
         "grep php1_mode /usr/local/directadmin/custombuild/options.conf | awk -F= '{print $2}'", "unknown"
     )
     versions["LetsEncrypt"] = run_command(
-        "/usr/local/directadmin/custombuild/build versions | grep 'Installed version of LetsEncrypt' | awk -F: '{print $2}'",
-        "unknown",
+        "lego --version",
+        "Not installed",
     )
     return versions
 

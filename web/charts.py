@@ -3,13 +3,11 @@ from secrets import token_hex
 
 from sqlalchemy import func
 
-from data_management.db_models import *
+from data_management.db_models import db
 
 
 def chart_from_column_elements(column, title="", type="bar"):
-    hostname_counts = (
-        db.session.query(column, func.count().label("count")).group_by(column).all()
-    )
+    hostname_counts = db.session.query(column, func.count().label("count")).group_by(column).all()
     # Convert the result into a dictionary for easy printing
     hostname_counts_dict = {hostname: count for hostname, count in hostname_counts}
     # Print the key-value pairs

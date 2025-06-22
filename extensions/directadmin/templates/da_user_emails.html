@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}User email summary{% endblock %}
+{% block content %}
+
+{% for host, data in table_data.items() %}
+<div class="table-responsive table-margin">
+  <table class="table table-outer-bordered" label="test">
+    <caption class="table-caption">{{ host }}</caption>
+    <thead>
+      <tr>
+        {% for header in table_headers %}
+        <th>{{ header }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for user, user_domains in data.items() %}
+      <tr>
+        <td>{{ user }}</td>
+        <td>
+          {% for domain in user_domains %}
+          {{domain}} <br>
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% endblock %}

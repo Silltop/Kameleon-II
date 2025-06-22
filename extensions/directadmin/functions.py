@@ -30,6 +30,16 @@ def da_websites():
     data = ApiConnector().call_hosts("/get-da-user-websites")
     for ip, host_data in data.items():
         print(host_data)
-    table_headers = ["User", "Domain"]
+    table_headers = ["User", "Domain", "PHP Version"]
     # print(data)
     return extended_render_template("da_user_websites.html", table_headers=table_headers, table_data=data)
+
+
+@plugin.route("/user-emails")
+def da_emails():
+    data = ApiConnector().call_hosts("/get-da-user-emails")
+    for ip, host_data in data.items():
+        print(host_data)
+    table_headers = ["Email", "Alias", "Last Login", "Size"]
+    # print(data)
+    return extended_render_template("da_user_emails.html", table_headers=table_headers, table_data=data)
