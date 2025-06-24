@@ -6,6 +6,8 @@ from flask import Blueprint, jsonify
 from utils import run_command
 
 from extensions.directadmin.data_retrival import get_user_domains, get_user_list
+from extensions.directadmin.data_retrival import get_user_domains
+import glob
 
 da = Blueprint("da", __name__)
 
@@ -157,3 +159,56 @@ def get_da_all_info():
     except Exception as e:
         # If any command fails, return an error message
         return jsonify({"error": "Failed to get data", "details": str(e)}), 500
+
+
+@da.route("/get-da-user-emails", methods=["GET"])
+def get_da_user_emails():
+    """
+    Returns a dictionary of users and their email accounts with details:
+    {user: {email: {alias: [...], last_login: ..., size: ...}}}
+    """
+    result = {}
+    users = get_user_list()
+    for user in users:
+        user_emails = {}
+        for domain in get_user_domains(user):
+            passwd_path = f"/etc/virtual/{domain}/passwd"
+            if not os.path.isfile(passwd_path):
+                continue
+            try:
+                with open(passwd_path) as f:
+                    for line in f:
+                        parts = line.strip().split(":")
+                        if len(parts) < 9:
+                            continue
+                        email_name = parts[0]
+                        email_addr = f"{email_name}@{domain}"
+                        size = parts[8].replace("bytes=", "").strip()
+                        # Aliases
+                        aliases = []
+                        aliases_path = f"/etc/virtual/{domain}/aliases"
+                        if os.path.isfile(aliases_path):
+                            with open(aliases_path) as af:
+                                for aline in af:
+                                    if aline.startswith(email_name + ":"):
+                                        aliases = [a.strip() for a in aline.split(":", 1)[1].split(",") if a.strip()]
+                                        break
+                        # Last login
+                        last_login = None
+                        last_login_file = f"/etc/virtual/{domain}/last_login/{email_name}"
+                        if os.path.isfile(last_login_file):
+                            with open(last_login_file) as lf:
+                                for lline in lf:
+                                    if "when=" in lline:
+                                        try:
+                                            ts = int(lline.split("when=")[-1].split("&", 1)[0])
+                                            last_login = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+                                        except Exception:
+                                            last_login = None
+                                        break
+                        user_emails[email_addr] = {"alias": aliases, "last_login": last_login, "size": size}
+            except Exception:
+                continue
+        if user_emails:
+            result[user] = user_emails
+    return jsonify(result), 200

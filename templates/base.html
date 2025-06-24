@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title>Kameleon - {% block title %}{% endblock %}</title>
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <meta http-equiv="Access-Control-Allow-Methods"
+      content="GET, POST, PUT, DELETE, OPTIONS" />
+    <meta http-equiv="Access-Control-Allow-Headers"
+      content="Content-Type, Authorization" />
     <link rel="stylesheet"
       href="{{ url_for('static', filename='css/halfmoon.css') }}">
     <link rel="stylesheet"

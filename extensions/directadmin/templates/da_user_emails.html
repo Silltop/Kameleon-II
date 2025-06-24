@@ -14,14 +14,14 @@
       </tr>
     </thead>
     <tbody>
-      {% for user, user_domains in data.items() %}
+      {% for user, user_data in data.items() %}
       <tr>
-        <td>{{ user }}</td>
-        <td>
-          {% for domain in user_domains %}
-          {{domain}} <br>
-          {% endfor %}
-        </td>
+        {% for email, config in user_data.items() %}
+        <td>{{ email }}</td>
+        <td>{{config.alias}}</td>
+        <td>{{config.last_login}}</td>
+        <td>{{config.size}}</td>
+        {% endfor %}
       </tr>
       {% endfor %}
     </tbody>

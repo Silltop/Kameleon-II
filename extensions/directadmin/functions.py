@@ -41,5 +41,5 @@ def da_emails():
     for ip, host_data in data.items():
         print(host_data)
     table_headers = ["Email", "Alias", "Last Login", "Size"]
-    # print(data)
+    print(data)
     return extended_render_template("da_user_emails.html", table_headers=table_headers, table_data=data)

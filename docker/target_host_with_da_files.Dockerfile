@@ -13,6 +13,13 @@ RUN chown -R root:root /root/.ssh
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 EXPOSE 22
 
+# Set up working directory for the agent
+WORKDIR /kameleon-agent
+COPY ./agent/requirements.txt .
+
+# Install Python dependencies
+RUN python3 -m pip install --break-system-packages -r requirements.txt
+
 # Create DirectAdmin user data simulation
 RUN mkdir -p /usr/local/directadmin/data/users
 
@@ -74,12 +81,16 @@ RUN echo '#!/bin/bash' > /usr/local/bin/da && \
     echo 'fi' >> /usr/local/bin/da && \
     chmod +x /usr/local/bin/da
 
-# Set up working directory for the agent
-WORKDIR /kameleon-agent
-COPY ./agent/requirements.txt .
+RUN mkdir -p /usr/local/directadmin/data/users/testuser
+RUN echo "email=testuser@example.com" > /usr/local/directadmin/data/users/testuser/user.conf
+RUN echo "package=package1" >> /usr/local/directadmin/data/users/testuser/user.conf
+RUN echo "domain1.com" > /usr/local/directadmin/data/users/testuser/domains.list
 
-# Install Python dependencies
-RUN python3 -m pip install --break-system-packages -r requirements.txt
+# Create mock /etc/virtual structure for testuser
+RUN mkdir -p /etc/virtual/domain1.com/last_login
+RUN echo "testuser:x:1001:1001::/home/testuser:/bin/bash::::bytes=12345" > /etc/virtual/domain1.com/passwd
+RUN echo "testuser:alias1,alias2" > /etc/virtual/domain1.com/aliases
+RUN echo "when=1700000000&ip=127.0.0.1" > /etc/virtual/domain1.com/last_login/testuser
 
 # Entry point for the main application
 ENTRYPOINT ["python3", "main.py"]
