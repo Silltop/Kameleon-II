@@ -53,11 +53,15 @@ def get_user_domains(user) -> list:
 
 def get_user_php_version(user, domain):
     try:
-        path = f"/usr/local/directadmin/data/users/{user}/domains/{domain}.conf"
-        if not Path(path).exists():
+        path = Path(f"/usr/local/directadmin/data/users/{user}/domains/{domain}.conf")
+        if not path.exists():
             return "Unable to find domain configuration"
 
-        with open(path, "r") as rfile:
+        php_list = get_php_list()
+        if not isinstance(php_list, list) or not php_list:
+            return "Unable to retrieve PHP versions"
+
+        with path.open() as rfile:
             lines = rfile.readlines()
 
         for line in lines:
