@@ -49,10 +49,10 @@ def test_load_ips(mock_yaml_file):
         "yaml.safe_load", return_value={"hosts": {"host1": {"ip": "192.168.1.1"}, "host2": {"ip": "192.168.1.2"}}}
     ):
         config = ConfigManager()
-        assert config.load_ips() == ["192.168.1.1", "192.168.1.2"]
+        assert config.load_ips() == ("192.168.1.1", "192.168.1.2")
 
 
 def test_load_ips_empty_hosts():
-    with patch("yaml.safe_load", return_value={}):  # No "hosts" key in YAML
+    with patch("yaml.safe_load", return_value={}):
         config = ConfigManager()
-        assert config.load_ips() == []  # Should return an empty list
+        assert config.load_ips() == ()

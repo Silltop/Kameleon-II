@@ -33,16 +33,17 @@ class ConfigManager:
                 logger.exception(
                     f"Unable to load configuration file make sure that .yaml file is valid. more info: {repr(exc)}"
                 )
+                raise ValueError("Invalid YAML configuration file") from exc
 
     def validate(self):
         # todo add validation
         raise NotImplementedError
 
     def load_ips(self) -> tuple:
-        host_list = self.file_content.get("hosts")
+        host_list = self.file_content.get("hosts", {})
         if len(host_list) <= 0:
             logger.warning("No hosts specified in the configuration!")
         ip_list = []
-        for host_name, host_definition in host_list.items():
+        for _, host_definition in host_list.items():
             ip_list.append(host_definition.get("ip"))
-        return ip_list
+        return tuple(ip_list)
