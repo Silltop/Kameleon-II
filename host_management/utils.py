@@ -1,5 +1,7 @@
 import ipaddress
+
 import dns.resolver
+
 from configuration import config
 
 

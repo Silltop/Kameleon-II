@@ -109,6 +109,7 @@ class ApiConnector(Connector):
                 headers=headers,
                 data=data,
                 json=json_data,
+                timeout=60,
             )
             if response.status_code == 211:
                 return None
@@ -119,3 +120,6 @@ class ApiConnector(Connector):
 
     def call_hosts(self, endpoint):
         return self.call_endpoints(endpoint, method="GET")
+
+    def call_host(self, endpoint, host):
+        return self.call_endpoints(endpoint, hosts=(host,), method="GET")

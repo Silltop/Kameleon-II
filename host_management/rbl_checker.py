@@ -1,8 +1,10 @@
 import json
 import os
-from web.app import db, app
+from pathlib import Path
 
 import dns.resolver
+
+from web.app import app, db
 
 
 class RblChecker:
@@ -13,13 +15,14 @@ class RblChecker:
 
     @staticmethod
     def get_rbls_from_json():
-        with open(f"{os.getcwd()}/inventory/rbl.json", "r") as f:
+        with open(f"{Path.cwd()}/inventory/rbl.json", "r") as f:
             file_data = json.load(f)
-            return file_data    
+            return file_data
 
     def check_rbl(self, ip):
         result = []
         from data_management.db_models import RblHosts
+
         with app.app_context():
             rblHostsList = db.session.query(RblHosts).all()
             for rblHost in rblHostsList:

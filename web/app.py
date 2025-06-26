@@ -1,11 +1,13 @@
 import os
-from pathlib import Path
 import secrets
 from functools import wraps
-from flask import Flask, request, jsonify
-from flask_caching import Cache
-from web.db_init import db
+from pathlib import Path
+
 from authlib.integrations.flask_client import OAuth
+from flask import Flask, jsonify, request
+from flask_caching import Cache
+
+from web.db_init import db
 
 
 def generate_random_secret_key(length):

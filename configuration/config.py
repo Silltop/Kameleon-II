@@ -38,7 +38,7 @@ class ConfigManager:
         # todo add validation
         raise NotImplementedError
 
-    def load_ips(self) -> List:
+    def load_ips(self) -> tuple:
         host_list = self.file_content.get("hosts")
         if len(host_list) <= 0:
             logger.warning("No hosts specified in the configuration!")

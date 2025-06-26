@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
-from typing import Optional, Tuple
+from typing import Optional
 import os
 import chardet  # For detecting character encoding
 import codecs  # For handling manual decoding attempts
@@ -10,7 +10,7 @@ import codecs  # For handling manual decoding attempts
 # Load maintenance keywords from the file
 def load_maintenance_keywords(file_path: str) -> list[str]:
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             return [line.strip() for line in file.readlines()]
     except FileNotFoundError:
         print(f"File not found: {file_path}")
@@ -31,19 +31,20 @@ ENCODING_ISSUE_PENALTY = 0.1  # Subtract 20% if there is a detected encoding iss
 
 
 # Helper function to fetch page content asynchronously
-async def fetch_page(url: str, session: aiohttp.ClientSession) -> tuple[int, str, str, str | None | float] | tuple[
-    None, None]:
+async def fetch_page(
+    url: str, session: aiohttp.ClientSession
+) -> tuple[int, str, str, str | None | float] | tuple[None, None]:
     try:
         async with session.get(url, timeout=10) as response:
             content = await response.text()
-            encoding = response.headers.get('Content-Type', '').lower()
-            if 'charset=' in encoding:
-                encoding = encoding.split('charset=')[-1]
+            encoding = response.headers.get("Content-Type", "").lower()
+            if "charset=" in encoding:
+                encoding = encoding.split("charset=")[-1]
             else:
                 # Default to utf-8 if no charset is found
-                encoding = 'utf-8'
+                encoding = "utf-8"
             detected_encoding = chardet.detect(content.encode())
-            return response.status, content, encoding, detected_encoding['encoding']
+            return response.status, content, encoding, detected_encoding["encoding"]
     except aiohttp.ClientError as e:
         print(f"Error accessing {url}: {e}")
         return None, None
@@ -76,7 +77,7 @@ async def check_keywords(url: str, content: str) -> float:
 
 # Method 3: Check for required elements in the content using BeautifulSoup
 async def check_required_elements(url: str, content: str) -> float:
-    soup = BeautifulSoup(content, 'html.parser')
+    soup = BeautifulSoup(content, "html.parser")
     missing_elements = 0
     for element in required_elements:
         if not soup.find_all(lambda tag: tag.name == element):
@@ -126,7 +127,7 @@ async def check_page(url: str) -> float:
             tasks = [
                 check_keywords(url, content),
                 check_required_elements(url, content),
-                check_encoding_issues(content, encoding, detected_encoding)
+                check_encoding_issues(content, encoding, detected_encoding),
             ]
             results = await asyncio.gather(*tasks)
 
@@ -143,8 +144,5 @@ async def check_page(url: str) -> float:
 
 # Example URL to check
 url = "https://kki-bci.pl/"
-confidence = asyncio.run(check_page(url))
-print(f"Confidence that the page {url} is working: {confidence:.2f}%")
-url = "https://albert.kki.pl/"
 confidence = asyncio.run(check_page(url))
 print(f"Confidence that the page {url} is working: {confidence:.2f}%")

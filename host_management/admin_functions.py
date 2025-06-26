@@ -1,10 +1,10 @@
-from connectors.os.remote_data_processor import get_service_status
+from connectors.api.api_connector import ApiConnector
 
 
-def check_mailing_services(hosts: tuple = None):
-    dovecot = get_service_status("dovecot", hosts)
-    exim = get_service_status("exim4", hosts)
-    spamassasin = get_service_status("spamassasin", hosts)
+def check_mailing_services(host):
+    dovecot = ApiConnector().call_host("/service-status/dovecot", host)
+    exim = ApiConnector().call_host("/service-status/exim4", host)
+    spamassasin = ApiConnector().call_host("/service-status/spamassasin", host)
     dicts = [dovecot, exim, spamassasin]
     combined_dict = {}
     for d in dicts:
@@ -14,7 +14,7 @@ def check_mailing_services(hosts: tuple = None):
     for host, services in combined_dict.items():
         status = "OK"
         details = ""
-        for service, service_status in services.items():
+        for _, service_status in services.items():
             if "running" not in service_status:
                 status = "NOK"
                 details += f"{service_status}, "

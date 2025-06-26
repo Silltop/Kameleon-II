@@ -1,7 +1,5 @@
 import hashlib
-import os
-
-from connectors.os import remote_data_processor
+from pathlib import Path
 
 
 def file_checksum(filename, hash_func=hashlib.sha256, block_size=65536):
@@ -15,9 +13,8 @@ def file_checksum(filename, hash_func=hashlib.sha256, block_size=65536):
 
 def compare_files(file1, file2):
     """Compare two files by calculating and comparing their checksums."""
-
-    size1 = os.path.getsize(file1)
-    size2 = os.path.getsize(file2)
+    size1 = Path(file1).stat().st_size
+    size2 = Path(file2).stat().st_size
 
     if size1 != size2:
         return False
@@ -26,7 +23,3 @@ def compare_files(file1, file2):
     checksum2 = file_checksum(file2)
 
     return checksum1 == checksum2
-
-
-def remote_file_checksum(file_path):
-    remote_data_processor.execute_command()

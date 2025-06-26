@@ -29,25 +29,26 @@ def extended_render_template(*args, **kwargs):
     return render_template(*args, **kwargs, user=user, extension_routes=extension_routes)
 
 
-def login_required(f):
-    @wraps(f)
+def login_required(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         if "user_claims" not in session:
             return redirect(url_for("login"))
-        return f(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return decorated_function
 
 
 @app.route("/logout")
 def logout():
+    print(url_for("index", _external=True))
     id_token = session.pop("id_token", None)
     logout_url = (
         f"http://localhost:8080/realms/kameleon/protocol/openid-connect/logout"
         f"?id_token_hint={id_token}"
         f"&post_logout_redirect_uri={url_for('index', _external=True)}"
     )
-    session.clear()  # Clear Flask session
+    session.clear()
     return redirect(logout_url)
 
 

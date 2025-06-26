@@ -1,4 +1,7 @@
+import re
+from typing import Union
 import hashlib
+import html
 import subprocess
 
 from flask import Blueprint, abort, jsonify, request
@@ -30,10 +33,15 @@ def before_request():
     # validate_certificate()
 
 
-def execute_command(command):
+def execute_command(command: Union[str, list]):
     result = b"Error"
     try:
-        result = subprocess.check_output(command, shell=True, executable="/bin/bash", stderr=subprocess.STDOUT)
+        if isinstance(command, list):
+            result = subprocess.check_output(command, shell=False, executable="/bin/bash", stderr=subprocess.STDOUT)
+        else:
+            result = subprocess.check_output(
+                command, shell=True, executable="/bin/bash", stderr=subprocess.STDOUT
+            )  # noqa: S602
     except subprocess.CalledProcessError as cpe:
         result = cpe.output
     finally:
@@ -113,3 +121,15 @@ def index():
 @api_bp.route("/error", methods=["GET"])
 def error_page():
     return abort(400)
+
+
+@api_bp.route("/service-status/<service_name>", methods=["GET"])
+def get_service_status(service_name: str):
+    result = execute_command(["systemctl", "status", service_name])
+    return jsonify({"uptime": result})
+
+
+@api_bp.route("/get-all-ips-on-host", methods=["GET"])
+def execute_command_route():
+    result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1")
+    return jsonify({"result": result})

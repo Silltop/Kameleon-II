@@ -19,6 +19,7 @@ from data_management.db_models import (
 from host_management.rbl_checker import RblChecker
 from host_management.utils import is_private_ip
 from web.app import app, db
+from configuration.config import check_interval
 
 
 def save_device_data():
@@ -44,7 +45,7 @@ def save_device_data():
 
 def save_ips_data():
     with app.app_context():
-        ips = get_all_ips_on_host()
+        ips = ApiConnector().call_hosts("/get-all-ips-on-host")
         for host, ip_list in ips.items():
             for ip in ip_list["ips"]:
                 logging.debug(f"SYNC | IP found: {ip}")
@@ -90,7 +91,7 @@ def sync_all():
 async def sync_rbl():
     logging.info("Starting scheduled RBL sync")
     with app.app_context():
-        ips = get_all_ips_on_host()
+        ips = ApiConnector().call_hosts("/get-all-ips-on-host")
         # print("sync_rbl - ips", ips)
         for host, ip_list in ips.items():
             if is_private_ip(host):
@@ -146,7 +147,7 @@ def healthcheck_service():
     # else:
     # Handle the case where the HostStatus record does not exist for the specified host_id
     #    pass
-    time.sleep(config.check_interval)
+    time.sleep(check_interval)
 
 
 # healthcheck_service()

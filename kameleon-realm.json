@@ -12,6 +12,9 @@
                 "http://127.0.0.1:5000/auth",
                 "http://localhost:5000/auth"
             ],
+            "attributes": {
+                "post.logout.redirect.uris": "http://127.0.0.1:5000/##"
+            },
             "publicClient": false,
             "secret": "my-secret"
         }

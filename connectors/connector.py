@@ -1,12 +1,13 @@
 import configuration.config
+
 cfg = configuration.config.ConfigManager().file_content
-host_list = cfg.get("hosts")
+host_list = cfg.get("hosts", [])
 
 
 def separate_hosts():
     method1 = []
     method2 = []
-    for host_name, host_definition in host_list.items():
+    for _, host_definition in host_list.items():
         ip = host_definition.get("ip")
         if host_definition.get("method") == "agent":
             method1.append(ip)
