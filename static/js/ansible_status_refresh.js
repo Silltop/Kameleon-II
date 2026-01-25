@@ -2,7 +2,7 @@
 async function updatePlaybookStatus(playbookID) {
     try {
         // Fetch the latest status from the endpoint
-        const response = await fetch(`/recent_run_status/${playbookID}`);
+        const response = await fetch(`/ansible/recent_run_status/${playbookID}`);
         const data = await response.json(); // Assume the response is JSON with { status: "success" }
         // Find the table row for this playbook using the ID
         const row = document.querySelector(`tr[id="${playbookID}"]`);

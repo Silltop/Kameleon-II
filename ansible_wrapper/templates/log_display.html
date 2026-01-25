@@ -46,7 +46,7 @@
 
         function fetchLogs(playbookId) {
             $.ajax({
-                url: `/logs/${playbookId}`,
+                url: `/ansible/logs/${playbookId}`,
                 type: 'GET',
                 dataType: 'json',
                 success: function(logs) {

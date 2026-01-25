@@ -47,7 +47,7 @@ def save_ips_data():
     with app.app_context():
         ips = ApiConnector().call_hosts("/get-all-ips-on-host")
         for host, ip_list in ips.items():
-            for ip in ip_list["ips"]:
+            for ip in ip_list:
                 logging.debug(f"SYNC | IP found: {ip}")
                 if "Error" in ip:
                     ip = host

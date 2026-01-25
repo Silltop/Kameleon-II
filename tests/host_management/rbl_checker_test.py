@@ -1,4 +1,3 @@
-import unittest
 from unittest.mock import patch, MagicMock
 from host_management.rbl_checker import RblChecker
 

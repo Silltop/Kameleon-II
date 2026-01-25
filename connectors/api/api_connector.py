@@ -7,6 +7,7 @@ import jwt
 import datetime
 import hashlib
 import threading
+from werkzeug.exceptions import Unauthorized
 
 SECRET_KEY = "your_secret_key"
 
@@ -37,8 +38,9 @@ class TokenManager:
             "iat": datetime.datetime.now(datetime.timezone.utc),
             "sub": host_id,  # Host identifier
         }
+        # todo unique token for each host
         # token = jwt.encode(payload, self.secret_keys[host_id], algorithm="HS256")
-        token = jwt.encode(payload, "mysecret", algorithm="HS256")
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
         self.token_store[host_id] = token  # Store the token
         return token
 
@@ -51,12 +53,12 @@ class TokenManager:
 
     def is_token_expired(self, token, host_id):
         try:
-            jwt.decode(token, "mysecret", algorithms=["HS256"])
+            jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             return False  # Token is still valid
         except jwt.ExpiredSignatureError:
             return True  # Token has expired
         except jwt.InvalidTokenError:
-            raise ValueError("Invalid token")  # Other token issues
+            raise Unauthorized from jwt.InvalidTokenError
 
 
 class ApiConnector(Connector):
@@ -118,8 +120,8 @@ class ApiConnector(Connector):
             logging.warning(f"Unable to connect to {api_url} {e}")
             return None
 
-    def call_hosts(self, endpoint):
-        return self.call_endpoints(endpoint, method="GET")
+    def call_hosts(self, endpoint, method="GET"):
+        return self.call_endpoints(endpoint, method=method)
 
-    def call_host(self, endpoint, host):
-        return self.call_endpoints(endpoint, hosts=(host,), method="GET")
+    def call_host(self, endpoint, host, method="GET"):
+        return self.call_endpoints(endpoint, hosts=(host,), method=method)
