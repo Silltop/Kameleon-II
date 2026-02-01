@@ -3,6 +3,7 @@ from typing import Union
 import hashlib
 import html
 import subprocess
+from api import cache
 
 from flask import Blueprint, abort, jsonify, request
 
@@ -133,3 +134,32 @@ def get_service_status(service_name: str):
 def execute_command_route():
     result = execute_command("ip -br addr | grep -v 'lo'  | awk '{print $3}' | cut -d'/' -f1")
     return jsonify({"result": result})
+
+
+@api_bp.route("/packages-status", methods=["GET"])
+@cache.cached(timeout=50)
+def packages_status():
+    """Get upgradeable packages status for any package manager."""
+    # Check for apt (Debian/Ubuntu)
+    apt_check = execute_command("which apt-get").strip()
+    if apt_check:
+        execute_command("apt update -y")
+        result = execute_command("apt list --upgradable 2>/dev/null")
+        packages = [line for line in result.split("\n") if line and not line.startswith("Listing...")]
+        return jsonify({"manager": "apt", "upgradable": len(packages)})
+
+    # Check for dnf (RHEL 8+/Fedora)
+    dnf_check = execute_command("which dnf").strip()
+    if dnf_check:
+        result = execute_command("dnf check-update --refresh 2>/dev/null")
+        packages = [line for line in result.split("\n") if line and not line.startswith("Last metadata expiration")]
+        return jsonify({"manager": "dnf", "upgradable": len(packages)})
+
+    # Check for yum (RHEL/CentOS 7)
+    yum_check = execute_command("which yum").strip()
+    if yum_check:
+        result = execute_command("yum check-update 2>/dev/null")
+        packages = [line for line in result.split("\n") if line and not line.startswith("Loaded plugins")]
+        return jsonify({"manager": "yum", "upgradable": len(packages)})
+
+    return jsonify({"error": "No supported package manager found"}), 400

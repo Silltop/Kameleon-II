@@ -47,3 +47,14 @@ class Chart:
         self.data = chart_data
         self.title = title
         self.precision = precision
+        
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "w": self.w,
+            "h": self.h,
+            "type": self.type,
+            "data": [vars(d) for d in self.data],
+            "title": self.title,
+            "precision": self.precision,
+        }

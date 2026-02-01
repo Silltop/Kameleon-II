@@ -4,4 +4,7 @@
     "python.testing.pytestArgs": [
         "tests"
     ],
+    "htmlhint.options": {
+        "doctype-first": false,
+    }
 }

@@ -1,20 +1,20 @@
-<div class="sticky-alerts">
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-primary" role="alert" id="precompiled-alert-flash">
-        <h4 class="alert-heading">Notification</h4> <!-- mb-5 = margin-bottom: 0.5rem (5px) -->
-        {{ message }}
-      </div>
-      <script>
-        halfmoon.toastAlert('precompiled-alert-flash', 7500)
-      </script>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-</div>
+<!-- Toast container - managed by Preact ToastManager component -->
+<div id="toast-container"></div>
 
-<div class="sticky-alerts">
-  <div class="alert" role="alert" id="save-status">
-  </div>
-</div>
+<!-- Display Flask flash messages via window.showToast API -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Give toast system a moment to initialize
+    setTimeout(function() {
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+          if (window.showToast) {
+            window.showToast('{{ message }}', 'info', 7500);
+          }
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    }, 100);
+  });
+</script>

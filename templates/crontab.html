@@ -2,21 +2,13 @@
 {% block title %}All host crontab{% endblock %}
 {% block content %}
 
-<div class="dashboard-content d-flex">
-{% for host, result in result.items() %}
+<div id="app"></div>
 
-<div class="card w-300">
-  <h3 class="card-title">
-    {{host}}
-  </h3>
-  {% for e in result %}
-  {{ e }} <br>
-  <hr>
-  {% endfor %}
-</div>
+{% endblock %}
 
-
-{% endfor %}
-</div>
-
+{% block scripts %}
+<script>
+  window.__APP_STATE__.results = {{ result | tojson if result else '{}' }}
+</script>
+<script src="{{ url_for('static', filename='js/crontab.js') }}"></script>
 {% endblock %}

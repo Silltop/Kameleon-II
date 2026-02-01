@@ -2,6 +2,7 @@ import os
 from functools import wraps
 
 import yaml
+from authlib.integrations.base_client.errors import MismatchingStateError
 from flask import jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
@@ -26,7 +27,8 @@ def extended_render_template(*args, **kwargs):
     """Dynamic list of navbar items as override to base flask function"""
     extension_routes = db.session.query(ExtensionRoutes).all()
     user = session.get("user_claims", None)
-    return render_template(*args, **kwargs, user=user, extension_routes=extension_routes)
+    extension_routes_json = [route.to_dict() for route in extension_routes]
+    return render_template(*args, **kwargs, user=user, extension_routes=extension_routes_json)
 
 
 def login_required(func):
@@ -96,15 +98,19 @@ def login():
 
 @app.route("/auth")
 def auth():
-    token = keycloak.authorize_access_token()  # type: ignore
-    # Ensure nonce validation
-    id_token = token.get("id_token")
-    claims = keycloak.parse_id_token(token, nonce=session.pop("nonce", None))  # type: ignore
-    # Store claims in session
-    session["user_claims"] = claims
-    session["id_token"] = id_token
-    print(claims)
-    return redirect(url_for("index"))
+    try:
+        token = keycloak.authorize_access_token()  # type: ignore
+        # Ensure nonce validation
+        id_token = token.get("id_token")
+        claims = keycloak.parse_id_token(token, nonce=session.pop("nonce", None))  # type: ignore
+        # Store claims in session
+        session["user_claims"] = claims
+        session["id_token"] = id_token
+        print(claims)
+        return redirect(url_for("index"))
+    except MismatchingStateError:
+        session.clear()
+        return redirect(url_for("login"))
 
 
 @app.route("/config")
@@ -142,8 +148,27 @@ def index():
         .all()
     )
     print(host_details_list)
+    host_details_json = [
+    {
+        "host": host.to_dict(),
+        "facts": facts.to_dict() if facts else None,
+    }
+    for host, facts in host_details_list
+    ]
+    upgradeable_packages = ApiConnector().call_hosts("/packages-status")
     kernel_chart = chart_from_column_elements(HostFacts.kernel, title="Kernels")
     distro_chart = chart_from_column_elements(HostFacts.distro, title="Distributions")
+    packages_chart = Chart(
+        name="upgradeable_packages",
+        title="Upgradeable Packages",
+        w="300em",
+        h="150em",
+        chart_type="bar",
+        chart_data=[
+            ChartDataElement(label=host, value=data.get("upgradable", 0))
+            for host, data in upgradeable_packages.items()
+        ],
+    )
     hosts_all = db.session.query(HostFacts).count()
     hosts_down = db.session.query(func.count()).filter(HostFacts.hostname.like("%connection error%")).scalar()
     de1 = ChartDataElement("Hosts up", int(hosts_all - hosts_down))
@@ -158,6 +183,6 @@ def index():
     )
     return extended_render_template(
         "index.html",
-        host_details_list=host_details_list,
-        charts=[chart, kernel_chart, distro_chart],
+        host_details_json=host_details_json,
+        charts=[chart.to_dict(), kernel_chart.to_dict(), distro_chart.to_dict(), packages_chart.to_dict()],
     )

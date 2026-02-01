@@ -86,13 +86,33 @@ class ApiConnector(Connector):
 
         protocol = "https" if https else "http"
         responses = {}
-        for host in hosts:
+        threads = []
+        lock = threading.Lock()
+        
+        def call_single_host(host):
             api_url = self.construct_api_url(protocol, host, endpoint)
             headers = self.create_headers_with_token(host)
             response = self.make_request(api_url, method, headers, data, json_data)
             if response:
-                responses[host] = response.json()
+                with lock:
+                    responses[host] = response.json()
+        
+        for host in hosts:
+            thread = threading.Thread(target=call_single_host, args=(host,))
+            thread.start()
+            threads.append(thread)
+        
+        for thread in threads:
+            thread.join()
+        
         return responses
+        # for host in hosts:
+        #     api_url = self.construct_api_url(protocol, host, endpoint)
+        #     headers = self.create_headers_with_token(host)
+        #     response = self.make_request(api_url, method, headers, data, json_data)
+        #     if response:
+        #         responses[host] = response.json()
+        # return responses
 
     def construct_api_url(self, protocol, host, endpoint):
         return f"{protocol}://{host}:{6622}{endpoint}"
