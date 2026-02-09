@@ -40,8 +40,9 @@ function getStatusBadge(status) {
   }
 }
 
-export function AnsiblePlaybookTable({ tableData = [], onRunPlaybook }) {
+export function AnsiblePlaybookTable({ tableData = [], onRunPlaybook, onShowRecentLog }) {
   const [statuses, setStatuses] = useState({})
+  const [recentLogLoadingId, setRecentLogLoadingId] = useState(null)
 
   useEffect(() => {
     const updateStatuses = async () => {
@@ -75,6 +76,31 @@ export function AnsiblePlaybookTable({ tableData = [], onRunPlaybook }) {
     }
   }
 
+  const handleShowRecentLog = async (playbookId) => {
+    try {
+      setRecentLogLoadingId(playbookId)
+      const response = await fetch(`/ansible/recent_run/${playbookId}`)
+      if (!response.ok) {
+        const message = response.status === 404
+          ? 'No recent runs found for this playbook'
+          : 'Failed to fetch recent run'
+        window.showToast?.error?.(message)
+        return
+      }
+      const data = await response.json()
+      if (data?.id) {
+        onShowRecentLog?.(data.id)
+      } else {
+        window.showToast?.error?.('Recent run id is missing')
+      }
+    } catch (error) {
+      console.error('Error fetching recent run:', error)
+      window.showToast?.error?.('Failed to fetch recent run')
+    } finally {
+      setRecentLogLoadingId(null)
+    }
+  }
+
   return (
     <table className="table table-hover">
       <thead>
@@ -102,9 +128,13 @@ export function AnsiblePlaybookTable({ tableData = [], onRunPlaybook }) {
               >
                 Run now
               </button>
-              <a href={`/ansible/display_current/${row.id}`}>
-                <button className="btn btn-primary">Show recent log</button>
-              </a>
+              <button
+                onClick={() => handleShowRecentLog(row.id)}
+                className="btn btn-primary"
+                disabled={recentLogLoadingId === row.id}
+              >
+                {recentLogLoadingId === row.id ? 'Loading...' : 'Show recent log'}
+              </button>
               <a href={`/ansible/display_logs/${row.id}`}>
                 <button className="btn btn-primary">Show historical logs</button>
               </a>

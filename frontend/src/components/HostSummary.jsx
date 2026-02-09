@@ -42,7 +42,7 @@ export function HostSummary({ hostDetailsList = [] }) {
   }
 
   return (
-    <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg m-8 p-8 text-black dark:text-gray-200">
+    <div className="w-full border border-gray-200 dark:border-gray-700 rounded-lg m-8 p-8 text-base-content">
       <h2 className="text-2xl font-bold mb-6 border-b border-gray-300 dark:border-gray-600 pb-3">
         Host Summary
       </h2>
@@ -72,7 +72,7 @@ export function HostSummary({ hostDetailsList = [] }) {
             {hostDetailsList.map(({ host, facts }) => (
             <tr
               key={host.id}
-              className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="border-b border-gray-200 dark:border-gray-700 hover:bg-base-200 transition-colors"
             >
               <th className="text-left px-4 py-3 font-normal">
                 <i 

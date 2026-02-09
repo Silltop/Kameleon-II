@@ -2,38 +2,17 @@
 {% block title %}Admin Functions{% endblock %}
 {% block content %}
 
-{% include 'result-modal.html' %}
+<div id="app"></div>
 
-{% if results|length >= 1 %}
 <script>
-  halfmoon.toggleModal('result-modal');
+  window.__APP_STATE__ = {
+    hostList: {{ host_list | tojson if host_list else '[]' }},
+    functions: {{ admin_functions_config | tojson if admin_functions_config else '[]' }}
+  }
 </script>
-{% endif %}
+{% endblock %}
 
-<div class="container-fluid">
-    <div class="card w-400 mw-full">
-      <h2 class="card-title">
-        Check Mailing Services
-      </h2>
-      <p class="border-bottom">
-        This functionality will run Service check on desired host and return result.
-          Checked Services: Exim, Dovecot, Spamassasin
-      </p>
-      <div class="text-right"> <!-- text-right = text-align: right -->
-        <!-- Third row -->
-        <form action="/run-function/check_mailing_services" method="POST" class="form-row row-eq-spacing-md d-flex justify-content-end align-items-center">
-          <label for="host" class="required">Hosts</label>
-          <div class="col-md-4">
-            <select class="form-control" name="host" id="host" required="required">
-              <option value="all" selected="selected" >All</option>
-              {% for host in host_list %}
-              <option value="{{host}}">{{host}}</option>
-              {% endfor %}
-            </select>
-
-          </div>
-        <button class="btn">Run</button>
-      </form>
-    </div>
-</div>
+{% block scripts %}
+<script type="module"
+  src="{{ url_for('static', filename='dist/js/admin_functions.js') }}"></script>
 {% endblock %}

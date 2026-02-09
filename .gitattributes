@@ -1,5 +1,3 @@
 *.py linguist-language=Python
-static/js/halfmoon*.js linguist-vendored
-static/css/halfmoon*.css linguist-vendored
-static/css/fontawesome*.css linguist-vendored
-static/css/font-awesome-all.css linguist-vendored
+*.jsx linguist-language=JavaScript
+*.js linguist-language=JavaScript

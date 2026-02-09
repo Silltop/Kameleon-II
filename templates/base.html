@@ -8,6 +8,15 @@
       content="GET, POST, PUT, DELETE, OPTIONS" />
     <meta http-equiv="Access-Control-Allow-Headers"
       content="Content-Type, Authorization" />
+    <script>
+      (function () {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      })();
+    </script>
     <link rel="stylesheet"
       href="{{ url_for('static', filename='dist/css/src.css') }}">
     <link rel="stylesheet"

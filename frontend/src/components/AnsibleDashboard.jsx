@@ -11,6 +11,11 @@ export function AnsibleDashboard({ tableData = [] }) {
     setModalOpen(true)
   }
 
+  const handleShowRecentLog = (runId) => {
+    setCurrentRunId(runId)
+    setModalOpen(true)
+  }
+
   const handleCloseModal = () => {
     setModalOpen(false)
     setCurrentRunId(null)
@@ -22,6 +27,7 @@ export function AnsibleDashboard({ tableData = [] }) {
       <AnsiblePlaybookTable
         tableData={tableData}
         onRunPlaybook={handleRunPlaybook}
+        onShowRecentLog={handleShowRecentLog}
       />
       <AnsibleLogModal
         runId={currentRunId}

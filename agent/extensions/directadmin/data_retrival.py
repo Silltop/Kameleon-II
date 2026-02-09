@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from urllib.parse import unquote
 
 from utils import run_command
 
@@ -49,6 +50,65 @@ def get_user_domains(user) -> list:
     except Exception as e:
         logging.error(f"Error retrieving domains for user {user}: {str(e)}")
         return [f"Unable to find domains list for user {user}"]
+
+
+def get_user_subdomains(user, domain) -> list:
+    try:
+        subdomains = []
+        user = user.replace("\n", "")
+        domain = domain.replace("\n", "")
+        path = f"/usr/local/directadmin/data/users/{user}/domains/{domain}.subdomains"
+
+        if not Path(path).exists():
+            return ["Unable to find subdomains list"]
+
+        with open(path) as rfile:
+            for line in rfile:
+                subdomain = line.strip()
+                if subdomain:
+                    subdomains.append(subdomain)
+
+        return subdomains
+    except Exception as e:
+        logging.error(f"Error retrieving subdomains for user {user}: {str(e)}")
+        return [f"Unable to find subdomains list for user {user}"]
+
+
+def get_user_subdomain_php_version(user, domain):
+    try:
+        user = user.replace("\n", "")
+        domain = domain.replace("\n", "")
+        path = Path(
+            f"/usr/local/directadmin/data/users/{user}/domains/{domain}.subdomains.docroot.override"
+        )
+
+        if not path.exists():
+            return "Unable to find subdomain configuration"
+
+        php_list = get_php_list()
+        if not isinstance(php_list, list) or not php_list:
+            return "Unable to retrieve PHP versions"
+
+        with path.open() as rfile:
+            for line in rfile:
+                decoded = unquote(line.strip())
+                if not decoded:
+                    continue
+
+                _, setting = decoded.split("=", 1) if "=" in decoded else ("", decoded)
+                if "_select=" in setting:
+                    _, value = setting.split("_select=", 1)
+                    value = value.strip()
+                    if value.isdigit():
+                        index = int(value) - 1
+                        if 0 <= index < len(php_list):
+                            return php_list[index]
+                    return value
+
+        return php_list[0]
+    except Exception as e:
+        logging.error(f"Error retrieving subdomain PHP version for user {user}: {str(e)}")
+        return "Unable to find subdomain configuration"
 
 
 def get_user_php_version(user, domain):

@@ -74,17 +74,42 @@ def query_rbl_db(ip):
 def admin_functions_render():
     results = session.pop("results", [])
     host_list = config.ConfigManager().ip_list
-    return extended_render_template("admin_functions.html", host_list=host_list, results=results)
+    admin_functions_config = [
+        {
+            "id": "check_mailing_services",
+            "title": "Check Mailing Services",
+            "description": (
+                "This functionality will run Service check on desired host and return result. "
+                "Checked Services: Exim, Dovecot, Spamassasin"
+            ),
+            "endpoint": "/run-function/check_mailing_services",
+        }
+    ]
+    return extended_render_template(
+        "admin_functions.html",
+        host_list=host_list,
+        results=results,
+        admin_functions_config=admin_functions_config,
+    )
 
 
 @app.route("/run-function/<functionname>", methods=["POST"])
 @login_required
 def run_admin_function(functionname):
-    hosts = request.form.get("host", None)
+    payload = request.get_json(silent=True) or {}
+    hosts = payload.get("host", None) or request.form.get("host", None)
     if hosts is not None:
         hosts = (hosts,)
     adm_function = getattr(admin_functions, functionname)
-    session["results"] = adm_function(hosts)
+    results = adm_function(hosts)
+    wants_json = (
+        request.is_json
+        or "application/json" in request.headers.get("Accept", "")
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    )
+    if wants_json:
+        return jsonify({"results": results})
+    session["results"] = results
     return redirect(url_for("admin_functions_render"))
 
 

@@ -31,6 +31,7 @@ export default defineConfig({
         config: 'src/pages/config.jsx',
         inventory: 'src/pages/inventory.jsx',
         ansible: 'src/pages/ansible.jsx',
+        admin_functions: 'src/pages/admin_functions.jsx',
       },
       output: {
         entryFileNames: 'js/[name].js',

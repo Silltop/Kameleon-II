@@ -1,1 +1,0 @@
-import{n as e,r as t,t as n}from"./chunks/jsxRuntime.module.js";function r(){return n(`footer`,{className:`footer footer-center bg-neutral text-neutral-content p-10`,children:n(`p`,{className:`text-sm`,children:`Kameleon V2`})})}var i=document.getElementById(`footer-container`);i&&e(t(r),i);
