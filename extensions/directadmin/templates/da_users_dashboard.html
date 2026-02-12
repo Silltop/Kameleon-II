@@ -3,51 +3,57 @@
 {% block content %}
 <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
 #todo fixme
-<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100" id = "record-container">
-{% for host, users in data.items() %}
-<h3>{{host}}</h3>
+<div
+  class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100"
+  id="record-container">
+  {% for host, users in data.items() %}
+  <h3>{{host}}</h3>
 
-<table class="table table-no-outer-padding">
-  <thead>
-    <tr>
-      <th>User</th>
-      <th>Email</th>
-      <th>Quota</th>
-      <th>Package</th>
-      <th>Domains</th>
-      <th>DNS A (google)</th>
-      <th>MX</th>
-      <th>NS</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for username, output in users.items() %}
-    <tr>
-      <th>{{username}}</th>
-      <td>
-        {{output.email}}
-      </td>
-      <td>
-        {{output.quota}}
-      </td>
-      <td>
-        {{output.package}}
-      </td>
-      <td>
-        {% for domain in output.domains %}
-        {{domain}}<br>
-        {% endfor %}
-      </td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <table class="table table-no-outer-padding">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Email</th>
+        <th>Quota</th>
+        <th>Package</th>
+        <th>Domains</th>
+        <th>Subdomains</th>
+        <th>DNS A (google)</th>
+        <th>MX</th>
+        <th>NS</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for username, output in users.items() %}
+      <tr>
+        <th>{{username}}</th>
+        <td>
+          {{output.email}}
+        </td>
+        <td>
+          {{output.quota}}
+        </td>
+        <td>
+          {{output.package}}
+        </td>
+        <td>
+          {% for domain in output.domains %}
+          {{domain}}<br>
+          {% endfor %}
+        </td>
+        <td>
+          {{output.subdomains}}
+          </td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-{% endfor %}
+  {% endfor %}
 </div>
 
 {% endblock %}

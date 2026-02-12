@@ -11,7 +11,7 @@
   window.__APP_STATE__.fileContent = {{ file_content | tojson if file_content else '""' }}
 </script>
 <script src="{{ url_for('static', filename='js/config.js') }}"></script>
-{% endblock %}
+
 
   <script>
 function saveConfig() {

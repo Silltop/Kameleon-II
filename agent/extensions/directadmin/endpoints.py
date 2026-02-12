@@ -3,9 +3,10 @@ import os
 from datetime import datetime
 
 from flask import Blueprint, jsonify
+
 from utils import run_command
 
-from extensions.directadmin.data_retrival import get_user_domains, get_user_list
+from extensions.directadmin.data_retrival import get_user_domains, get_user_list, get_user_subdomains
 from extensions.directadmin.data_retrival import get_user_domains
 import glob
 
@@ -139,6 +140,8 @@ def get_da_all_info():
                     user_info["email"] = None  # Set to None if no email is found
 
             user_info["domains"] = get_user_domains(user)
+
+            user_info["subdomains"] = len(get_user_subdomains(user, user_info["domains"][0]) if user_info["domains"] else [])
 
             # Get user quota
             usage_path = f"/usr/local/directadmin/data/users/{user}/user.usage"

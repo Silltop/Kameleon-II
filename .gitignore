@@ -11,3 +11,6 @@ __pycache__
 .vscode
 venv
 static/dist/**
+.venv-pypy
+**.so
+agent/build/**

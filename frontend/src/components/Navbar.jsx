@@ -59,7 +59,6 @@ export function Navbar() {
                 <details>
                   <summary>Reports</summary>
                   <ul className="p-2 bg-base-100 w-40 z-1">
-                    <li><a href="/disks">Disks</a></li>
                     <li><a href="/admin-functions">Admin Functions</a></li>
                   </ul>
                 </details>
@@ -114,7 +113,6 @@ export function Navbar() {
             <details>
               <summary>Reports</summary>
               <ul className="p-2 bg-base-100 w-48 z-[1]">
-                <li><a href="/disks">Disks</a></li>
                 <li><a href="/admin-functions">Admin Functions</a></li>
               </ul>
             </details>

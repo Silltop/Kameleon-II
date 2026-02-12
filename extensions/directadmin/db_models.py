@@ -1,3 +1,4 @@
+from re import sub
 from web.app import db
 
 
@@ -22,6 +23,7 @@ class Domains(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("da_user_details.id"), nullable=False)
     domain_name = db.Column(db.String, nullable=False, default="Unknown")
+    subdomain_count = db.Column(db.Integer, nullable=False, default=0)
     dns_a = db.Column(db.String, nullable=False, default="Unknown")
     dns_mx = db.Column(db.String, nullable=False, default="Unknown")
     dns_ns = db.Column(db.String, nullable=False, default="Unknown")

@@ -138,7 +138,7 @@ def auth():
         return redirect(url_for("login"))
 
 
-@app.route("/config")
+@app.route("/configuration")
 @login_required
 def configuration_page():
     file = ConfigManager().file_content
