@@ -1,36 +1,64 @@
 import re
 from typing import Union
 import hashlib
+import hmac
 import html
 import subprocess
+import time
 from api import cache
 
 from flask import Blueprint, abort, jsonify, request
 
 API_KEY = "your_api_key_here"  # Replace with your actual API key
+HMAC_KEYS = {
+    "default": "your_hmac_secret_here",
+}
+HMAC_MAX_AGE_SECONDS = 300
 
 api_bp = Blueprint("api", __name__)
 
 
-# todo make HMAC
-def validate_api_key():
-    api_key = request.headers.get("X-API-KEY")
-    hashed_api_key = hashlib.sha256(API_KEY.encode()).hexdigest() if API_KEY else None
-    if hashed_api_key != api_key:
-        abort(401, description="Invalid API key")
+# # todo make HMAC
+# def validate_api_key():
+#     api_key = request.headers.get("X-API-KEY")
+#     hashed_api_key = hashlib.sha256(API_KEY.encode()).hexdigest() if API_KEY else None
+#     if hashed_api_key != api_key:
+#         abort(401, description="Invalid API key")
 
 
-def validate_certificate():
-    if not request.is_secure:
-        abort(403, description="SSL certificate required")
-    cert = request.headers.get("X-SSL-CERT")
-    if not cert:
-        abort(403, description="Client certificate required")
+def validate_hmac():
+    key_id = request.headers.get("X-KEY-ID")
+    signature = request.headers.get("X-SIGNATURE")
+    timestamp = request.headers.get("X-TIMESTAMP")
+
+    if not key_id or not signature or not timestamp:
+        abort(401, description="Missing HMAC headers")
+
+    secret = HMAC_KEYS.get(key_id)
+    if not secret:
+        abort(401, description="Invalid HMAC key id")
+
+    try:
+        ts = int(timestamp)
+    except ValueError:
+        abort(401, description="Invalid HMAC timestamp")
+
+    now = int(time.time())
+    if abs(now - ts) > HMAC_MAX_AGE_SECONDS:
+        abort(401, description="HMAC timestamp expired")
+
+    body = request.get_data(cache=True, as_text=True) or ""
+    message = f"{request.method}\n{request.path}\n{timestamp}\n{body}".encode()
+    expected = hmac.new(secret.encode(), message, hashlib.sha256).hexdigest()
+
+    if not hmac.compare_digest(expected, signature):
+        abort(401, description="Invalid HMAC signature")
 
 
 @api_bp.before_request
 def before_request():
-    validate_api_key()
+    # validate_api_key()
+    validate_hmac()
     # validate_certificate()
 
 

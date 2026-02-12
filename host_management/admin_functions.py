@@ -1,10 +1,10 @@
 from connectors.api.api_connector import ApiConnector
 
 
-def check_mailing_services(host):
-    dovecot = ApiConnector().call_host("/service-status/dovecot", host)
-    exim = ApiConnector().call_host("/service-status/exim4", host)
-    spamassasin = ApiConnector().call_host("/service-status/spamassasin", host)
+def check_mailing_services(host: tuple[str]) -> list[tuple[str, str, str]]:
+    dovecot = ApiConnector().call_hosts("/service-status/dovecot", hosts=host)
+    exim = ApiConnector().call_hosts("/service-status/exim4", hosts=host)
+    spamassasin = ApiConnector().call_hosts("/service-status/spamassasin", hosts=host)
     dicts = [dovecot, exim, spamassasin]
     combined_dict = {}
     for d in dicts:

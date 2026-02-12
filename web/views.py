@@ -1,9 +1,10 @@
+import logging
 import os
 from functools import wraps
 
 import yaml
 from authlib.integrations.base_client.errors import MismatchingStateError
-from flask import jsonify, redirect, render_template, request, session, url_for
+from flask import abort, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 
@@ -98,8 +99,13 @@ def admin_functions_render():
 def run_admin_function(functionname):
     payload = request.get_json(silent=True) or {}
     hosts = payload.get("host", None) or request.form.get("host", None)
-    if hosts is not None:
-        hosts = (hosts,)
+    logging.info("Hosts received for admin function: %s", hosts)
+    if hosts is None:
+        abort(400, description="Host(s) must be provided")
+    if hosts == "all":
+        hosts = None
+    else:
+        hosts = tuple(hosts.split(","))
     adm_function = getattr(admin_functions, functionname)
     results = adm_function(hosts)
     wants_json = (
