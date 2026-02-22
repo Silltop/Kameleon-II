@@ -31,6 +31,8 @@ def get_php_list():
         logging.error(f"Error reading options.conf: {str(e)}")
         return "Unable to find options.conf"
 
+php_list = get_php_list()
+
 
 def get_user_domains(user) -> list:
     try:
@@ -85,7 +87,6 @@ def get_user_subdomain_php_version(user, domain):
         if not path.exists():
             return "Unable to find subdomain configuration"
 
-        php_list = get_php_list()
         if not isinstance(php_list, list) or not php_list:
             return "Unable to retrieve PHP versions"
 
@@ -111,13 +112,12 @@ def get_user_subdomain_php_version(user, domain):
         return "Unable to find subdomain configuration"
 
 
-def get_user_php_version(user, domain):
+def get_user_domain_php_version(user: str, domain: str) -> str:
     try:
         path = Path(f"/usr/local/directadmin/data/users/{user}/domains/{domain}.conf")
         if not path.exists():
             return "Unable to find domain configuration"
 
-        php_list = get_php_list()
         if not isinstance(php_list, list) or not php_list:
             return "Unable to retrieve PHP versions"
 

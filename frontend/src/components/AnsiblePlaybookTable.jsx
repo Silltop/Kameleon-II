@@ -65,19 +65,28 @@ export function AnsiblePlaybookTable({ tableData = [], onRunPlaybook, onShowRece
   }, [tableData])
 
   const handleRunPlaybook = async (playbookId) => {
+    onRunPlaybook?.(null)
     try {
       const response = await fetch(`/ansible/run_playbook/${playbookId}`)
-      if (response.ok) {
-        const data = await response.json()
-        onRunPlaybook(data.run_id)
+      if (!response.ok) {
+        window.showToast?.error?.('Failed to start playbook')
+        return
+      }
+      const data = await response.json()
+      if (data?.run_id) {
+        onRunPlaybook?.(data.run_id)
+      } else {
+        window.showToast?.error?.('Run id is missing')
       }
     } catch (error) {
       console.error('Error starting playbook:', error)
+      window.showToast?.error?.('Failed to start playbook')
     }
   }
 
   const handleShowRecentLog = async (playbookId) => {
     try {
+      onShowRecentLog?.(null)
       setRecentLogLoadingId(playbookId)
       const response = await fetch(`/ansible/recent_run/${playbookId}`)
       if (!response.ok) {
@@ -131,7 +140,7 @@ export function AnsiblePlaybookTable({ tableData = [], onRunPlaybook, onShowRece
               <button
                 onClick={() => handleShowRecentLog(row.id)}
                 className="btn btn-primary"
-                disabled={recentLogLoadingId === row.id}
+                disabled={recentLogLoadingId === row.id || !row.start || row.start === 'Never'}
               >
                 {recentLogLoadingId === row.id ? 'Loading...' : 'Show recent log'}
               </button>

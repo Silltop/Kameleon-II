@@ -33,3 +33,17 @@ body {
   background-color: green;
 }
 
+.ellipsis::after {
+  content: '...';
+  display: inline-block;
+  width: 1.5em;
+  text-align: left;
+  animation: ellipsis 1.2s steps(4, end) infinite;
+}
+
+@keyframes ellipsis {
+  0% { width: 0; }
+  100% { width: 1.5em; }
+}
+
+

@@ -78,6 +78,14 @@ def recent_run_status(playbook_id):
         return jsonify({"error": "No runs found for this playbook"}), 404
 
 
+@ansible.route("/run_status/<int:run_id>", methods=["GET"])
+def run_status(run_id):
+    run = AnsibleRuns.query.get(run_id)
+    if run:
+        return jsonify({"result": run.result})
+    return jsonify({"error": "Run not found"}), 404
+
+
 @ansible.route("/recent_run/<int:playbook_id>", methods=["GET"])
 def get_recent_run(playbook_id):
     recent_run = AnsibleRuns.query.filter_by(playbook_id=playbook_id).order_by(AnsibleRuns.start_time.desc()).first()

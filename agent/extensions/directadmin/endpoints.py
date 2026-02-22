@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify
 
 from utils import run_command
 
-from extensions.directadmin.data_retrival import get_user_domains, get_user_list, get_user_subdomains
+from extensions.directadmin.data_retrival import get_user_domain_php_version, get_user_domains, get_user_list, get_user_subdomains
 from extensions.directadmin.data_retrival import get_user_domains
 import glob
 
@@ -56,7 +56,10 @@ def get_da_user_websites():
     users = get_user_list()
     for user in users:
         domains = get_user_domains(user)
-        user_domains[user] = domains
+        for domain in domains:
+            php_version = get_user_domain_php_version(user, domain)
+            user_domains[domain] = php_version
+    print(user_domains)
     return jsonify(user_domains), 200
 
 
