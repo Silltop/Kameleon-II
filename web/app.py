@@ -7,7 +7,9 @@ from authlib.integrations.flask_client import OAuth
 from flask import Flask, jsonify, request
 from flask_caching import Cache
 
+from auth.jwt_middleware import CustomJWTManager
 from web.db_init import db
+
 
 
 def generate_random_secret_key(length):
@@ -62,3 +64,7 @@ keycloak = oauth.register(
     client_kwargs={"scope": "openid profile email"},
     jwks_uri="http://192.168.55.222:8080/realms/kameleon/protocol/openid-connect/certs",
 )
+
+# Initialize custom JWT manager for API authentication (Option B)
+# Backend generates custom tokens from Keycloak claims
+jwt_manager = CustomJWTManager(secret_key=app.secret_key, token_lifetime_hours=24)

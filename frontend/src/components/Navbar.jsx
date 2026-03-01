@@ -1,10 +1,28 @@
 import { useState, useEffect } from 'preact/hooks'
 import '../assets/css/anim.css'
 import { LoginModal } from './LoginModal'
+import { getAPIToken } from '../init/token-exchange'
 
 const logoUrl = window.APP_CONFIG.logoUrl
 const extensionRoutes = window.APP_CONFIG.extensionRoutes || []
-const user = window.APP_CONFIG.user || null
+
+/**
+ * Decode JWT payload without verification
+ * JWT format: header.payload.signature
+ */
+function decodeJWTPayload(token) {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    
+    const payload = parts[1]
+    const decoded = JSON.parse(atob(payload))
+    return decoded
+  } catch (error) {
+    console.error('Failed to decode token:', error)
+    return null
+  }
+}
 
 export function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
@@ -16,6 +34,21 @@ export function Navbar() {
       document.documentElement.dataset.theme === 'dark'
     )
   })
+  const [user, setUser] = useState(null)
+
+  // Extract user info from JWT token
+  useEffect(() => {
+    const token = getAPIToken()
+    if (token) {
+      const claims = decodeJWTPayload(token)
+      if (claims) {
+        setUser(claims)
+      }
+    } else {
+      // No token - redirect to login
+      window.location.href = '/login'
+    }
+  }, [])
 
   useEffect(() => {
     const theme = isDark ? 'dark' : 'light'
@@ -173,11 +206,11 @@ export function Navbar() {
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </label>
-        {user?.user ? (
+        {user ? (
           <div className="dropdown dropdown-end">
             <button tabIndex={0} className="btn btn-ghost gap-2">
               <i className="fa fa-user"></i>
-              <span className="font-mono">{user.preferred_username}</span>
+              <span className="font-mono">{user.preferred_username || user.sub}</span>
             </button>
 
             <ul className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
@@ -188,14 +221,7 @@ export function Navbar() {
               </li>
             </ul>
           </div>
-        ) : (
-          <button 
-            onClick={() => document.getElementById('login-modal').showModal()} 
-            className="btn btn-primary btn-sm"
-          >
-            Log In
-          </button>
-        )}
+        ) : null}
       </div>
       <LoginModal />
     </div>

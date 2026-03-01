@@ -19,7 +19,7 @@ from host_management.rbl_checker import RblChecker
 from host_management.utils import ip_address_is_valid
 
 # from ansible_wrapper import check_service_status
-from web.app import app, db, keycloak
+from web.app import app, db, keycloak, jwt_manager
 
 from .charts import Chart, ChartDataElement, chart_from_column_elements
 
@@ -57,7 +57,11 @@ def logout():
 
 @app.before_request
 def before_request():
-    if request.endpoint not in ["login", "auth", "static"] and "user_claims" not in session:
+    # Skip auth check for login, auth exchange, static files, and API routes (checked by JWT)
+    if request.path.startswith("/api/") or request.endpoint in ["login", "auth", "exchange_token", "static"]:
+        return
+    
+    if "user_claims" not in session:
         return redirect(url_for("login"))
 
 
@@ -142,6 +146,36 @@ def auth():
     except MismatchingStateError:
         session.clear()
         return redirect(url_for("login"))
+
+
+@app.route("/auth/exchange", methods=["POST"])
+def exchange_token():
+    """
+    Exchange Keycloak session claims for a custom API JWT token.
+    
+    Option B: Backend generates and controls custom JWT tokens.
+    Frontend calls this endpoint after Keycloak authentication to get API token.
+    
+    Returns:
+        JSON with custom JWT token for API calls
+    """
+    # Check if user is authenticated via Keycloak session
+    user_claims = session.get("user_claims")
+    if not user_claims:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    try:
+        # Generate custom JWT from Keycloak claims
+        api_token = jwt_manager.generate_token(user_claims)
+        
+        return jsonify({
+            "token": api_token,
+            "token_type": "Bearer",
+            "expires_in": 24 * 3600  # 24 hours in seconds
+        }), 200
+    except Exception as e:
+        logging.error(f"Token exchange failed: {e}")
+        return jsonify({"error": "Token generation failed"}), 500
 
 
 @app.route("/configuration")

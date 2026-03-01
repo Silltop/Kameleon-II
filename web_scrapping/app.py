@@ -29,7 +29,6 @@ ERROR_PENALTY = 0.5  # Subtract 30% if PHP errors are found
 MISSING_CONTENT_PENALTY = 0.5  # Subtract 20% if required elements are missing
 ENCODING_ISSUE_PENALTY = 0.1  # Subtract 20% if there is a detected encoding issue
 
-
 # Helper function to fetch page content asynchronously
 async def fetch_page(
     url: str, session: aiohttp.ClientSession
@@ -140,9 +139,3 @@ async def check_page(url: str) -> float:
 
         # Convert the score to a percentage (0-100)
         return confidence_score * 100
-
-
-# Example URL to check
-url = "https://kki-bci.pl/"
-confidence = asyncio.run(check_page(url))
-print(f"Confidence that the page {url} is working: {confidence:.2f}%")

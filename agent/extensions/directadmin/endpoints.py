@@ -8,6 +8,11 @@ from utils import run_command
 
 from extensions.directadmin.data_retrival import get_user_domain_php_version, get_user_domains, get_user_list, get_user_subdomains
 from extensions.directadmin.data_retrival import get_user_domains
+
+# Import DNS resolver
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../web_scrapping'))
+from dns_resolver import get_complete_dns_info
 import glob
 
 da = Blueprint("da", __name__)
@@ -144,7 +149,30 @@ def get_da_all_info():
 
             user_info["domains"] = get_user_domains(user)
 
-            user_info["subdomains"] = len(get_user_subdomains(user, user_info["domains"][0]) if user_info["domains"] else [])
+            # Get subdomain count per domain and DNS information
+            user_info["subdomains"] = {}
+            user_info["dns_info"] = {}
+            for domain in user_info["domains"]:
+                subdomains = get_user_subdomains(user, domain)
+                user_info["subdomains"][domain] = len(subdomains)
+                
+                # Get DNS information for the domain
+                try:
+                    dns_data = get_complete_dns_info(domain)
+                    user_info["dns_info"][domain] = {
+                        "a_records": [r["value"] for r in dns_data["a_records"]],
+                        "mx_records": [r["value"] for r in dns_data["mx_records"]],
+                        "ns_records": dns_data["nameservers"],
+                        "cname_records": [r["value"] for r in dns_data["cname_records"]]
+                    }
+                except Exception as e:
+                    logging.error(f"Error getting DNS info for domain {domain}: {str(e)}")
+                    user_info["dns_info"][domain] = {
+                        "a_records": ["Error"],
+                        "mx_records": ["Error"],
+                        "ns_records": ["Error"],
+                        "cname_records": ["Error"]
+                    }
 
             # Get user quota
             usage_path = f"/usr/local/directadmin/data/users/{user}/user.usage"

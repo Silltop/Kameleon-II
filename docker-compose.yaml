@@ -13,6 +13,7 @@ services:
       - ./main.py:/kameleon/main.py
       - ./extensions_handler.py:/kameleon/extensions_handler.py
       - ./ansible_wrapper:/kameleon/ansible_wrapper
+      - ./auth:/kameleon/auth
       - ./web:/kameleon/web
       - ./configuration:/kameleon/configuration
       - ./connectors:/kameleon/connectors
@@ -58,6 +59,7 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
+      - ./web_scrapping:/kameleon-agent/web_scrapping
 
   agent_machine_2:
     build:
@@ -71,6 +73,8 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
+      - ./web_scrapping:/kameleon-agent/web_scrapping
+
   agent_machine_da_1:
     build:
       context: .
@@ -83,6 +87,9 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
+      - ./web_scrapping:/kameleon-agent/web_scrapping
+
+
   agent_machine_da_2:
     build:
       context: .
@@ -95,6 +102,8 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
+      - ./web_scrapping:/kameleon-agent/web_scrapping
+
   agent_machine_da_3:
     build:
       context: .
@@ -107,6 +116,7 @@ services:
     volumes:
       - ./agent:/kameleon-agent/
       - ./core:/kameleon-agent/core
+      - ./web_scrapping:/kameleon-agent/web_scrapping
 
 networks:
   machine-net:

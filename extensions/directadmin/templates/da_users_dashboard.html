@@ -1,59 +1,205 @@
 {% extends "base.html" %}
 {% block title %}Directadmin Summary of all hosts{% endblock %}
 {% block content %}
-<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
-#todo fixme
-<div
-  class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100"
-  id="record-container">
-  {% for host, users in data.items() %}
-  <h3>{{host}}</h3>
+<div class="px-6 py-6">
+  <div class="flex gap-4 mb-6 items-end">
+    <div class="flex-1">
+      <label class="block text-sm font-semibold mb-2">View data from:</label>
+      <select id="snapshot-select"
+        class="select select-bordered w-full max-w-xs">
+        <option value="current">Current Data</option>
+      </select>
+    </div>
+    <button id="refresh-btn" class="btn btn-primary gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Refresh
+    </button>
+  </div>
 
-  <table class="table table-no-outer-padding">
-    <thead>
-      <tr>
-        <th>User</th>
-        <th>Email</th>
-        <th>Quota</th>
-        <th>Package</th>
-        <th>Domains</th>
-        <th>Subdomains</th>
-        <th>DNS A (google)</th>
-        <th>MX</th>
-        <th>NS</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for username, output in users.items() %}
-      <tr>
-        <th>{{username}}</th>
-        <td>
-          {{output.email}}
-        </td>
-        <td>
-          {{output.quota}}
-        </td>
-        <td>
-          {{output.package}}
-        </td>
-        <td>
-          {% for domain in output.domains %}
-          {{domain}}<br>
-          {% endfor %}
-        </td>
-        <td>
-          {{output.subdomains}}
-          </td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% endfor %}
+  <div
+    class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100"
+    id="record-container">
+    {% for host, users in data.items() %}
+    <section
+      id="host-{{ host|replace('.', '-')|replace(':', '-')|replace(' ', '-') }}"
+      data-scrollspy-id="host-{{ host|replace('.', '-')|replace(':', '-')|replace(' ', '-') }}"
+      class="border-b border-base-content/5">
+      <details class="collapse collapse-arrow" {% if loop.first %}open{% endif
+        %}>
+        <summary
+          class="collapse-title text-lg font-semibold flex items-center justify-between">
+          <span>{{ host }}</span>
+          <span class="badge badge-outline">{{ users|length }} users</span>
+        </summary>
+        <div class="collapse-content">
+          <table class="table table-no-outer-padding">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Quota</th>
+                <th>Package</th>
+                <th>Domains</th>
+                <th>Subdomains</th>
+                <th>DNS A (google)</th>
+                <th>MX</th>
+                <th>NS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for username, output in users.items() %}
+              <tr class="hover:bg-base-200">
+                <th>{{ username }}</th>
+                <td>{{ output.email }}</td>
+                <td>{{ output.quota }}</td>
+                <td>{{ output.package }}</td>
+                <td>
+                  {% for domain in output.domains %}
+                  {{ domain }}<br>
+                  {% endfor %}
+                </td>
+                <td>{{ output.subdomains }}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+    {% endfor %}
+  </div>
 </div>
 
+<script>
+  let currentData = {{ data | tojson }};
+
+  const snapshotSelect = document.getElementById('snapshot-select');
+  const refreshBtn = document.getElementById('refresh-btn');
+  const recordContainer = document.getElementById('record-container');
+
+  async function loadSnapshots() {
+    try {
+      const response = await fetch('/da/api/user-snapshots');
+      const snapshots = await response.json();
+
+      snapshots.forEach((snapshot) => {
+        const option = document.createElement('option');
+        option.value = snapshot.id;
+        option.textContent = snapshot.display;
+        snapshotSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error loading snapshots:', error);
+    }
+  }
+
+  snapshotSelect.addEventListener('change', async (e) => {
+    if (e.target.value === 'current') {
+      renderData(currentData);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/da/api/user-snapshot/${e.target.value}`);
+      const result = await response.json();
+      if (result.data) {
+        renderData(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading snapshot:', error);
+      window.showToast?.error?.('Failed to load snapshot');
+    }
+  });
+
+  refreshBtn.addEventListener('click', async () => {
+    refreshBtn.disabled = true;
+    try {
+      const response = await fetch('/da/api/refresh-snapshot');
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        window.showToast?.success?.('Data refreshed successfully');
+        location.reload();
+      }
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      window.showToast?.error?.('Failed to refresh data');
+    } finally {
+      refreshBtn.disabled = false;
+    }
+  });
+
+  function renderData(data) {
+    let html = '';
+    for (const [host, users] of Object.entries(data)) {
+      const hostId = host.replace(/\./g, '-').replace(/:/g, '-').replace(/ /g, '-');
+      const userCount = Object.keys(users).length;
+
+      html += `
+        <section
+          id="host-${hostId}"
+          data-scrollspy-id="host-${hostId}"
+          class="border-b border-base-content/5">
+          <details class="collapse collapse-arrow" open>
+            <summary class="collapse-title text-lg font-semibold flex items-center justify-between">
+              <span>${host}</span>
+              <span class="badge badge-outline">${userCount} users</span>
+            </summary>
+            <div class="collapse-content">
+              <table class="table table-no-outer-padding">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Quota</th>
+                    <th>Package</th>
+                    <th>Domains</th>
+                    <th>Subdomains</th>
+                    <th>DNS A (google)</th>
+                    <th>MX</th>
+                    <th>NS</th>
+                  </tr>
+                </thead>
+                <tbody>
+      `;
+
+      for (const [username, userInfo] of Object.entries(users)) {
+        const domains = Array.isArray(userInfo.domains) ? userInfo.domains.join('<br>') : userInfo.domains;
+
+        html += `
+                  <tr class="hover:bg-base-200">
+                    <th>${username}</th>
+                    <td>${userInfo.email || 'N/A'}</td>
+                    <td>${userInfo.quota || 'N/A'}</td>
+                    <td>${userInfo.package || 'N/A'}</td>
+                    <td>${domains || 'N/A'}</td>
+                    <td>${userInfo.subdomains || 'N/A'}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+        `;
+      }
+
+      html += `
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+      `;
+    }
+
+    recordContainer.innerHTML = html;
+  }
+
+  loadSnapshots();
+</script>
 {% endblock %}

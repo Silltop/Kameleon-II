@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'preact/hooks'
+import { apiGet } from '../utils/api-client'
 
 export function HostSummary({ hostDetailsList = [] }) {
   const [uptimeData, setUptimeData] = useState({})
@@ -6,11 +7,8 @@ export function HostSummary({ hostDetailsList = [] }) {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch('/uptime')
-        if (response.ok) {
-          const data = await response.json()
-          setUptimeData(data)
-        }
+        const result = await apiGet('/api/uptime')
+        setUptimeData(result.data)
       } catch (error) {
         console.error('Failed to fetch uptime:', error)
       }

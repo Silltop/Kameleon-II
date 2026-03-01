@@ -1,13 +1,12 @@
 import { HostSummary } from './HostSummary'
 import { ChartWidget } from './ChartWidget'
+import { apiPost } from '../utils/api-client'
 
 export function Dashboard({ hostDetailsList = [], charts = [] }) {
   const handleRefresh = async () => {
     try {
-      const response = await fetch('/sync-all', { method: 'GET' })
-      if (response.ok) {
-        window.showToast.success('Data refreshed successfully')
-      }
+      const result = await apiPost('/api/sync-all', {})
+      window.showToast.success('Data refreshed successfully')
     } catch (error) {
       console.error('Refresh failed:', error)
       window.showToast.error('Refresh failed')

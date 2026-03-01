@@ -1,32 +1,208 @@
 {% extends "base.html" %}
-{% block title %}User domains summery{% endblock %}
+{% block title %}User domains summary{% endblock %}
 {% block content %}
+<div class="px-6 py-6">
+  <div class="flex gap-4 mb-6 items-end">
+    <div class="flex-1">
+      <label class="block text-sm font-semibold mb-2">View data from:</label>
+      <select id="snapshot-select"
+        class="select select-bordered w-full max-w-xs">
+        <option value="current">Current Data</option>
+      </select>
+    </div>
+    <button id="refresh-btn" class="btn btn-primary gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Refresh
+    </button>
+  </div>
 
-{% for host, data in table_data.items() %}
-<div class="table-responsive table-margin">
-  <table class="table table-outer-bordered" label="test">
-    <caption class="table-caption">{{ host }}</caption>
-    <thead>
-      <tr>
-        {% for header in table_headers %}
-        <th>{{ header }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for user, user_domains in data.items() %}
-      <tr>
-        <td>{{ user }}</td>
-        <td>
-          {% for domain in user_domains %}
-          {{domain}} <br>
+  <div id="record-container">
+    {% for host, data in table_data.items() %}
+    <div class="table-responsive table-margin mb-6">
+      <table class="table table-outer-bordered">
+        <caption class="table-caption">{{ host }}</caption>
+        <thead>
+          <tr>
+            {% for header in table_headers %}
+            <th>{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for user, user_info in data.items() %}
+          {% set domains = user_info.domains or [] %}
+          {% set subdomains = user_info.subdomains or {} %}
+          {% set dns_info = user_info.dns_info or {} %}
+          {% for domain in domains %}
+          <tr>
+            <td>{% if loop.first %}{{ user }}{% endif %}</td>
+            <td><strong>{{ domain }}</strong></td>
+            <td>{{ user_info.php_version if user_info.php_version is defined
+              else 'N/A' }}</td>
+            <td>{{ subdomains.get(domain, 0) }}</td>
+            <td>
+              {% if dns_info.get(domain) %}
+              {{ dns_info[domain].a_records|join('<br>')|safe }}
+              {% else %}
+              N/A
+              {% endif %}
+            </td>
+            <td>
+              {% if dns_info.get(domain) %}
+              {{ dns_info[domain].mx_records|join('<br>')|safe }}
+              {% else %}
+              N/A
+              {% endif %}
+            </td>
+            <td>
+              {% if dns_info.get(domain) %}
+              {{ dns_info[domain].ns_records|join('<br>')|safe }}
+              {% else %}
+              N/A
+              {% endif %}
+            </td>
+          </tr>
           {% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </div>
 </div>
-{% endfor %}
 
+<script>
+  let currentData = {{ table_data | tojson }};
+  let currentHeaders = {{ table_headers | tojson }};
+
+  const snapshotSelect = document.getElementById('snapshot-select');
+  const refreshBtn = document.getElementById('refresh-btn');
+  const recordContainer = document.getElementById('record-container');
+
+  async function loadSnapshots() {
+    try {
+      // Clear existing snapshot options (keep only 'Current Data')
+      Array.from(snapshotSelect.options).forEach((option, index) => {
+        if (index > 0) option.remove();
+      });
+
+      const response = await fetch('/da/api/user-websites-snapshots');
+      const snapshots = await response.json();
+
+      snapshots.forEach((snapshot) => {
+        const option = document.createElement('option');
+        option.value = snapshot.id;
+        option.textContent = snapshot.display;
+        snapshotSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error loading snapshots:', error);
+    }
+  }
+
+  snapshotSelect.addEventListener('change', async (e) => {
+    if (e.target.value === 'current') {
+      renderData(currentData);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/da/api/user-websites-snapshot/${e.target.value}`);
+      const result = await response.json();
+      if (result.data) {
+        renderData(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading snapshot:', error);
+      window.showToast?.error?.('Failed to load snapshot');
+    }
+  });
+
+  refreshBtn.addEventListener('click', async () => {
+    refreshBtn.disabled = true;
+    try {
+      const response = await fetch('/da/api/refresh-user-websites-snapshot');
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        window.showToast?.success?.('Data refreshed successfully');
+        location.reload();
+      }
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      window.showToast?.error?.('Failed to refresh data');
+    } finally {
+      refreshBtn.disabled = false;
+    }
+  });
+
+  function renderData(data) {
+    let html = '';
+
+    for (const [host, userData] of Object.entries(data)) {
+      html += `
+        <div class="table-responsive table-margin mb-6">
+          <table class="table table-outer-bordered">
+            <caption class="table-caption">${host}</caption>
+            <thead>
+              <tr>
+      `;
+      currentHeaders.forEach((header) => {
+        html += `<th>${header}</th>`;
+      });
+      html += `
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      for (const [user, userInfo] of Object.entries(userData)) {
+        const domains = userInfo.domains || [];
+        const subdomains = userInfo.subdomains || {};
+        const dnsInfo = userInfo.dns_info || {};
+
+        if (domains.length === 0) {
+          html += `<tr><td colspan="${currentHeaders.length}">${user} - No domains</td></tr>`;
+          continue;
+        }
+
+        domains.forEach((domain, index) => {
+          const dns = dnsInfo[domain] || {
+            a_records: ['N/A'],
+            mx_records: ['N/A'],
+            ns_records: ['N/A']
+          };
+          const subdomainCount = subdomains[domain] || 0;
+
+          html += `
+            <tr>
+              <td>${index === 0 ? user : ''}</td>
+              <td><strong>${domain}</strong></td>
+              <td>${userInfo.php_version || 'N/A'}</td>
+              <td>${subdomainCount}</td>
+              <td>${Array.isArray(dns.a_records) ? dns.a_records.join('<br>') : dns.a_records}</td>
+              <td>${Array.isArray(dns.mx_records) ? dns.mx_records.join('<br>') : dns.mx_records}</td>
+              <td>${Array.isArray(dns.ns_records) ? dns.ns_records.join('<br>') : dns.ns_records}</td>
+            </tr>
+          `;
+        });
+      }
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    recordContainer.innerHTML = html;
+  }
+
+  loadSnapshots();
+  renderData(currentData);
+</script>
 {% endblock %}
